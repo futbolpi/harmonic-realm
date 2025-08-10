@@ -1,11 +1,11 @@
 // Node types configuration
 model NodeType {
-    id                 Int     @id @default(autoincrement())
+    id                 Int            @id @default(autoincrement())
     name               String
     baseYieldPerMinute Float
     maxMiners          Int
     lockInMinutes      Int
-    rarity             Int
+    NodeTypeRarity     NodeTypeRarity
     iconUrl            String?
 
     // Relations
@@ -67,4 +67,13 @@ model UserNodeMastery {
 
     @@unique([userId, nodeTypeId])
     @@map("user_node_mastery")
+}
+
+// Enums
+enum NodeTypeRarity {
+    Common
+    Uncommon
+    Rare
+    Epic
+    Legendary
 }

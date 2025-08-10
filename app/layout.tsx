@@ -7,9 +7,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/shared/auth/auth-context";
 import TanstackQueryProvider from "@/components/shared/tanstack-query/provider";
 import { PiProvider } from "@/components/shared/pi/pi-provider";
-
-import "./globals.css";
 import { env } from "@/env";
+
+import "maplibre-gl/dist/maplibre-gl.css";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

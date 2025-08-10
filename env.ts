@@ -26,6 +26,9 @@ export const env = createEnv({
     NEXT_PUBLIC_PINET_URL: z.url(),
     NEXT_PUBLIC_WALLET_ADDRESS: z.string().min(1),
     NEXT_PUBLIC_PI_EXPLORER_LINK: z.url(),
+
+    // MAPTILER
+    NEXT_PUBLIC_MAPTILER_TOKEN: z.string().min(1),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -42,5 +45,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PINET_URL: process.env.NEXT_PUBLIC_PINET_URL,
     PI_SECRET_KEY: process.env.PI_SECRET_KEY,
     NEXT_PUBLIC_WALLET_ADDRESS: process.env.NEXT_PUBLIC_WALLET_ADDRESS,
+
+    // MAPTILER
+    NEXT_PUBLIC_MAPTILER_TOKEN: process.env.NEXT_PUBLIC_MAPTILER_TOKEN,
   },
 });

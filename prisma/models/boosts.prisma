@@ -1,0 +1,24 @@
+// Firmware boosts (temporary boosts)
+model FirmwareBoost {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    userId     String
+    boostType  BoostType
+    multiplier Float
+    duration   Int // in minutes
+    expiresAt  DateTime
+    isActive   Boolean   @default(true)
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("firmware_boosts")
+}
+
+enum BoostType {
+    YIELD_MULTIPLIER
+    TIME_REDUCTION
+    ACCURACY_BOOST
+    EXPERIENCE_BOOST
+}

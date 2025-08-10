@@ -1,0 +1,70 @@
+// Node types configuration
+model NodeType {
+    id                 Int     @id @default(autoincrement())
+    name               String
+    baseYieldPerMinute Float
+    maxMiners          Int
+    lockInMinutes      Int
+    rarity             Int
+    iconUrl            String?
+
+    // Relations
+    nodes   Node[]
+    mastery UserNodeMastery[]
+
+    @@map("node_types")
+}
+
+// Individual node instances
+model Node {
+    id            String  @id @default(cuid())
+    typeId        Int
+    latitude      Float
+    longitude     Float
+    openForMining Boolean @default(true)
+    sponsor       String?
+
+    // Relations
+    type     NodeType        @relation(fields: [typeId], references: [id])
+    sessions MiningSession[]
+
+    @@map("nodes")
+}
+
+// User node upgrades
+model UserNodeUpgrade {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    userId       String
+    nodeTypeId   Int
+    level        Int    @default(1)
+    bonusPercent Float  @default(0.0)
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, nodeTypeId])
+    @@map("user_node_upgrades")
+}
+
+// User node mastery
+model UserNodeMastery {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId         String
+    nodeTypeId     Int
+    masteryLevel   Int    @default(0)
+    totalSessions  Int    @default(0)
+    totalTimeSpent Int    @default(0) // in minutes
+    bonusPercent   Float  @default(0.0)
+
+    // Relations
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    nodeType NodeType @relation(fields: [nodeTypeId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, nodeTypeId])
+    @@map("user_node_mastery")
+}

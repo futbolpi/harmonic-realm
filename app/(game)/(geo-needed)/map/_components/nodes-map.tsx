@@ -1,26 +1,32 @@
 "use client";
 
-import React, { RefObject, useEffect, useMemo } from "react";
-import Map, { MapRef, Marker } from "react-map-gl/maplibre";
+import { Dispatch, RefObject, SetStateAction, useEffect, useMemo } from "react";
+import Map, { MapRef, Marker, Popup } from "react-map-gl/maplibre";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
+import { Node } from "@/lib/schema/node";
 import { cn } from "@/lib/utils";
 import { getNodeIcon, MAPLIBRE_STYLE, NODE_COLORS } from "../utils";
+import { NodePopup } from "./node-popup";
 
 type NodesMapProps = {
   filteredAndSortedNodes: Node[];
   selectedNode: Node | null;
   mapRef: RefObject<MapRef | null>;
   handleNodeClick: (node: Node) => void;
+  setShowPopup: Dispatch<SetStateAction<boolean>>;
+  showPopup: boolean;
+  handleNodeDetails: (nodeId: string) => void;
 };
 
 const NodesMap = ({
   filteredAndSortedNodes,
-  selectedNode,
-  mapRef,
   handleNodeClick,
+  mapRef,
+  selectedNode,
+  setShowPopup,
+  showPopup,
+  handleNodeDetails,
 }: NodesMapProps) => {
   const {
     searchParams: { latitude, longitude },
@@ -58,64 +64,74 @@ const NodesMap = ({
   }, [initialViewState.latitude, initialViewState.longitude, mapRef]);
 
   return (
-    <div className="lg:col-span-2 relative">
-      <Card className="game-card h-full">
-        <CardContent className="p-0 h-full">
-          <div
-            className="w-full h-full rounded-lg overflow-hidden"
-            style={{ minHeight: "500px" }}
+    <div className="absolute inset-0">
+      <Map
+        initialViewState={initialViewState}
+        style={{ width: "100%", height: "100%" }}
+        mapStyle={MAPLIBRE_STYLE}
+        attributionControl={false}
+        ref={mapRef}
+        onClick={() => setShowPopup(false)}
+      >
+        {/* Node Markers */}
+        {filteredAndSortedNodes.map((node) => (
+          <Marker
+            key={node.id}
+            longitude={node.longitude}
+            latitude={node.latitude}
+            onClick={(e) => {
+              e.originalEvent.stopPropagation();
+              handleNodeClick(node);
+            }}
           >
-            <Map
-              initialViewState={initialViewState}
-              style={{ width: "100%", height: "100%" }}
-              mapStyle={MAPLIBRE_STYLE}
-              attributionControl={false}
-              ref={mapRef}
-            >
-              {/* Node Markers */}
-              {filteredAndSortedNodes.map((node) => (
-                <Marker
-                  key={node.id}
-                  longitude={node.longitude}
-                  latitude={node.latitude}
-                  onClick={(e) => {
-                    e.originalEvent.stopPropagation();
-                    handleNodeClick(node);
-                  }}
-                >
-                  <div
-                    className={cn(
-                      "w-10 h-10 rounded-full border-2 border-white/80 cursor-pointer flex items-center justify-center text-lg transition-all duration-300 hover:scale-110",
-                      node.openForMining ? "animate-pulse" : "opacity-75",
-                      selectedNode?.id === node.id &&
-                        "ring-4 ring-primary/50 scale-110"
-                    )}
-                    style={{
-                      backgroundColor:
-                        NODE_COLORS[node.type.rarity] || NODE_COLORS["Common"],
-                      boxShadow: `0 0 20px ${
-                        NODE_COLORS[node.type.rarity] || NODE_COLORS["Common"]
-                      }60`,
-                    }}
-                  >
-                    {getNodeIcon(node)}
-                  </div>
-                </Marker>
-              ))}
-
-              {/* User Location Marker */}
-              {userLocation && (
-                <Marker
-                  longitude={userLocation.longitude}
-                  latitude={userLocation.latitude}
-                >
-                  <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white animate-pulse" />
-                </Marker>
+            <div
+              className={cn(
+                "w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white/80 cursor-pointer flex items-center justify-center text-sm md:text-lg transition-all duration-300 hover:scale-110",
+                node.openForMining ? "animate-pulse" : "opacity-75",
+                selectedNode?.id === node.id &&
+                  "ring-4 ring-primary/50 scale-110"
               )}
-            </Map>
-          </div>
-        </CardContent>
-      </Card>
+              style={{
+                backgroundColor:
+                  NODE_COLORS[node.type.rarity] || NODE_COLORS["Common"],
+                boxShadow: `0 0 20px ${
+                  NODE_COLORS[node.type.rarity] || NODE_COLORS["Common"]
+                }60`,
+              }}
+            >
+              {getNodeIcon(node)}
+            </div>
+          </Marker>
+        ))}
+
+        {/* User Location Marker */}
+        {userLocation && (
+          <Marker
+            longitude={userLocation.longitude}
+            latitude={userLocation.latitude}
+          >
+            <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white animate-pulse" />
+          </Marker>
+        )}
+
+        {/* Node Popup */}
+        {selectedNode && showPopup && (
+          <Popup
+            longitude={selectedNode.longitude}
+            latitude={selectedNode.latitude}
+            onClose={() => setShowPopup(false)}
+            closeButton={false}
+            className="node-popup"
+          >
+            <NodePopup
+              node={selectedNode}
+              userLocation={userLocation}
+              onViewDetails={() => handleNodeDetails(selectedNode.id)}
+              onClose={() => setShowPopup(false)}
+            />
+          </Popup>
+        )}
+      </Map>
     </div>
   );
 };

@@ -1,8 +1,6 @@
 import { Suspense } from "react";
-
 import { getNodes } from "@/lib/api-helpers/server/nodes";
-import { MapSkeleton } from "./_components/map-skeleton";
-import { InteractiveMapGL } from "./_components/interactive-map-gl";
+import { MobileMapView } from "./_components/mobile-map-view";
 
 export const metadata = {
   title: "Mining Map - Pi Mining Nodes",
@@ -14,24 +12,12 @@ export default async function MapPage() {
   const nodes = await getNodes();
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold">Mining Map</h1>
-          <p className="text-muted-foreground">
-            Discover and explore mining nodes in your area. Click on any node to
-            view details and start mining.
-          </p>
-        </div>
-
-        {/* Map Container */}
-        <div className="h-[calc(100vh-200px)] min-h-[600px]">
-          <Suspense fallback={<MapSkeleton />}>
-            <InteractiveMapGL nodes={nodes} />
-          </Suspense>
-        </div>
-      </div>
+    <div className="h-screen w-full relative">
+      <Suspense
+        fallback={<div className="h-full w-full bg-muted animate-pulse" />}
+      >
+        <MobileMapView nodes={nodes} />
+      </Suspense>
     </div>
   );
 }

@@ -31,14 +31,13 @@ const LocationButton = () => {
       onClick={handleGetLocation}
       disabled={buttonDisabled}
       size="sm"
-      className="game-button cursor-pointer"
+      className="game-button cursor-pointer shadow-lg"
     >
       {buttonDisabled ? (
-        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Navigation className="h-4 w-4 mr-2" />
+        <Navigation className="h-4 w-4" />
       )}
-      {buttonDisabled ? "Locating..." : "My Location"}
     </Button>
   );
 };

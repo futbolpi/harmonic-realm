@@ -1,92 +1,141 @@
 "use client";
 
-import { useMemo } from "react";
+import { Zap, Clock, Users, MapPin, ExternalLink } from "lucide-react";
 
-import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Node } from "@/lib/schema/node";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { calculateDistance, getRarityInfo } from "../utils";
 
-type NodesListProps = {
-  filteredAndSortedNodes: Node[];
+interface NodesListProps {
+  nodes: Node[];
   selectedNode: Node | null;
-  handleNodeClick: (node: Node) => void;
-};
+  userLocation: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  onNodeClick: (node: Node) => void;
+  onNodeDetails: (nodeId: string) => void;
+}
 
-const NodesList = ({
-  filteredAndSortedNodes,
+export function NodesList({
+  nodes,
   selectedNode,
-  handleNodeClick,
-}: NodesListProps) => {
-  const {
-    searchParams: { latitude, longitude },
-  } = useMapSearchParams();
-
-  const userLocation = useMemo(() => {
-    return latitude !== null && longitude !== null
-      ? { latitude, longitude }
-      : null;
-  }, [latitude, longitude]);
+  userLocation,
+  onNodeClick,
+  onNodeDetails,
+}: NodesListProps) {
+  if (nodes.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">
+          No nodes found with current filters
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <Card className="game-card">
-      <CardHeader>
-        <CardTitle className="text-lg">
-          Filtered Nodes ({filteredAndSortedNodes.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="space-y-3 max-h-60 overflow-y-auto">
-          {filteredAndSortedNodes.slice(0, 10).map((node) => (
-            <div
-              key={node.id}
-              onClick={() => handleNodeClick(node)}
-              className={cn(
-                "p-3 rounded-lg border cursor-pointer transition-colors",
-                "hover:bg-muted/20 hover:border-primary/50",
-                selectedNode?.id === node.id && "bg-primary/10 border-primary"
-              )}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">{node.type.name}</span>
-                <Badge
-                  className={cn(
-                    "text-white text-xs",
-                    getRarityInfo(node.type.rarity).color
-                  )}
-                >
-                  {node.type.rarity}
-                </Badge>
+    <div className="space-y-3">
+      {nodes.slice(0, 20).map((node) => (
+        <Card
+          key={node.id}
+          className={cn(
+            "cursor-pointer transition-all duration-200 hover:shadow-md",
+            selectedNode?.id === node.id && "ring-2 ring-primary",
+            !node.openForMining && "opacity-75"
+          )}
+          onClick={() => onNodeClick(node)}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-medium text-sm">{node.type.name}</h3>
+                  <Badge
+                    className={cn(
+                      "text-white text-xs",
+                      getRarityInfo(node.type.rarity).color
+                    )}
+                  >
+                    {node.type.rarity}
+                  </Badge>
+                </div>
+                {node.sponsor && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs text-neon-green border-neon-green/50 mb-2"
+                  >
+                    {node.sponsor}
+                  </Badge>
+                )}
               </div>
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNodeDetails(node.id);
+                }}
+                className="h-8 w-8 p-0"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="flex items-center gap-1">
+                <Zap className="h-3 w-3 text-neon-green" />
                 <span>{node.type.baseYieldPerMinute}π/min</span>
-                <span>{node.type.lockInMinutes}m lock-in</span>
-                {userLocation && (
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3 text-neon-orange" />
+                <span>{node.type.lockInMinutes}m</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3 text-neon-purple" />
+                <span>{node.type.maxMiners}</span>
+              </div>
+            </div>
+
+            {userLocation && (
+              <div className="mt-2 pt-2 border-t border-border/50">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Distance</span>
                   <span>
                     {calculateDistance(
                       userLocation.latitude,
                       userLocation.longitude,
                       node.latitude,
                       node.longitude
-                    ).toFixed(1)}
+                    ).toFixed(1)}{" "}
                     km
                   </span>
-                )}
+                </div>
               </div>
-            </div>
-          ))}
-          {filteredAndSortedNodes.length > 10 && (
-            <p className="text-xs text-muted-foreground text-center py-2">
-              And {filteredAndSortedNodes.length - 10} more nodes...
-            </p>
-          )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  );
-};
+            )}
 
-export default NodesList;
+            {!node.openForMining && (
+              <div className="mt-2 pt-2 border-t border-border/50">
+                <Badge variant="secondary" className="text-xs">
+                  Currently Inactive
+                </Badge>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+
+      {nodes.length > 20 && (
+        <div className="text-center py-4">
+          <p className="text-xs text-muted-foreground">
+            Showing first 20 of {nodes.length} nodes
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

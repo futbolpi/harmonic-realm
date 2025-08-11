@@ -1,6 +1,8 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
+
+import { Separator } from "@/components/ui/separator";
 import useCurrentLocation from "../../_components/location-provider";
 
 const LocationError = () => {
@@ -13,10 +15,13 @@ const LocationError = () => {
   }
 
   return (
-    <div className="mt-3 flex items-center gap-2 text-destructive text-sm">
-      <AlertCircle className="h-4 w-4" />
-      {locationError.message}
-    </div>
+    <>
+      <Separator />
+      <div className="flex items-center gap-2 text-destructive text-sm">
+        <AlertCircle className="h-4 w-4" />
+        <span>{locationError.message}</span>
+      </div>
+    </>
   );
 };
 

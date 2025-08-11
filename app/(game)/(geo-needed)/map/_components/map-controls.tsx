@@ -1,31 +1,29 @@
 "use client";
 
-import { Filter, MapPin, SortAsc } from "lucide-react";
+import { Filter, SortAsc } from "lucide-react";
 import { useMemo } from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { $Enums } from "@/lib/generated/prisma";
-import { useMapSearchParams } from "@/hooks/use-map-search-params";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Node } from "@/lib/schema/node";
-import LocationButton from "./location-button";
-import { SortBy, sortBy as sortByValues } from "../search-params";
+import { useMapSearchParams } from "@/hooks/use-map-search-params";
+import { $Enums } from "@/lib/generated/prisma";
 import { getRarityInfo } from "../utils";
+import { SortBy, sortBy as sortByValues } from "../search-params";
 import LocationError from "./location-error";
 
-type MapControlsProps = {
+interface MapControlsProps {
   nodes: Node[];
-  noOfFilteredNodes: number;
-};
+}
 
-const MapControls = ({ noOfFilteredNodes, nodes }: MapControlsProps) => {
+export function MapControls({ nodes }: MapControlsProps) {
   const { searchParams, updateSearchParams, isLoading } = useMapSearchParams();
   const { sortBy, rarityFilter, nodeTypeFilter } = searchParams;
 
@@ -43,56 +41,49 @@ const MapControls = ({ noOfFilteredNodes, nodes }: MapControlsProps) => {
   );
 
   return (
-    <Card className="game-card">
-      <CardContent className="p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" />
-            <span className="font-medium">Mining Map</span>
-            <Badge variant="outline" className="text-primary border-primary/50">
-              {noOfFilteredNodes} of {nodes.length} Nodes
-            </Badge>
-          </div>
+    <div className="space-y-6">
+      {/* Sort Section */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <SortAsc className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Sort By</span>
+        </div>
+        <Select
+          value={sortBy}
+          onValueChange={(value: SortBy) =>
+            updateSearchParams({ sortBy: value })
+          }
+          disabled={isLoading}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {sortByValues.map((value) => (
+              <SelectItem
+                key={`sort-by-${value}`}
+                value={value}
+                className="capitalize"
+              >
+                {value}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Sort */}
-            <Select
-              value={sortBy}
-              onValueChange={(value: SortBy) =>
-                updateSearchParams({ sortBy: value })
-              }
-              disabled={isLoading}
-            >
-              <SelectTrigger className="w-32">
-                <SortAsc className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {sortByValues.map((value) => (
-                  <SelectItem
-                    key={`sort-by-${value}`}
-                    value={value}
-                    className="capitalize"
-                  >
-                    {value}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <Separator />
 
-            {/* Location Button */}
-            <LocationButton />
-          </div>
+      {/* Filters Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Filters</span>
         </div>
 
-        {/* Filters */}
-        <div className="mt-4 flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Filters:</span>
-          </div>
-
-          {/* Rarity Filter */}
+        {/* Rarity Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Rarity</Label>
           <Select
             value={rarityFilter ?? undefined}
             onValueChange={(value: $Enums.NodeTypeRarity | "all") =>
@@ -102,12 +93,11 @@ const MapControls = ({ noOfFilteredNodes, nodes }: MapControlsProps) => {
             }
             disabled={isLoading}
           >
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Rarity" />
+            <SelectTrigger>
+              <SelectValue placeholder="All Rarities" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Rarities</SelectItem>{" "}
-              {/* Updated value prop */}
+              <SelectItem value="all">All Rarities</SelectItem>
               {rarities.map((rarity) => (
                 <SelectItem key={rarity} value={rarity}>
                   {rarity}
@@ -115,8 +105,11 @@ const MapControls = ({ noOfFilteredNodes, nodes }: MapControlsProps) => {
               ))}
             </SelectContent>
           </Select>
+        </div>
 
-          {/* Node Type Filter */}
+        {/* Node Type Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Node Type</Label>
           <Select
             value={nodeTypeFilter ?? undefined}
             onValueChange={(value: string) =>
@@ -126,12 +119,11 @@ const MapControls = ({ noOfFilteredNodes, nodes }: MapControlsProps) => {
             }
             disabled={isLoading}
           >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Node Type" />
+            <SelectTrigger>
+              <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>{" "}
-              {/* Updated value prop */}
+              <SelectItem value="all">All Types</SelectItem>
               {nodeTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
@@ -139,14 +131,10 @@ const MapControls = ({ noOfFilteredNodes, nodes }: MapControlsProps) => {
               ))}
             </SelectContent>
           </Select>
-
-          {/* Open Only Filter */}
         </div>
+      </div>
 
-        <LocationError />
-      </CardContent>
-    </Card>
+      <LocationError />
+    </div>
   );
-};
-
-export default MapControls;
+}

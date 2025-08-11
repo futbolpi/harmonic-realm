@@ -1,77 +1,53 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MapLoading() {
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="space-y-6">
-        {/* Page Header Skeleton */}
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-96" />
-        </div>
+    <div className="h-screen w-full relative bg-muted animate-pulse">
+      {/* Mobile-first loading for full-screen map */}
 
-        {/* Map Container Skeleton */}
-        <div className="h-[calc(100vh-200px)] min-h-[600px] flex flex-col space-y-4">
-          {/* Controls Skeleton */}
-          <Card className="game-card">
-            <CardContent className="p-4">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-5 w-5" />
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-10 w-32" />
-                  <Skeleton className="h-10 w-32" />
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-4">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-10 w-32" />
-                <Skeleton className="h-10 w-40" />
-                <Skeleton className="h-6 w-20" />
-              </div>
-            </CardContent>
-          </Card>
+      {/* Top Controls Skeleton */}
+      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
+        <Skeleton className="h-9 w-9 rounded-md" /> {/* Location button */}
+        <Skeleton className="h-6 w-20 rounded-full" /> {/* Node count badge */}
+      </div>
 
-          <div className="flex-1 grid lg:grid-cols-3 gap-4">
-            {/* Map Skeleton */}
-            <div className="lg:col-span-2">
-              <Card className="game-card h-full">
-                <CardContent className="p-0 h-full">
-                  <Skeleton
-                    className="w-full h-full rounded-lg"
-                    style={{ minHeight: "500px" }}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar Skeleton */}
-            <div className="space-y-4">
-              <Card className="game-card">
-                <CardContent className="p-8 text-center">
-                  <Skeleton className="h-12 w-12 mx-auto mb-4" />
-                  <Skeleton className="h-5 w-24 mx-auto mb-2" />
-                  <Skeleton className="h-4 w-32 mx-auto" />
-                </CardContent>
-              </Card>
-
-              <Card className="game-card">
-                <CardContent className="p-4">
-                  <Skeleton className="h-5 w-32 mb-4" />
-                  <div className="space-y-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Skeleton key={i} className="h-16 w-full" />
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+      {/* Map Loading Area - takes most of screen */}
+      <div className="absolute inset-0 bg-muted/50">
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Skeleton className="h-16 w-16 rounded-full mx-auto" />
+            <Skeleton className="h-4 w-32 mx-auto" />
+            <Skeleton className="h-3 w-24 mx-auto" />
           </div>
         </div>
+      </div>
+
+      {/* Bottom Controls Skeleton - Mobile */}
+      <div className="absolute bottom-4 left-4 right-4 z-10 flex gap-2 md:hidden">
+        <Skeleton className="flex-1 h-12 rounded-md" /> {/* Filters button */}
+        <Skeleton className="flex-1 h-12 rounded-md" />{" "}
+        {/* Nodes list button */}
+      </div>
+
+      {/* Desktop Controls Skeleton */}
+      <div className="hidden md:flex absolute bottom-4 right-4 z-10 gap-2">
+        <Skeleton className="h-10 w-24 rounded-md" /> {/* Controls button */}
+        <Skeleton className="h-10 w-32 rounded-md" /> {/* Nodes button */}
+      </div>
+
+      {/* Floating node markers simulation */}
+      <div className="absolute inset-0 pointer-events-none">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton
+            key={i}
+            className="absolute w-8 h-8 md:w-10 md:h-10 rounded-full"
+            style={{
+              top: `${20 + Math.random() * 60}%`,
+              left: `${10 + Math.random() * 80}%`,
+              animationDelay: `${i * 0.2}s`,
+            }}
+          />
+        ))}
       </div>
     </div>
   );

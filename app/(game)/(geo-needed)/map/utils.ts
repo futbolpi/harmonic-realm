@@ -3,15 +3,15 @@
 import { env } from "@/env";
 import { $Enums } from "@/lib/generated/prisma";
 import { Node } from "@/lib/schema/node";
+import { calculateDistance } from "@/lib/utils";
 
-// MapLibre configuration - using free MapTiler style
-export const MAPLIBRE_STYLE = `https://api.maptiler.com/maps/streets/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`;
-
-// Alternative free styles
+// Alternative styles
 export const MAP_STYLES = {
-  default: "https://demotiles.maplibre.org/style.json",
-  dark: "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json",
-  satellite: "https://tiles.stadiamaps.com/styles/alidade_satellite.json",
+  default: `https://api.maptiler.com/maps/streets/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
+  streets2: `https://api.maptiler.com/maps/streets-v2/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
+  outdoor: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
+  outdoorDark: `https://api.maptiler.com/maps/outdoor-v2-dark/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
+  dark: `https://api.maptiler.com/maps/streets-dark/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
 } as const;
 
 // Node marker colors based on rarity
@@ -22,26 +22,6 @@ export const NODE_COLORS: Record<$Enums.NodeTypeRarity, string> = {
   Epic: "#f59e0b", // orange - epic
   Legendary: "#ef4444", // red - legendary
 } as const;
-
-// Calculate distance between two points (in km)
-export function calculateDistance(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 6371; // Earth's radius in km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
 
 // Get node icon based on type
 export function getNodeIcon(node: Node): string {

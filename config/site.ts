@@ -30,3 +30,8 @@ export const siteConfig: SiteConfig = {
 };
 
 export const SiteId = `${siteConfig.name}-${siteConfig.network}`;
+
+// Mining constants
+export const MINING_RANGE_METERS = 100; // Distance in meters user must be within to mine
+export const LOCATION_UPDATE_INTERVAL = 5000; // Update location every 5 seconds
+export const SESSION_REFETCH_INTERVAL = 10000; // Refetch session every 10 seconds when active

@@ -7,20 +7,19 @@ import { fetchUserProfile } from "@/lib/api-helpers/client/users";
 import { UserStats } from "@/lib/schema/user";
 
 export function useProfile() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated, accessToken } = useAuth();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["profile", user?.piId],
+    queryKey: ["profile", accessToken],
     queryFn: async () => {
-      if (!isAuthenticated || !user) {
+      if (!isAuthenticated || !accessToken) {
         throw new Error("User not authenticated");
       }
-      // In a real app, you'd get the actual access token from your auth system
-      const accessToken = `Bearer mock-token-${user.piId}`;
+
       return fetchUserProfile(accessToken);
     },
-    enabled: isAuthenticated && !!user,
+    enabled: isAuthenticated && !!accessToken,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000, // 10 minutes
     retry: (failureCount, error) => {
@@ -36,11 +35,11 @@ export function useProfile() {
   });
 
   const refreshProfile = () => {
-    queryClient.invalidateQueries({ queryKey: ["profile", user?.piId] });
+    queryClient.invalidateQueries({ queryKey: ["profile", accessToken] });
   };
 
   const updateProfileCache = (updater: (old: UserStats) => UserStats) => {
-    queryClient.setQueryData(["profile", user?.piId], updater);
+    queryClient.setQueryData(["profile", accessToken], updater);
   };
 
   return {

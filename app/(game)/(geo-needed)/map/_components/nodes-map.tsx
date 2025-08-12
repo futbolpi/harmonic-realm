@@ -2,11 +2,12 @@
 
 import { Dispatch, RefObject, SetStateAction, useEffect, useMemo } from "react";
 import Map, { MapRef, Marker, Popup } from "react-map-gl/maplibre";
+import { useTheme } from "next-themes";
 
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { Node } from "@/lib/schema/node";
 import { cn } from "@/lib/utils";
-import { getNodeIcon, MAPLIBRE_STYLE, NODE_COLORS } from "../utils";
+import { getNodeIcon, MAP_STYLES, NODE_COLORS } from "../utils";
 import { NodePopup } from "./node-popup";
 
 type NodesMapProps = {
@@ -31,6 +32,7 @@ const NodesMap = ({
   const {
     searchParams: { latitude, longitude },
   } = useMapSearchParams();
+  const { resolvedTheme } = useTheme();
 
   const userLocation = useMemo(() => {
     return latitude !== null && longitude !== null
@@ -68,7 +70,11 @@ const NodesMap = ({
       <Map
         initialViewState={initialViewState}
         style={{ width: "100%", height: "100%" }}
-        mapStyle={MAPLIBRE_STYLE}
+        mapStyle={
+          resolvedTheme === "light"
+            ? MAP_STYLES.outdoor
+            : MAP_STYLES.outdoorDark
+        }
         attributionControl={false}
         ref={mapRef}
         onClick={() => setShowPopup(false)}
@@ -121,7 +127,6 @@ const NodesMap = ({
             latitude={selectedNode.latitude}
             onClose={() => setShowPopup(false)}
             closeButton={false}
-            className="node-popup"
           >
             <NodePopup
               node={selectedNode}

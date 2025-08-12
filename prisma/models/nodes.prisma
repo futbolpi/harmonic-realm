@@ -5,7 +5,7 @@ model NodeType {
     baseYieldPerMinute Float
     maxMiners          Int
     lockInMinutes      Int
-    NodeTypeRarity     NodeTypeRarity
+    rarity             NodeTypeRarity
     iconUrl            String?
 
     // Relations

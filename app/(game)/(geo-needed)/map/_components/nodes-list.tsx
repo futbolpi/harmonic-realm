@@ -5,9 +5,9 @@ import { Zap, Clock, Users, MapPin, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { calculateDistance, cn } from "@/lib/utils";
 import { Node } from "@/lib/schema/node";
-import { calculateDistance, getRarityInfo } from "../utils";
+import { getRarityInfo } from "../utils";
 
 interface NodesListProps {
   nodes: Node[];

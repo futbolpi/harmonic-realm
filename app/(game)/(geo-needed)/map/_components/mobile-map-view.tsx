@@ -8,13 +8,13 @@ import { AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
 import NodesMap from "./nodes-map";
 import { MapControlModal } from "./map-control-modal";
 import { NodesListModal } from "./nodes-list-modal";
 import useCurrentLocation from "../../_components/location-provider";
-import { Alert, AlertTitle } from "@/components/ui/alert";
 
 interface MobileMapViewProps {
   nodes: Node[];
@@ -84,7 +84,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
 
   const handleNodeDetails = useCallback(
     (nodeId: string) => {
-      router.push(`/node/${nodeId}`);
+      router.push(`/nodes/${nodeId}`);
     },
     [router]
   );

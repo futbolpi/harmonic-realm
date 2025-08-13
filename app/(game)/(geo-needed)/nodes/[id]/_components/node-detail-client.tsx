@@ -5,7 +5,6 @@ import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Node } from "@/lib/schema/node";
-import { useLocation } from "@/hooks/use-location";
 import { useMiningSession } from "@/hooks/queries/use-mining-session";
 import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
@@ -19,25 +18,23 @@ interface NodeDetailClientProps {
 export function NodeDetailClient({ node }: NodeDetailClientProps) {
   const router = useRouter();
 
-  const userLocation = useLocation();
   // Fetch mining session data with range validation
   const {
     data: sessionData,
     isInRange,
     distance,
   } = useMiningSession({
-    nodeId: node.id,
-    nodeLocation: {
-      latitude: node.latitude,
-      longitude: node.longitude,
-    },
+    id: node.id,
+    latitude: node.latitude,
+    longitude: node.longitude,
+    openForMining: node.openForMining,
+    maxMiners: node.type.maxMiners,
+    completedMiners: node.sessions.length,
   });
 
   const showActiveDrawer =
-    isInRange && sessionData?.session?.status === "ACTIVE";
-  const showStartDrawer =
-    isInRange && sessionData?.canMine && !sessionData?.session;
-  const showOutOfRangeInfo = !isInRange && !!userLocation;
+    sessionData?.canMine && sessionData?.session?.status === "ACTIVE";
+  const showStartDrawer = sessionData?.canMine && !sessionData?.session;
 
   return (
     <div className="relative h-screen bg-background">
@@ -81,16 +78,16 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       {showStartDrawer && <StartMiningDrawer node={node} />}
 
       {/* Completed session drawer */}
-      <CompletedSessionDrawer />
+      <CompletedSessionDrawer node={node} />
 
-      {/* Out of range indicator */}
-      {showOutOfRangeInfo && (
+      {/* show sessions */}
+
+      {/* can't mine info */}
+      {!sessionData?.canMine && !!sessionData?.reason && (
         <div className="absolute bottom-20 left-4 right-4 z-10">
           <div className="bg-amber-500/90 text-white p-3 rounded-lg shadow-lg text-center">
-            <p className="text-sm font-medium">Move closer to start mining</p>
-            <p className="text-xs opacity-90">
-              You need to be within 100m of the node
-            </p>
+            <p className="text-sm font-medium">Closed Node</p>
+            <p className="text-xs opacity-90">{sessionData.reason}</p>
           </div>
         </div>
       )}

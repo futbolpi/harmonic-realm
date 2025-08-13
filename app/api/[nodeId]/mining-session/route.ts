@@ -1,15 +1,17 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 
-import {
-  getUserProfile,
-  verifyTokenAndGetUser,
-} from "@/lib/api-helpers/server/users";
-import { type UserProfile } from "@/lib/schema/user";
+import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
+import { getMiningSession } from "@/lib/api-helpers/server/mining-sessions";
 import { ApiResponse } from "@/lib/schema/api";
+import { MiningSession } from "@/lib/schema/mining-session";
 
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ nodeId: string }> }
+) {
   try {
+    const { nodeId } = await params;
     // Extract access token from Authorization header
     const headersList = await headers();
     const authHeader = headersList.get("Authorization");
@@ -23,25 +25,15 @@ export async function GET() {
 
     const accessToken = authHeader.substring(7); // Remove 'Bearer ' prefix
     const user = await verifyTokenAndGetUser(accessToken);
+    const data = await getMiningSession({ nodeId, userId: user.id });
 
-    const userProfile = await getUserProfile(user.id);
-
-    const response: ApiResponse<UserProfile> = {
-      success: true,
-      data: userProfile,
-    };
+    const response: ApiResponse<MiningSession> = { success: true, data };
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Profile API error:", error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      );
-    }
+    console.error("Mining session API error:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

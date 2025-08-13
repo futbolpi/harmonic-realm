@@ -22,15 +22,19 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
   const mapRef = useRef<MapRef>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  const { data: sessionData } = useMiningSession({
-    nodeId: node.id,
-    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+  const { isInRange, rangeMeters } = useMiningSession({
+    id: node.id,
+    latitude: node.latitude,
+    longitude: node.longitude,
+    openForMining: node.openForMining,
+    maxMiners: node.type.maxMiners,
+    completedMiners: node.sessions.length,
   });
 
   const userLocation = useLocation();
 
   // Create circle for mining radius
-  const miningRadius = sessionData?.requiredDistance || 100;
+  const miningRadius = rangeMeters;
   const radiusCircle = circle(
     [node.longitude, node.latitude],
     miningRadius / 1000,
@@ -81,7 +85,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
             id="mining-radius-fill"
             type="fill"
             paint={{
-              "fill-color": sessionData?.isWithinRange ? "#22c55e" : "#ef4444",
+              "fill-color": isInRange ? "#22c55e" : "#ef4444",
               "fill-opacity": 0.1,
             }}
           />
@@ -89,7 +93,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
             id="mining-radius-line"
             type="line"
             paint={{
-              "line-color": sessionData?.isWithinRange ? "#22c55e" : "#ef4444",
+              "line-color": isInRange ? "#22c55e" : "#ef4444",
               "line-width": 2,
               "line-opacity": 0.8,
             }}
@@ -144,10 +148,10 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
       {/* Status indicator */}
       <div className="absolute top-4 left-4">
         <Badge
-          variant={sessionData?.isWithinRange ? "default" : "destructive"}
+          variant={isInRange ? "default" : "destructive"}
           className="shadow-lg"
         >
-          {sessionData?.isWithinRange ? "In Range" : "Out of Range"}
+          {isInRange ? "In Range" : "Out of Range"}
         </Badge>
       </div>
     </div>

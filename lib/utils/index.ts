@@ -55,6 +55,6 @@ export function isWithinMiningRange(
   nodeLat: number,
   nodeLon: number
 ): boolean {
-  const distance = calculateDistance(userLat, userLon, nodeLat, nodeLon);
+  const distance = calculateDistance(userLat, userLon, nodeLat, nodeLon) * 1000; // Convert to meters;
   return distance <= MINING_RANGE_METERS;
 }

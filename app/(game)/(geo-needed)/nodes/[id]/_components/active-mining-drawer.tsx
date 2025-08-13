@@ -27,9 +27,14 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
   const [isPending, startTransition] = useTransition();
 
   const { data: sessionData, refreshSession } = useMiningSession({
-    nodeId: node.id,
-    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+    id: node.id,
+    latitude: node.latitude,
+    longitude: node.longitude,
+    openForMining: node.openForMining,
+    maxMiners: node.type.maxMiners,
+    completedMiners: node.sessions.length,
   });
+
   const { accessToken } = useAuth();
 
   // Calculate time remaining based on lockInMinutes
@@ -45,7 +50,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
 
       if (remaining === 0) {
         startTransition(async () => {
-          if (!accessToken || !sessionData?.session) {
+          if (!accessToken || !sessionData?.session?.id) {
             toast.error("Unauthorized");
             return;
           }
@@ -74,7 +79,6 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
     refreshSession,
     sessionData?.session?.id,
     accessToken,
-    sessionData?.session,
   ]);
 
   const formatTime = (ms: number) => {
@@ -132,7 +136,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             <div className="bg-card rounded-lg p-3 text-center">
               <Coins className="h-4 w-4 text-yellow-500 mx-auto mb-1" />
               <div className="text-lg font-bold">
-                {sessionData?.session?.sharesEarned.toFixed(2)}
+                {sessionData?.session?.minerSharesEarned.toFixed(2)}
               </div>
               <div className="text-xs text-muted-foreground">Shares Earned</div>
             </div>

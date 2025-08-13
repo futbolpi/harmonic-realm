@@ -10,34 +10,37 @@ import { MINING_RANGE_METERS, SESSION_REFETCH_INTERVAL } from "@/config/site";
 import { useLocation } from "../use-location";
 
 type UseMininingSessionParams = {
-  nodeId: string;
-  nodeLocation: {
-    latitude: number;
-    longitude: number;
-  };
+  id: string;
+  latitude: number;
+  longitude: number;
+  openForMining: boolean;
+  maxMiners: number;
+  completedMiners: number;
 };
 
-export function useMiningSession({
-  nodeId,
-  nodeLocation,
-}: UseMininingSessionParams) {
-  // this should only fetch if user is within node range,
-  // so hook should also take node location, calculate distance,
-  // ensure user is within range for query to be enabled.
-  // also browse on ways to invalidate query when user is out of range
+export function useMiningSession(node: UseMininingSessionParams) {
   const queryClient = useQueryClient();
   const wasInRangeRef = useRef<boolean>(false);
 
   const { isAuthenticated, accessToken } = useAuth();
   const userLocation = useLocation();
 
+  const {
+    completedMiners,
+    id: nodeId,
+    latitude: nodeLat,
+    longitude: nodeLon,
+    maxMiners,
+    openForMining,
+  } = node;
+
   // Calculate if user is within range
   const isInRange = userLocation
     ? isWithinMiningRange(
         userLocation.latitude,
         userLocation.longitude,
-        nodeLocation.latitude,
-        nodeLocation.longitude
+        nodeLat,
+        nodeLon
       )
     : false;
 
@@ -46,10 +49,15 @@ export function useMiningSession({
     ? calculateDistance(
         userLocation.latitude,
         userLocation.longitude,
-        nodeLocation.latitude,
-        nodeLocation.longitude
+        nodeLat,
+        nodeLon
       )
     : null;
+
+  // calculate max miners reached
+  const maxMinersReached = maxMiners >= completedMiners;
+
+  const canMine = isInRange && openForMining && !maxMinersReached;
 
   // Invalidate query when user goes out of range
   useEffect(() => {
@@ -73,9 +81,32 @@ export function useMiningSession({
         throw new Error("User not found");
       }
 
-      const { latitude, longitude } = userLocation;
+      let reason: null | string = "";
 
-      return fetchMiningSession({ accessToken, latitude, longitude, nodeId });
+      // in range?
+      if (!isInRange) {
+        reason = "You are not within mining zone";
+      }
+
+      // is node available
+      if (!openForMining) {
+        reason = "Node is not currently active";
+      }
+
+      // is node max miners reached
+      if (!maxMinersReached) {
+        reason = "Node is at maximum capacity";
+      }
+
+      // has session ? // complete session : // start session
+
+      const miningSession = await fetchMiningSession({
+        accessToken,
+        nodeId,
+        canMine,
+      });
+
+      return { session: miningSession, canMine, reason };
     },
     enabled: !!nodeId && !!userLocation && isAuthenticated && isInRange,
     refetchInterval: (data) => {

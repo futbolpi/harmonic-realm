@@ -9,9 +9,18 @@ import { getRarityInfo } from "../../../map/utils";
 type NodeInfoContentProps = { node: Node };
 
 export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
-  const { data: sessionData } = useMiningSession({
-    nodeId: node.id,
-    nodeLocation: { latitude: node.latitude, longitude: node.latitude },
+  const {
+    data: sessionData,
+    distance,
+    rangeMeters,
+    isInRange,
+  } = useMiningSession({
+    id: node.id,
+    latitude: node.latitude,
+    longitude: node.longitude,
+    openForMining: node.openForMining,
+    maxMiners: node.type.maxMiners,
+    completedMiners: node.sessions.length,
   });
 
   return (
@@ -70,29 +79,27 @@ export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
           <div className="flex items-center justify-between text-sm">
             <span>Distance:</span>
             <span className="font-medium">
-              {sessionData.userDistance
-                ? `${Math.round(sessionData.userDistance)}m`
-                : "Unknown"}
+              {distance ? `${Math.round(distance)}m` : "Unknown"}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span>Required:</span>
-            <span className="font-medium">{sessionData.requiredDistance}m</span>
+            <span className="font-medium">{rangeMeters}m</span>
           </div>
           <div className="flex items-center gap-2">
             <div
               className={cn(
                 "w-2 h-2 rounded-full",
-                sessionData.isWithinRange ? "bg-green-500" : "bg-red-500"
+                isInRange ? "bg-green-500" : "bg-red-500"
               )}
             />
             <span
               className={cn(
                 "text-xs font-medium",
-                sessionData.isWithinRange ? "text-green-600" : "text-red-600"
+                isInRange ? "text-green-600" : "text-red-600"
               )}
             >
-              {sessionData.isWithinRange ? "In Range" : "Too Far"}
+              {isInRange ? "In Range" : "Too Far"}
             </span>
           </div>
         </div>

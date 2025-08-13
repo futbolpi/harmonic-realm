@@ -1,26 +1,22 @@
 import { z } from "zod";
 
+import { $Enums } from "../generated/prisma";
+
 // Mining session schemas
-export const MiningSessionSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  nodeId: z.string(),
-  startTime: z.string().transform((val) => new Date(val)),
-  endTime: z
-    .string()
-    .transform((val) => new Date(val))
-    .optional(),
-  lockInMinutes: z.number(), // renamed from duration for consistency
-  baseYieldPerMinute: z.number(), // renamed from baseYield for clarity
-  bonusMultiplier: z.number().default(1),
-  sharesEarned: z.number(), // renamed from totalEarned for clarity
-  estimatedYield: z.number(), // added for total estimated yield
-  status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]),
-  userLatitude: z.number(),
-  userLongitude: z.number(),
-  createdAt: z.string().transform((val) => new Date(val)),
-  updatedAt: z.string().transform((val) => new Date(val)),
-});
+export const MiningSessionSchema = z
+  .object({
+    id: z.string(),
+    status: z.enum($Enums.SessionStatus),
+    createdAt: z.string().transform((val) => new Date(val)),
+    updatedAt: z.string().transform((val) => new Date(val)),
+    minerSharesEarned: z.number(),
+    startTime: z.string().transform((val) => new Date(val)),
+    endTime: z
+      .string()
+      .transform((val) => new Date(val))
+      .nullable(),
+  })
+  .nullable();
 
 export const StartMiningSchema = z.object({
   nodeId: z.string(),
@@ -35,7 +31,7 @@ export const CompleteMiningSchema = z.object({
 });
 
 export const MiningSessionResponseSchema = z.object({
-  session: MiningSessionSchema.nullable(),
+  session: MiningSessionSchema,
   canMine: z.boolean(),
   reason: z.string().optional(),
   userDistance: z.number().optional(), // renamed from distanceToNode for clarity

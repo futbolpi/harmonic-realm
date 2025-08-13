@@ -1,28 +1,24 @@
 import {
-  type MiningSessionResponse,
-  MiningSessionResponseSchema,
+  MiningSession,
+  MiningSessionSchema,
 } from "@/lib/schema/mining-session";
 
 type FetchMiningSessionParams = {
   accessToken: string;
   nodeId: string;
-  latitude: number;
-  longitude: number;
+  canMine: boolean;
 };
 
 // Helper function to get user session with access token
 export async function fetchMiningSession(
   params: FetchMiningSessionParams
-): Promise<MiningSessionResponse> {
-  const { accessToken, latitude, longitude, nodeId } = params;
+): Promise<MiningSession> {
+  const { accessToken, nodeId, canMine } = params;
+  if (!canMine) {
+    return null;
+  }
 
-  const searchParams = new URLSearchParams({
-    nodeId,
-    latitude: latitude.toString(),
-    longitude: longitude.toString(),
-  });
-
-  const response = await fetch(`/api/mining-session?${searchParams}`, {
+  const response = await fetch(`/api/${nodeId}/mining-session`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
@@ -35,6 +31,10 @@ export async function fetchMiningSession(
 
   const data = await response.json();
 
+  if (!data.success) {
+    throw new Error(data.error || "Failed to fetch mining session");
+  }
+
   // Validate and parse the response data
-  return MiningSessionResponseSchema.parse(data);
+  return MiningSessionSchema.parse(data.data);
 }

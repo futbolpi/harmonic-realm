@@ -20,6 +20,7 @@ model MiningSession {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
     node Node @relation(fields: [nodeId], references: [id])
 
+    @@unique([userId, nodeId])
     @@map("mining_sessions")
 }
 

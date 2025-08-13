@@ -9,40 +9,42 @@ import {
   StartMiningSchema,
 } from "@/lib/schema/mining-session";
 import { calculateDistance } from "@/lib/utils";
+import prisma from "@/lib/prisma";
+import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
+import { MINING_RANGE_METERS } from "@/config/site";
 
 export async function startMiningAction(
-  data: StartMiningRequest
+  params: StartMiningRequest
 ): Promise<ApiResponse<MiningSession>> {
   try {
     // Validate input
-    const validatedData = StartMiningSchema.parse(data);
+    const { success, data } = StartMiningSchema.safeParse(params);
 
-    // Mock node data - in real app, fetch from database
-    const mockNodes = [
-      {
-        id: "node_1",
-        latitude: 40.7829,
-        longitude: -73.9654,
-        openForMining: true,
-        maxMiners: 10,
-        currentMiners: 3,
-        baseYieldPerMinute: 2.5,
-        lockInMinutes: 15,
-      },
-      {
-        id: "node_2",
-        latitude: 40.758,
-        longitude: -73.9855,
-        openForMining: true,
-        maxMiners: 15,
-        currentMiners: 8,
-        baseYieldPerMinute: 1.8,
-        lockInMinutes: 10,
-      },
-      // Add other nodes...
-    ];
+    if (!success) {
+      return { success: false, error: "Invalid Request" };
+    }
 
-    const node = mockNodes.find((n) => n.id === validatedData.nodeId);
+    const { accessToken, nodeId, userLatitude, userLongitude } = data;
+
+    const user = await verifyTokenAndGetUser(accessToken);
+
+    const node = await prisma.node.findUnique({
+      where: { id: nodeId },
+      select: {
+        openForMining: true,
+        latitude: true,
+        longitude: true,
+        _count: {
+          select: {
+            sessions: {
+              where: { endTime: { not: null }, status: "COMPLETED" },
+            },
+          },
+        },
+        type: { select: { maxMiners: true } },
+      },
+    });
+
     if (!node) {
       return {
         success: false,
@@ -58,7 +60,7 @@ export async function startMiningAction(
       };
     }
 
-    if (node.currentMiners >= node.maxMiners) {
+    if (node._count.sessions >= node.type.maxMiners) {
       return {
         success: false,
         error: "Node is at maximum capacity",
@@ -68,13 +70,13 @@ export async function startMiningAction(
     // Check distance
     const distance =
       calculateDistance(
-        validatedData.userLatitude,
-        validatedData.userLongitude,
+        userLatitude,
+        userLongitude,
         node.latitude,
         node.longitude
       ) * 1000; // Convert to meters
 
-    if (distance > 100) {
+    if (distance > MINING_RANGE_METERS) {
       // 100m range
       return {
         success: false,
@@ -85,8 +87,10 @@ export async function startMiningAction(
     }
 
     // Check if user already has an active session
-    // In real app, query database for active sessions
-    const hasActiveSession = false; // Mock: no active session
+    const hasActiveSession = await prisma.miningSession.findUnique({
+      where: { userId_nodeId: { nodeId, userId: user.id } },
+      select: { id: true },
+    });
 
     if (hasActiveSession) {
       return {
@@ -96,29 +100,14 @@ export async function startMiningAction(
     }
 
     // Create mining session
-    const now = new Date();
-    const session: MiningSession = {
-      id: `session_${Date.now()}`,
-      userId: "mock_user_id", // In real app, get from auth
-      nodeId: validatedData.nodeId,
-      startTime: now,
-      lockInMinutes: node.lockInMinutes,
-      baseYieldPerMinute: node.baseYieldPerMinute,
-      bonusMultiplier: 1.0, // Base multiplier, could be higher based on user level
-      sharesEarned: node.baseYieldPerMinute * node.lockInMinutes,
-      status: "ACTIVE",
-      userLatitude: validatedData.userLatitude,
-      userLongitude: validatedData.userLongitude,
-      createdAt: now,
-      updatedAt: now,
-      estimatedYield: node.baseYieldPerMinute * node.lockInMinutes,
-    };
+    const session = await prisma.miningSession.create({
+      data: { userId: user.id, nodeId },
+    });
 
-    // In real app, save to database
     console.log("Created mining session:", session);
 
     // Revalidate the page to show the new session
-    revalidatePath(`/node/${validatedData.nodeId}`);
+    revalidatePath(`/nodes/${nodeId}`);
     revalidatePath("/dashboard");
 
     return {

@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle, Coins, Clock, Star } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,10 +11,27 @@ import {
   CredenzaTitle,
   CredenzaHeader,
 } from "@/components/credenza";
+import { Node } from "@/lib/schema/node";
+import { useMiningSession } from "@/hooks/queries/use-mining-session";
 
-export function CompletedSessionDrawer() {
+type CompletedSessionDrawerProps = { node: Node };
+
+export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
   // Mock completed session data if none provided
-  const session = 
+  const [isOpen, onOpenChange] = useState(false);
+
+  const { data: sessionData } = useMiningSession({
+    id: node.id,
+    latitude: node.latitude,
+    longitude: node.longitude,
+    openForMining: node.openForMining,
+    maxMiners: node.type.maxMiners,
+    completedMiners: node.sessions.length,
+  });
+
+  if (sessionData?.session?.status !== "COMPLETED") {
+    return null;
+  }
 
   return (
     <Credenza open={isOpen} onOpenChange={onOpenChange}>
@@ -43,7 +61,7 @@ export function CompletedSessionDrawer() {
           <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-4 text-center">
             <Coins className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-foreground">
-              +{mockSession.minerSharesEarned}
+              +{sessionData.session.minerSharesEarned}
             </div>
             <div className="text-sm text-muted-foreground">
               Miner Shares Earned
@@ -54,7 +72,7 @@ export function CompletedSessionDrawer() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-card rounded-lg p-3 text-center">
               <Clock className="h-4 w-4 text-blue-500 mx-auto mb-1" />
-              <div className="text-lg font-bold">{mockSession.duration}</div>
+              <div className="text-lg font-bold">{node.type.lockInMinutes}</div>
               <div className="text-xs text-muted-foreground">Minutes</div>
             </div>
             <div className="bg-card rounded-lg p-3 text-center">
@@ -71,7 +89,7 @@ export function CompletedSessionDrawer() {
               className="bg-green-500/10 text-green-700 border-green-500/20"
             >
               <CheckCircle className="w-3 h-3 mr-1" />
-              {mockSession.status}
+              {sessionData.session.status}
             </Badge>
           </div>
 

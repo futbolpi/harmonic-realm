@@ -29,9 +29,13 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
 
   const userLocation = useLocation();
   const { accessToken } = useAuth();
-  const { refreshSession, data: sessionData } = useMiningSession({
-    nodeId: node.id,
-    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+  const { data: sessionData, refreshSession } = useMiningSession({
+    id: node.id,
+    latitude: node.latitude,
+    longitude: node.longitude,
+    openForMining: node.openForMining,
+    maxMiners: node.type.maxMiners,
+    completedMiners: node.sessions.length,
   });
 
   const onSubmit = () => {

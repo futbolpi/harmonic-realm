@@ -2,6 +2,12 @@ import { z } from "zod";
 
 import { $Enums } from "../generated/prisma";
 
+export const NodeSessionSchema = z.object({
+  endTime: z.coerce.date().nullable(),
+  minerSharesEarned: z.number(),
+  user: z.object({ username: z.string() }),
+});
+
 // Node Schema
 export const NodeSchema = z.object({
   id: z.string(),
@@ -9,6 +15,7 @@ export const NodeSchema = z.object({
   longitude: z.number(),
   openForMining: z.boolean(),
   sponsor: z.string().nullable(),
+  sessions: z.array(NodeSessionSchema),
   type: z.object({
     id: z.number(),
     name: z.string(),

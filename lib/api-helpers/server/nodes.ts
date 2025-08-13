@@ -10,6 +10,14 @@ export async function getNodes(): Promise<Node[]> {
       longitude: true,
       openForMining: true,
       sponsor: true,
+      sessions: {
+        select: {
+          endTime: true,
+          minerSharesEarned: true,
+          user: { select: { username: true } },
+        },
+        where: { status: "COMPLETED", endTime: { not: null } },
+      },
       type: {
         select: {
           id: true,
@@ -36,6 +44,14 @@ export async function getNode(id: string): Promise<Node | null> {
       longitude: true,
       openForMining: true,
       sponsor: true,
+      sessions: {
+        select: {
+          endTime: true,
+          minerSharesEarned: true,
+          user: { select: { username: true } },
+        },
+        where: { status: "COMPLETED", endTime: { not: null } },
+      },
       type: {
         select: {
           id: true,

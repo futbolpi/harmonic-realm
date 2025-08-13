@@ -9,18 +9,12 @@ model MiningSession {
     nodeId    String
     startTime DateTime  @default(now())
     endTime   DateTime?
-    duration  Int? // in minutes
 
     // Rewards
     minerSharesEarned Float @default(0)
 
     // Session Status
     status SessionStatus @default(ACTIVE)
-
-    // GPS and Lock-in
-    gpsVerified       Boolean   @default(false)
-    lockInCompleted   Boolean   @default(false)
-    lockInCompletedAt DateTime?
 
     // Relations
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -33,8 +27,5 @@ model MiningSession {
 enum SessionStatus {
     ACTIVE
     COMPLETED
-    ABANDONED
-    EXPIRED
-    GPS_PENDING
-    LOCKED_IN
+    CANCELLED
 }

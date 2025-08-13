@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: NodeDetailsPageProps) {
 
   return {
     title: `${node.type.name} - Mining Node`,
-    description: `Mine Pi cryptocurrency at this ${node.type.name} node. Earn ${node.type.baseYieldPerMinute}π per minute with ${node.type.lockInMinutes} minute lock-in time.`,
+    description: `Mine shares at this ${node.type.name} node. Earn ${node.type.baseYieldPerMinute} shares per minute with ${node.type.lockInMinutes} minute lock-in time.`,
   };
 }
 

@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@/components/shared/auth/auth-context";
 import { fetchUserProfile } from "@/lib/api-helpers/client/users";
-import { UserStats } from "@/lib/schema/user";
 
 export function useProfile() {
   const { isAuthenticated, accessToken } = useAuth();
@@ -38,17 +37,8 @@ export function useProfile() {
     queryClient.invalidateQueries({ queryKey: ["profile", accessToken] });
   };
 
-  const updateProfileCache = (updater: (old: UserStats) => UserStats) => {
-    queryClient.setQueryData(["profile", accessToken], updater);
-  };
-
   return {
     ...query,
     refreshProfile,
-    updateProfileCache,
-    userStats: query.data,
-    isLoading: query.isLoading,
-    isError: query.isError,
-    error: query.error,
   };
 }

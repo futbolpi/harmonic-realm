@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       console.error("[VERIFY_TOKEN]", "Invalid Access Token");
       return Response.json(
         {
-          isValid: true,
+          isValid: false,
         },
         { status: 400 }
       );

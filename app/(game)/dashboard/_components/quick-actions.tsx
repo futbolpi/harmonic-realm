@@ -1,75 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import {
-  MapPin,
-  Zap,
-  Trophy,
-  TrendingUp,
-  Settings,
-  Star,
-  ArrowRight,
-} from "lucide-react";
+import { Zap, Star, ArrowRight } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getActions } from "./actions";
 
 interface QuickActionsProps {
   stats: {
+    userId: string;
     totalSessions: number;
-    activeSessions: number;
-    nodesDiscovered: number;
+    recentSessions: number;
+    xp: number;
     achievements: number;
-    weeklyEarnings: number;
+    earnings: number;
     rank?: number;
   };
 }
 
 export function QuickActions({ stats }: QuickActionsProps) {
-  const actions = [
-    {
-      title: "Explore Map",
-      description: "Discover nearby mining nodes and start earning Pi!",
-      icon: MapPin,
-      href: "/map",
-      color: "text-primary",
-      bgColor: "bg-primary/20",
-      borderColor: "border-primary/50",
-      badge: `${stats.nodesDiscovered} discovered`,
-    },
-    {
-      title: "View Leaderboard",
-      description: "See how you rank against other miners globally",
-      icon: Trophy,
-      href: "/leaderboard",
-      color: "text-neon-orange",
-      bgColor: "bg-neon-orange/20",
-      borderColor: "border-neon-orange/50",
-      badge: stats.rank ? `#${stats.rank}` : "Unranked",
-    },
-    {
-      title: "Mining Analytics",
-      description: "Track your progress and optimize your mining strategy",
-      icon: TrendingUp,
-      href: "/analytics",
-      color: "text-neon-green",
-      bgColor: "bg-neon-green/20",
-      borderColor: "border-neon-green/50",
-      badge: `${stats.totalSessions} sessions`,
-    },
-    {
-      title: "Profile & Settings",
-      description: "Manage your account, upgrades, and preferences",
-      icon: Settings,
-      href: "/profile",
-      color: "text-neon-purple",
-      bgColor: "bg-neon-purple/20",
-      borderColor: "border-neon-purple/50",
-      badge: "Customize",
-    },
-  ];
+  const {
+    achievements,
+    recentSessions,
+    xp,
+    totalSessions,
+    earnings,
+    rank,
+    userId,
+  } = stats;
 
+  const actions = getActions({ totalSessions, rank, userId });
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {actions.map((action, index) => (
@@ -114,8 +76,8 @@ export function QuickActions({ stats }: QuickActionsProps) {
         </Card>
       ))}
 
-      {/* Active Sessions Card */}
-      {stats.activeSessions > 0 && (
+      {/* Recent Sessions Card */}
+      {recentSessions > 0 && (
         <Card className="game-card md:col-span-2 border-neon-orange/50 bg-neon-orange/5">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -128,13 +90,13 @@ export function QuickActions({ stats }: QuickActionsProps) {
                     Active Mining Session
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    You have {stats.activeSessions} active mining session
-                    {stats.activeSessions > 1 ? "s" : ""}
+                    You have {recentSessions} active mining session
+                    {recentSessions > 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
               <Button asChild className="game-button">
-                <Link href="/sessions">
+                <Link href={`/${userId}/sessions`}>
                   <Zap className="mr-2 h-4 w-4" />
                   View Sessions
                 </Link>
@@ -149,32 +111,30 @@ export function QuickActions({ stats }: QuickActionsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star className="h-5 w-5 text-primary" />
-            This Week&apos;s Summary
+            Profile Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 rounded-lg bg-muted/20">
               <div className="text-lg font-bold text-neon-green">
-                +{stats.weeklyEarnings.toFixed(2)}π
+                +{earnings.toFixed(2)}π
               </div>
               <div className="text-xs text-muted-foreground">Earned</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/20">
-              <div className="text-lg font-bold text-primary">
-                {stats.totalSessions}
-              </div>
-              <div className="text-xs text-muted-foreground">Sessions</div>
+              <div className="text-lg font-bold text-primary">{xp}</div>
+              <div className="text-xs text-muted-foreground">XP</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/20">
               <div className="text-lg font-bold text-neon-purple">
-                {stats.nodesDiscovered}
+                {totalSessions}
               </div>
               <div className="text-xs text-muted-foreground">Nodes</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/20">
               <div className="text-lg font-bold text-neon-orange">
-                {stats.achievements}
+                {achievements}
               </div>
               <div className="text-xs text-muted-foreground">Achievements</div>
             </div>

@@ -1,9 +1,9 @@
-import { type UserStats, UserStatsSchema } from "@/lib/schema/user";
+import { type UserProfile, UserProfileSchema } from "@/lib/schema/user";
 
 // Helper function to get user profile with access token
 export async function fetchUserProfile(
   accessToken: string
-): Promise<UserStats> {
+): Promise<UserProfile> {
   const response = await fetch("/api/profile", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -22,5 +22,5 @@ export async function fetchUserProfile(
   }
 
   // Validate and parse the response data
-  return UserStatsSchema.parse(data.data);
+  return UserProfileSchema.parse(data.data);
 }

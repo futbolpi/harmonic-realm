@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+
 import { getNodes } from "@/lib/api-helpers/server/nodes";
 import { MobileMapView } from "./_components/mobile-map-view";
 

@@ -1,61 +1,43 @@
 import { z } from "zod";
 
+import { $Enums } from "../generated/prisma";
+
+// User Profile Achievement Schema
+const UserProfileAchievementSchema = z.object({
+  id: z.string(),
+  achievement: z.object({
+    name: z.string(),
+    description: z.string(),
+    icon: z.string().nullable(),
+  }),
+});
+
+// User Profile Session Schema
+const UserProfileSessionSchema = z.object({
+  id: z.string(),
+  minerSharesEarned: z.number(),
+  status: z.enum($Enums.SessionStatus),
+  node: z.object({
+    type: z.object({ name: z.string(), lockInMinutes: z.number() }),
+  }),
+});
+
 // User Profile Schema
 export const UserProfileSchema = z.object({
   id: z.string(),
-  piUid: z.string(),
-  piUsername: z.string(),
-  displayName: z.string().optional(),
-  level: z.number(),
-  experience: z.number(),
-  minerShares: z.number(),
+  username: z.string(),
+  sharePoints: z.number(),
   totalEarned: z.number(),
-  piBalance: z.number(),
-  isVerified: z.boolean(),
-  lastActive: z.string().transform((val) => new Date(val)),
-  createdAt: z.string().transform((val) => new Date(val)),
-});
-
-// User Stats Schema
-export const UserStatsSchema = z.object({
-  profile: UserProfileSchema,
-  stats: z.object({
-    totalSessions: z.number(),
-    activeSessions: z.number(),
-    nodesDiscovered: z.number(),
-    achievements: z.number(),
-    weeklyEarnings: z.number(),
-    rank: z.number().optional(),
-    nextLevelXP: z.number(),
-    currentXP: z.number(),
-  }),
-  recentSessions: z.array(
-    z.object({
-      id: z.string(),
-      nodeId: z.string(),
-      nodeName: z.string().optional(),
-      earned: z.number(),
-      duration: z.number(),
-      status: z.enum(["COMPLETED", "ACTIVE", "ABANDONED"]),
-      createdAt: z.string().transform((val) => new Date(val)),
-    })
-  ),
-  achievements: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string(),
-      icon: z.string().optional(),
-      category: z.string(),
-      unlocked: z.boolean(),
-      unlockedAt: z
-        .string()
-        .transform((val) => new Date(val))
-        .optional(),
-    })
-  ),
+  level: z.number(),
+  xp: z.number(),
+  _count: z.object({ sessions: z.number(), achievements: z.number() }),
+  achievements: z.array(UserProfileAchievementSchema),
+  sessions: z.array(UserProfileSessionSchema),
 });
 
 // Types
 export type UserProfile = z.infer<typeof UserProfileSchema>;
-export type UserStats = z.infer<typeof UserStatsSchema>;
+export type UserProfileAchievement = z.infer<
+  typeof UserProfileAchievementSchema
+>;
+export type UserProfileSession = z.infer<typeof UserProfileSessionSchema>;

@@ -3,12 +3,12 @@ model FirmwareBoost {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
 
-    userId     String
-    boostType  BoostType
-    multiplier Float
-    duration   Int // in minutes
-    expiresAt  DateTime
-    isActive   Boolean   @default(true)
+    userId       String
+    boostType    BoostType
+    multiplier   Float
+    noOfSessions Int // in minutes
+    expiresAt    DateTime
+    isActive     Boolean   @default(true)
 
     // Relations
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)

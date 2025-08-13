@@ -8,7 +8,7 @@ export const NodeSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   openForMining: z.boolean(),
-  sponsor: z.string().optional(),
+  sponsor: z.string().nullable(),
   type: z.object({
     id: z.number(),
     name: z.string(),
@@ -16,20 +16,8 @@ export const NodeSchema = z.object({
     maxMiners: z.number(),
     lockInMinutes: z.number(),
     rarity: z.enum($Enums.NodeTypeRarity),
-    iconUrl: z.string().optional(),
+    iconUrl: z.string().nullable(),
   }),
 });
 
-// Nodes Response Schema
-export const NodesResponseSchema = z.object({
-  nodes: z.array(NodeSchema),
-  userLocation: z
-    .object({
-      latitude: z.number(),
-      longitude: z.number(),
-    })
-    .optional(),
-});
-
 export type Node = z.infer<typeof NodeSchema>;
-export type NodesResponse = z.infer<typeof NodesResponseSchema>;

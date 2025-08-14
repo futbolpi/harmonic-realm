@@ -25,6 +25,11 @@ export const StartMiningSchema = z.object({
   userLongitude: z.number(),
 });
 
+export const CompleteMiningResponseSchema = z.object({
+  sharesEarned: z.number(),
+  xpGained: z.number(),
+});
+
 export const CompleteMiningSchema = z.object({
   sessionId: z.string(),
   accessToken: z.string(),
@@ -43,3 +48,6 @@ export type MiningSession = z.infer<typeof MiningSessionSchema>;
 export type StartMiningRequest = z.infer<typeof StartMiningSchema>;
 export type MiningSessionResponse = z.infer<typeof MiningSessionResponseSchema>;
 export type CompleteMiningRequest = z.infer<typeof CompleteMiningSchema>;
+export type CompleteMiningResponse = z.infer<
+  typeof CompleteMiningResponseSchema
+>;

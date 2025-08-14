@@ -2,6 +2,7 @@
 model NodeType {
     id                 Int            @id @default(autoincrement())
     name               String
+    description        String
     baseYieldPerMinute Float
     maxMiners          Int
     lockInMinutes      Int
@@ -36,10 +37,10 @@ model UserNodeUpgrade {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
 
-    userId       String
-    nodeTypeId   Int
-    level        Int    @default(1)
-    bonusPercent Float  @default(0.0)
+    userId     String
+    nodeTypeId Int
+    level      Int    @default(1)
+    effectPct  Float  @default(0.0)
 
     // Relations
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -56,7 +57,7 @@ model UserNodeMastery {
 
     userId         String
     nodeTypeId     Int
-    masteryLevel   Int    @default(0)
+    level          Int    @default(0)
     totalSessions  Int    @default(0)
     totalTimeSpent Int    @default(0) // in minutes
     bonusPercent   Float  @default(0.0)

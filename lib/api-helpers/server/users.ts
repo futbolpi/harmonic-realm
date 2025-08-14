@@ -1,6 +1,7 @@
 import { isValidAccessToken } from "@/lib/pi/platform-api-client";
 import prisma from "@/lib/prisma";
 import { UserProfile } from "@/lib/schema/user";
+import { calculateLevelFromXp } from "@/lib/utils/xp";
 
 export async function verifyTokenAndGetUser(accessToken: string) {
   if (!accessToken) {
@@ -66,4 +67,26 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
     },
   });
   return user;
+}
+
+export async function awardXp(userId: string, xpGained: number) {
+  // 1. Increment XP and fetch updated values
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: { xp: { increment: xpGained } },
+    select: { xp: true, level: true },
+  });
+
+  // 2. Compute new level based on updated XP
+  const newLevel = calculateLevelFromXp(user.xp);
+
+  // 3. If user has leveled up, persist the new level
+  if (newLevel > user.level) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { level: newLevel },
+    });
+  }
+
+  return { xp: user.xp, level: newLevel };
 }

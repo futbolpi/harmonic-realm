@@ -56,12 +56,18 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
           }
 
           try {
-            await completeMiningSession({
+            const response = await completeMiningSession({
               accessToken,
               sessionId: sessionData.session.id,
             });
-            toast.success("Mining session completed!");
-            refreshSession();
+            if (response.success) {
+              toast.success("Mining session completed!");
+              refreshSession();
+            } else {
+              toast.error(
+                response.error || "Failed to complete mining session"
+              );
+            }
           } catch (error) {
             console.log(error);
             toast.error("Failed to complete mining session");
@@ -142,9 +148,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             </div>
             <div className="bg-card rounded-lg p-3 text-center">
               <MapPin className="h-4 w-4 text-green-500 mx-auto mb-1" />
-              <div className="text-lg font-bold">
-                {node.type?.name || "Node"}
-              </div>
+              <div className="text-lg font-bold">{node.type.name}</div>
               <div className="text-xs text-muted-foreground">
                 Mining Location
               </div>

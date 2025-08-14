@@ -8,7 +8,7 @@ import {
   parseAsBoolean,
 } from "nuqs/server";
 
-import { $Enums } from "@/lib/generated/prisma";
+import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 
 export const sortBy = ["distance", "rarity", "yield", "name"] as const;
 export type SortBy = (typeof sortBy)[number];
@@ -17,8 +17,8 @@ export const mapSearchParamsParsers = {
   // Use human-readable variable names throughout your codebase
   latitude: parseAsFloat,
   longitude: parseAsFloat,
-  rarityFilter: parseAsStringEnum<$Enums.NodeTypeRarity>(
-    Object.values($Enums.NodeTypeRarity)
+  rarityFilter: parseAsStringEnum<NodeTypeRarity>(
+    Object.values(NodeTypeRarity)
   ),
   // Then pass it to the parser
   sortBy: parseAsStringLiteral(sortBy).withDefault("distance"),

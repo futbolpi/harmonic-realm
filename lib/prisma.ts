@@ -2,7 +2,7 @@
 // defined in the global scope. This is because the global object is only
 // defined in the global scope in Node.js and not in the browser.
 
-import { PrismaClient } from "@/lib/generated/prisma";
+import { PrismaClient } from "@/lib/generated/prisma/client";
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit.

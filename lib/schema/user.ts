@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { $Enums } from "../generated/prisma";
+import { SessionStatus } from "../generated/prisma/enums";
 
 // User Profile Achievement Schema
 const UserProfileAchievementSchema = z.object({
@@ -16,7 +16,7 @@ const UserProfileAchievementSchema = z.object({
 const UserProfileSessionSchema = z.object({
   id: z.string(),
   minerSharesEarned: z.number(),
-  status: z.enum($Enums.SessionStatus),
+  status: z.enum(SessionStatus),
   node: z.object({
     type: z.object({ name: z.string(), lockInMinutes: z.number() }),
   }),

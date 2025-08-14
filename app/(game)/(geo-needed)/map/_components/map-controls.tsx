@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
-import { $Enums } from "@/lib/generated/prisma";
+import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { getRarityInfo } from "../utils";
 import { SortBy, sortBy as sortByValues } from "../search-params";
 import LocationError from "./location-error";
@@ -86,7 +86,7 @@ export function MapControls({ nodes }: MapControlsProps) {
           <Label className="text-xs text-muted-foreground">Rarity</Label>
           <Select
             value={rarityFilter ?? undefined}
-            onValueChange={(value: $Enums.NodeTypeRarity | "all") =>
+            onValueChange={(value: NodeTypeRarity | "all") =>
               updateSearchParams({
                 rarityFilter: value === "all" ? null : value,
               })

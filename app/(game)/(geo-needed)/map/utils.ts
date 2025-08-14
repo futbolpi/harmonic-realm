@@ -1,7 +1,7 @@
 "use client";
 
 import { env } from "@/env";
-import { $Enums } from "@/lib/generated/prisma";
+import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { Node } from "@/lib/schema/node";
 import { calculateDistance } from "@/lib/utils";
 
@@ -15,7 +15,7 @@ export const MAP_STYLES = {
 } as const;
 
 // Node marker colors based on rarity
-export const NODE_COLORS: Record<$Enums.NodeTypeRarity, string> = {
+export const NODE_COLORS: Record<NodeTypeRarity, string> = {
   Common: "#10b981", // green - common
   Uncommon: "#3b82f6", // blue - uncommon
   Rare: "#8b5cf6", // purple - rare
@@ -37,7 +37,7 @@ export function getNodeIcon(node: Node): string {
 }
 
 // Get rarity info
-export function getRarityInfo(rarity: $Enums.NodeTypeRarity) {
+export function getRarityInfo(rarity: NodeTypeRarity) {
   const rarityMap = {
     Common: {
       rating: 1,
@@ -64,7 +64,7 @@ export function getRarityInfo(rarity: $Enums.NodeTypeRarity) {
 export function filterNodes(
   nodes: Node[],
   filters: {
-    rarity: $Enums.NodeTypeRarity | null;
+    rarity: NodeTypeRarity | null;
     nodeType: string | null;
     openOnly: boolean | null;
     sponsored: boolean | null;

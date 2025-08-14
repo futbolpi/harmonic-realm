@@ -1,4 +1,4 @@
-import { $Enums } from "@/lib/generated/prisma";
+import { PaymentType } from "@/lib/generated/prisma/enums";
 import { AuthResultSchema } from "@/lib/schema/auth";
 
 declare global {
@@ -11,7 +11,7 @@ declare global {
 export type PiUser = AuthResultSchema["user"];
 
 export type PiMetadata = {
-  type: $Enums.PaymentType;
+  type: PaymentType;
   modelId: string;
 };
 

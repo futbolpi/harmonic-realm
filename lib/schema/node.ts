@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { $Enums } from "../generated/prisma";
+import { NodeTypeRarity } from "../generated/prisma/enums";
 
 export const NodeSessionSchema = z.object({
   endTime: z.coerce.date().nullable(),
@@ -22,7 +22,7 @@ export const NodeSchema = z.object({
     baseYieldPerMinute: z.number(),
     maxMiners: z.number(),
     lockInMinutes: z.number(),
-    rarity: z.enum($Enums.NodeTypeRarity),
+    rarity: z.enum(NodeTypeRarity),
     iconUrl: z.string().nullable(),
   }),
 });

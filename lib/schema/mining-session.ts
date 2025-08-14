@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { $Enums } from "../generated/prisma";
+import { SessionStatus } from "../generated/prisma/enums";
 
 // Mining session schemas
 export const MiningSessionSchema = z
   .object({
     id: z.string(),
-    status: z.enum($Enums.SessionStatus),
+    status: z.enum(SessionStatus),
     createdAt: z.string().transform((val) => new Date(val)),
     updatedAt: z.string().transform((val) => new Date(val)),
     minerSharesEarned: z.number(),

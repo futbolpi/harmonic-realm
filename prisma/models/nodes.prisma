@@ -2,17 +2,20 @@
 model NodeType {
     id                 Int            @id @default(autoincrement())
     name               String
-    description        String
+    description        String // Basic flavor text
+    extendedLore       String? // Optional boosted lore for engaging stories (e.g., AI-generated epics)
     baseYieldPerMinute Float
     maxMiners          Int
-    lockInMinutes      Int
+    lockInMinutes      Int // Dynamically generated based on rarity (e.g., Common: 6, Legendary: 144)
     rarity             NodeTypeRarity
     iconUrl            String?
+    phase              Int? // Genesis phase (e.g., 1 for initial, null for non-phased-release)
 
     // Relations
     nodes   Node[]
     mastery UserNodeMastery[]
 
+    @@index([rarity, phase]) // For efficient queries on rarity/phase
     @@map("node_types")
 }
 
@@ -24,11 +27,13 @@ model Node {
     longitude     Float
     openForMining Boolean @default(true)
     sponsor       String?
+    phase         Int? // Mirrors NodeType phase for direct node filtering
 
     // Relations
     type     NodeType        @relation(fields: [typeId], references: [id])
     sessions MiningSession[]
 
+    @@index([phase]) // Efficient phase-based queries
     @@map("nodes")
 }
 

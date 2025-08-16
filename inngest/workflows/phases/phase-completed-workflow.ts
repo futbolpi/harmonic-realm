@@ -31,7 +31,7 @@ export const phaseCompletedWorkflow = inngest.createFunction(
               achievementId: achievement.id,
             },
           },
-          update: { unlockedAt: new Date() },
+          update: {},
           create: {
             userId: triggeringUserId,
             achievementId: achievement.id,

@@ -12,6 +12,7 @@ import {
 } from "@/lib/schema/mining-session";
 import { calculateMinerShares, calculateMiningXp } from "@/lib/utils/mining";
 import { binLatLon } from "@/lib/node-spawn/region-metrics";
+import { inngest } from "@/inngest/client";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -66,9 +67,14 @@ export const completeMiningSession = async (
       };
     }
 
+    const completedSessions = session.node._count.sessions;
+    const maxMiners = session.node.type.maxMiners;
+    const activeMiners = completedSessions + 1;
+    const durationMinutes = session.node.type.lockInMinutes;
+
     // 2. Compute durations and constraints
 
-    const lockInDurationMs = session.node.type.lockInMinutes * 60 * 1000;
+    const lockInDurationMs = durationMinutes * 60 * 1000;
     const now = new Date();
     const leastLockinTime = session.startTime.getTime() + lockInDurationMs;
 
@@ -81,7 +87,7 @@ export const completeMiningSession = async (
     }
 
     // check completedSessions < maxMiners
-    if (session.node.type.maxMiners >= session.node._count.sessions) {
+    if (completedSessions >= maxMiners) {
       return {
         success: false,
         error: "Node is at maximum capacity",
@@ -101,23 +107,23 @@ export const completeMiningSession = async (
     ]);
 
     const upgradeBonusPct = upgrades.reduce((sum, u) => sum + u.effectPct, 0);
-    const masteryBonusPct = mastery ? (mastery.level - 1) * 0.01 : 0;
+    const masteryBonusPct = mastery ? mastery.bonusPercent : 0;
     // add algorithm later
     const miniTaskMultiplier = 1;
 
     // 4. Calculate shares, binlatlol & XP
     const sharesEarned = calculateMinerShares({
       baseYieldPerMinute: session.node.type.baseYieldPerMinute,
-      durationMinutes: session.node.type.lockInMinutes,
+      durationMinutes,
       upgradeBonusPct,
       masteryBonusPct,
       miniTaskMultiplier,
-      maxMiners: session.node.type.maxMiners,
-      activeMiners: session.node._count.sessions + 1,
+      maxMiners,
+      activeMiners,
     });
 
     const xpGained = calculateMiningXp({
-      durationMinutes: session.node.type.lockInMinutes,
+      durationMinutes,
       upgradeBonusPct,
       masteryBonusPct,
       miniTaskMultiplier,
@@ -148,7 +154,36 @@ export const completeMiningSession = async (
     // 6. Award XP & handle level-up
     await awardXp(userId, xpGained);
 
-    // 7. Revalidate pages showing balances & levels
+    // 7. check if user is eligible for Surge Survivor achievement
+    if (activeMiners === maxMiners) {
+      const surgeAchievement = await prisma.achievement.findUnique({
+        where: { name: "Surge Survivor" }, // Assuming this achievement exists from seed
+      });
+      if (surgeAchievement) {
+        await prisma.userAchievement.upsert({
+          where: {
+            userId_achievementId: {
+              userId,
+              achievementId: surgeAchievement.id,
+            },
+          },
+          update: {},
+          create: {
+            userId,
+            achievementId: surgeAchievement.id,
+            unlockedAt: new Date(),
+          },
+        });
+      }
+    }
+
+    // 8. call the achievement unlock workflow
+    await inngest.send({
+      name: "game.achievement.check",
+      data: { eventType: "miningCompleted", userId },
+    });
+
+    // 9. Revalidate pages showing balances & levels
     revalidatePath("/");
     revalidatePath(`/nodes/${session.nodeId}`);
 

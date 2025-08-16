@@ -6,7 +6,7 @@ model FirmwareBoost {
     userId       String
     boostType    BoostType
     multiplier   Float
-    noOfSessions Int // in minutes
+    noOfSessions Int
     expiresAt    DateTime
     isActive     Boolean   @default(true)
 

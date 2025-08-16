@@ -59,6 +59,8 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             const response = await completeMiningSession({
               accessToken,
               sessionId: sessionData.session.id,
+              latitude: node.latitude,
+              longitude: node.longitude,
             });
             if (response.success) {
               toast.success("Mining session completed!");
@@ -85,6 +87,8 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
     refreshSession,
     sessionData?.session?.id,
     accessToken,
+    node.latitude,
+    node.longitude,
   ]);
 
   const formatTime = (ms: number) => {

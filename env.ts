@@ -18,6 +18,16 @@ export const env = createEnv({
     TELEGRAM_BOT_TOKEN: z.string().min(1),
     TELEGRAM_PUBLIC_CHANNEL: z.string().min(1),
     TELEGRAM_PRIVATE_CHANNEL: z.string().min(1),
+
+    // XAI
+    XAI_API_KEY: z.string().min(1),
+
+    // OPENROUTER
+    OPENROUTER_API_KEY: z.string().min(1),
+
+    // REDIS
+    UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+    UPSTASH_REDIS_REST_URL: z.url(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.url(),
@@ -48,5 +58,15 @@ export const env = createEnv({
 
     // MAPTILER
     NEXT_PUBLIC_MAPTILER_TOKEN: process.env.NEXT_PUBLIC_MAPTILER_TOKEN,
+
+    // XAI
+    XAI_API_KEY: process.env.XAI_API_KEY,
+
+    // OPENROUTER
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+
+    // REDIS
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   },
 });

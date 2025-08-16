@@ -11,6 +11,7 @@ import {
   CompleteMiningResponse,
 } from "@/lib/schema/mining-session";
 import { calculateMinerShares, calculateMiningXp } from "@/lib/utils/mining";
+import { binLatLon } from "@/lib/node-spawn/region-metrics";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -22,7 +23,7 @@ export const completeMiningSession = async (
       return { success: false, error: "Invalid Request" };
     }
 
-    const { accessToken, sessionId } = data;
+    const { accessToken, sessionId, latitude, longitude } = data;
 
     const { id: userId } = await verifyTokenAndGetUser(accessToken);
 
@@ -104,7 +105,7 @@ export const completeMiningSession = async (
     // add algorithm later
     const miniTaskMultiplier = 1;
 
-    // 4. Calculate shares & XP
+    // 4. Calculate shares, binlatlol & XP
     const sharesEarned = calculateMinerShares({
       baseYieldPerMinute: session.node.type.baseYieldPerMinute,
       durationMinutes: session.node.type.lockInMinutes,
@@ -112,7 +113,7 @@ export const completeMiningSession = async (
       masteryBonusPct,
       miniTaskMultiplier,
       maxMiners: session.node.type.maxMiners,
-      activeMiners: session.node._count.sessions,
+      activeMiners: session.node._count.sessions + 1,
     });
 
     const xpGained = calculateMiningXp({
@@ -122,6 +123,8 @@ export const completeMiningSession = async (
       miniTaskMultiplier,
     });
 
+    const { latitudeBin, longitudeBin } = binLatLon(latitude, longitude);
+
     // 5. Persist all changes atomically
     await prisma.$transaction([
       prisma.miningSession.update({
@@ -130,6 +133,8 @@ export const completeMiningSession = async (
           status: "COMPLETED",
           endTime: now,
           minerSharesEarned: sharesEarned,
+          latitudeBin,
+          longitudeBin,
         },
       }),
       prisma.user.update({

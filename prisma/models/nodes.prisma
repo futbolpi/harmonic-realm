@@ -1,7 +1,8 @@
 // Node types configuration
 model NodeType {
-    id                 Int            @id @default(autoincrement())
+    id                 String         @id
     name               String
+    cellId             String
     description        String // Basic flavor text
     extendedLore       String? // Optional boosted lore for engaging stories (e.g., AI-generated epics)
     baseYieldPerMinute Float
@@ -10,6 +11,7 @@ model NodeType {
     rarity             NodeTypeRarity
     iconUrl            String?
     phase              Int? // Genesis phase (e.g., 1 for initial, null for non-phased-release)
+    echoIntensity      Float          @default(1.0) // Lore modifier for resonance
 
     // Relations
     nodes   Node[]
@@ -22,12 +24,15 @@ model NodeType {
 // Individual node instances
 model Node {
     id            String  @id @default(cuid())
-    typeId        Int
+    name          String
+    typeId        String
     latitude      Float
     longitude     Float
     openForMining Boolean @default(true)
     sponsor       String?
+    lore          String
     phase         Int? // Mirrors NodeType phase for direct node filtering
+    echoIntensity Float   @default(1.0)
 
     // Relations
     type     NodeType        @relation(fields: [typeId], references: [id])
@@ -61,7 +66,7 @@ model UserNodeMastery {
     updatedAt DateTime @updatedAt
 
     userId         String
-    nodeTypeId     Int
+    nodeTypeId     String
     level          Int    @default(0)
     totalSessions  Int    @default(0)
     totalTimeSpent Int    @default(0) // in minutes

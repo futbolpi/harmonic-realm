@@ -1,0 +1,21 @@
+// New: GamePhase
+model GamePhase {
+    id            Int              @id @default(autoincrement())
+    phaseNumber   Int              @unique
+    totalNodes    Int // Spawned in this phase
+    triggerType   GamePhaseTrigger // 'threshold' or 'timed'
+    threshold     Int? // Mining sessions if threshold
+    loreNarrative String // AI-generated phase story
+
+    startTime DateTime  @default(now())
+    endTime   DateTime?
+
+    @@map("game_phases")
+}
+
+enum GamePhaseTrigger {
+    THRESHOLD
+    TIMED
+    GENESIS
+    SPONSORED
+}

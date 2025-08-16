@@ -1,24 +1,43 @@
-// Achievements
 model Achievement {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
 
-    name        String              @unique
-    description String
-    icon        String?
-    category    AchievementCategory
-    requirement Json
-    reward      Float               @default(0) // Miner shares reward
-    rarity      AchievementRarity   @default(COMMON)
-    isActive    Boolean             @default(true)
+    name                           String                      @unique
+    description                    String
+    icon                           String?
+    category                       AchievementCategory
+    requirementType                AchievementRequirementType? // Changed to enum
+    miningSessionsRequired         Int?
+    uniqueRealmsRequired           Int?
+    upgradesPurchasedRequired      Int?
+    playerLevelRequired            Int?
+    masteryLevelRequired           Int?
+    phaseTriggeredRequired         Int?
+    guildPhaseContributionRequired Int?
+    loreFragmentsCollectedRequired Int?
+    boostsUsedRequired             Int?
+    minedNodeRarityRequired        String?
+    maxConcurrencyMinedRequired    Int?
+    uniqueBinsMinedRequired        Int?
+    sharesAccumulatedRequired      Int?
+    sessionsPerPhaseRequired       Int?
+    miniTasksCompletedRequired     Int?
+    boostsTypesUsedRequired        Int?
+    friendsInvitedRequired         Int?
+    nodeTypesMasteredRequired      Int?
+    sharesHeldRequired             Int?
+    phasesSurvivedRequired         Int?
+    echoIntensityRequired          Float?
+    loreFragmentsPerPhaseRequired  String?
+    reward                         Float                       @default(0)
+    rarity                         AchievementRarity           @default(COMMON)
+    isActive                       Boolean                     @default(true)
 
-    // Relations
     userAchievements UserAchievement[]
 
     @@map("achievements")
 }
 
-// User achievements
 model UserAchievement {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
@@ -26,9 +45,7 @@ model UserAchievement {
     userId        String
     achievementId String
     unlockedAt    DateTime @default(now())
-    progress      Json?
 
-    // Relations
     user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     achievement Achievement @relation(fields: [achievementId], references: [id])
 
@@ -47,7 +64,33 @@ enum AchievementCategory {
 
 enum AchievementRarity {
     COMMON
+    UNCOMMON
     RARE
     EPIC
     LEGENDARY
+}
+
+enum AchievementRequirementType {
+    MINING_SESSIONS
+    UNIQUE_REALMS_MINED
+    UPGRADES_PURCHASED
+    PLAYER_LEVEL
+    MASTERY_LEVEL
+    PHASE_TRIGGERED
+    GUILD_PHASE_CONTRIBUTION
+    LORE_FRAGMENTS_COLLECTED
+    BOOSTS_USED
+    MINED_NODE_RARITY
+    MAX_CONCURRENCY_MINED
+    UNIQUE_BINS_MINED
+    SHARES_ACCUMULATED
+    SESSIONS_PER_PHASE
+    MINI_TASKS_COMPLETED
+    BOOSTS_TYPES_USED
+    FRIENDS_INVITED
+    NODE_TYPES_MASTERED
+    SHARES_HELD
+    PHASES_SURVIVED
+    ECHO_INTENSITY
+    LORE_FRAGMENTS_PER_PHASE
 }

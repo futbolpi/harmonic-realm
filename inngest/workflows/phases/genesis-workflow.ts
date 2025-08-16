@@ -1,7 +1,7 @@
 import { inngest } from "@/inngest/client";
 import { getEffectivePioneersForPhase } from "@/lib/node-spawn/quota";
 
-import { nodeSpawnWorkflow } from "./node-spawn-workflow";
+import { nodeSpawnWorkflow } from "../node-spawning/node-spawn-workflow";
 import prisma from "@/lib/prisma";
 
 // Updated genesisWorkflow: Initializes Phase 1 with half nodes equally distributed.
@@ -63,10 +63,10 @@ export const genesisWorkflow = inngest.createFunction(
     });
 
     // Step 4: Notify ecosystem of genesis completion
-    // await inngest.send({
-    //   name: "harmonicrealm.phase.completed",
-    //   data: { phase, nodesSpawned },
-    // });
+    await inngest.send({
+      name: "game.phase.completed",
+      data: { phase, nodesSpawned },
+    });
 
     return { phase, nodesSpawned, narrative };
   }

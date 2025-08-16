@@ -2,7 +2,7 @@ import { inngest } from "@/inngest/client";
 import { calculatePhaseThreshold } from "@/lib/node-spawn/phase-threshold";
 import { getEffectivePioneersForPhase } from "@/lib/node-spawn/quota";
 import prisma from "@/lib/prisma";
-import { nodeSpawnWorkflow } from "./node-spawn-workflow";
+import { nodeSpawnWorkflow } from "../node-spawning/node-spawn-workflow";
 
 // New nextPhaseWorkflow: Triggers phase >1 when 'game.phase.next' event is sent by completeMiningSession.
 // Verifies threshold, spawns halved nodes based on activity, and records phase in GamePhase.
@@ -18,7 +18,7 @@ export const nextPhaseWorkflow = inngest.createFunction(
   },
   { event: "game.phase.next" },
   async ({ event, step }) => {
-    const { phase } = event.data;
+    const { phase, triggeringUserId } = event.data;
 
     // Step 1: Validate phase
     await step.run("validate-phase", async () => {
@@ -78,10 +78,10 @@ export const nextPhaseWorkflow = inngest.createFunction(
     });
 
     // Step 6: Notify ecosystem of phase completion
-    // await inngest.send({
-    //   name: "harmonicrealm.phase.completed",
-    //   data: { phase, nodesSpawned },
-    // });
+    await inngest.send({
+      name: "game.phase.completed",
+      data: { phase, nodesSpawned, triggeringUserId },
+    });
 
     return { phase, nodesSpawned, narrative };
   }

@@ -64,7 +64,7 @@ export default function DashboardPage() {
         <QuickActions
           stats={{
             achievements: data._count.achievements,
-            recentSessions: data.sessions.length,
+            recentSessions: data.sessions.slice(0, 3).length,
             earnings: data.totalEarned,
             xp: data.xp,
             totalSessions: data._count.sessions,
@@ -74,7 +74,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <RecentActivity sessions={data.sessions} />
+      <RecentActivity sessions={data.sessions.slice(0, 3)} />
 
       {/* Recent Achievements */}
       <RecentAchievements achievements={data.achievements} />

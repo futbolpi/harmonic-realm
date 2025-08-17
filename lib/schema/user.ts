@@ -17,8 +17,16 @@ const UserProfileSessionSchema = z.object({
   id: z.string(),
   minerSharesEarned: z.number(),
   status: z.enum(SessionStatus),
+  startTime: z.coerce.date(),
+  endTime: z.coerce.date().nullish(),
+  nodeId: z.string(),
+  user: z.object({ username: z.string() }),
   node: z.object({
     type: z.object({ name: z.string(), lockInMinutes: z.number() }),
+    name: z.string(),
+    echoIntensity: z.number(),
+    latitude: z.number(),
+    longitude: z.number(),
   }),
 });
 

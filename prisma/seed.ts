@@ -1,6 +1,7 @@
-import { achievementsData } from "../config/achievements-data";
+import { achievementsData } from "@/config/achievements-data";
 import prisma from "../lib/prisma";
-import { nodesData, nodeTypesData } from "../lib/seed/node-data";
+import { nodesData, nodeTypesData } from "@/lib/seed/node-data";
+import { miningSessionsData, usersData } from "@/lib/seed/user-data";
 
 async function seedAchievements() {
   for (const ach of achievementsData) {
@@ -15,7 +16,6 @@ async function seedAchievements() {
 
 async function seedNodesAndTypes() {
   await prisma.$transaction(async (tx) => {
-    // Seed NodeTypes
     for (const nt of nodeTypesData) {
       await tx.nodeType.upsert({
         where: { id: nt.id },
@@ -35,7 +35,6 @@ async function seedNodesAndTypes() {
       });
     }
 
-    // Seed Nodes (after types to ensure typeId exists)
     for (const node of nodesData) {
       await tx.node.upsert({
         where: { id: node.id },
@@ -57,9 +56,52 @@ async function seedNodesAndTypes() {
   console.log("Nodes and NodeTypes seeded.");
 }
 
+async function seedUsersAndSessions() {
+  await prisma.$transaction(async (tx) => {
+    for (const user of usersData) {
+      await tx.user.upsert({
+        where: { piId: user.piId },
+        update: {
+          username: user.username,
+          accessToken: user.accessToken,
+          sharePoints: user.sharePoints,
+          totalEarned: user.totalEarned,
+          level: user.level,
+          xp: user.xp,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          archivedAt: user.archivedAt,
+        },
+        create: user,
+      });
+    }
+
+    for (const session of miningSessionsData) {
+      await tx.miningSession.upsert({
+        where: { id: session.id },
+        update: {
+          createdAt: session.createdAt,
+          updatedAt: session.updatedAt,
+          userId: session.userId,
+          nodeId: session.nodeId,
+          startTime: session.startTime,
+          endTime: session.endTime,
+          latitudeBin: session.latitudeBin,
+          longitudeBin: session.longitudeBin,
+          minerSharesEarned: session.minerSharesEarned,
+          status: session.status,
+        },
+        create: session,
+      });
+    }
+  });
+  console.log("Users and MiningSessions seeded.");
+}
+
 async function main() {
   await seedAchievements();
   await seedNodesAndTypes();
+  await seedUsersAndSessions();
 }
 
 main()

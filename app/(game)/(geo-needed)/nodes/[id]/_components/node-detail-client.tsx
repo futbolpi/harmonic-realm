@@ -61,9 +61,9 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
                 : "bg-red-500/90 text-white"
             }`}
           >
-            {distance < 1000
-              ? `${Math.round(distance)}m`
-              : `${(distance / 1000).toFixed(1)}km`}
+            {distance > 1
+              ? `${Math.round(distance)}km`
+              : `${(distance * 1000).toFixed(1)}km`}
           </div>
         </div>
       )}

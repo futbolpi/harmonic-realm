@@ -44,7 +44,6 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
       username: true,
       achievements: {
         orderBy: { unlockedAt: "desc" },
-        take: 3,
         select: {
           id: true,
           achievement: {
@@ -54,13 +53,22 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
       },
       sessions: {
         orderBy: { updatedAt: "desc" },
-        take: 3,
         select: {
           id: true,
           status: true,
           minerSharesEarned: true,
+          startTime: true,
+          nodeId: true,
+          endTime: true,
+          user: { select: { username: true } },
           node: {
-            select: { type: { select: { name: true, lockInMinutes: true } } },
+            select: {
+              type: { select: { name: true, lockInMinutes: true } },
+              name: true,
+              echoIntensity: true,
+              latitude: true,
+              longitude: true,
+            },
           },
         },
       },

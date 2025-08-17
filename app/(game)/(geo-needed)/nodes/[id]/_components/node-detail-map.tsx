@@ -5,12 +5,13 @@ import Map, { Marker, Source, Layer, type MapRef } from "react-map-gl/maplibre";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import circle from "@turf/circle";
+import { useTheme } from "next-themes";
 
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMiningSession } from "@/hooks/queries/use-mining-session";
 import { useLocation } from "@/hooks/use-location";
-import { getRarityInfo } from "../../../map/utils";
+import { getRarityInfo, MAP_STYLES } from "../../../map/utils";
 import FloatingControls from "./floating-controls";
 import NodeInfoModal from "./node-info-modal";
 
@@ -21,6 +22,7 @@ interface NodeDetailMapProps {
 export function NodeDetailMap({ node }: NodeDetailMapProps) {
   const mapRef = useRef<MapRef>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   const { isInRange, rangeMeters } = useMiningSession({
     id: node.id,
@@ -70,7 +72,12 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
     <div className="relative h-screen w-full">
       <Map
         ref={mapRef}
-        mapStyle="https://demotiles.maplibre.org/style.json"
+        attributionControl={false}
+        mapStyle={
+          resolvedTheme === "light"
+            ? MAP_STYLES.outdoor
+            : MAP_STYLES.outdoorDark
+        }
         initialViewState={{
           longitude: node.longitude,
           latitude: node.latitude,
@@ -146,7 +153,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
       <NodeInfoModal node={node} />
 
       {/* Status indicator */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-4 left-28">
         <Badge
           variant={isInRange ? "default" : "destructive"}
           className="shadow-lg"

@@ -4,4 +4,7 @@ import "dotenv/config";
 
 export default {
   schema: path.join("prisma"),
+  migrations: {
+    seed: `tsx prisma/seed.ts`,
+  },
 } satisfies PrismaConfig;

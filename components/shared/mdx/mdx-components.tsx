@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ExternalLink, Info, AlertTriangle, CheckCircle } from "lucide-react";
+import type React from "react";
+import {
+  ExternalLink,
+  Info,
+  AlertTriangle,
+  CheckCircle,
+  Sparkles,
+  LucideProps,
+} from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -189,7 +197,9 @@ const components = {
     description,
     color = "text-primary",
   }: {
-    icon: typeof ExternalLink;
+    icon: React.ForwardRefExoticComponent<
+      Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+    >;
     title: string;
     description: string;
     color?: string;
@@ -206,6 +216,110 @@ const components = {
       </CardContent>
     </Card>
   ),
+
+  // Cosmic-themed components for HarmonicRealm lore
+  CosmicAlert: ({ children }: { children: React.ReactNode }) => (
+    <Alert className="my-6 border-primary/50 bg-primary/10 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-neon-purple/5" />
+      <Sparkles className="h-4 w-4 text-primary relative z-10" />
+      <AlertDescription className="text-primary-foreground relative z-10">
+        {children}
+      </AlertDescription>
+    </Alert>
+  ),
+
+  LatticeCard: ({
+    icon: Icon,
+    title,
+    description,
+    color = "text-primary",
+  }: {
+    icon: React.ForwardRefExoticComponent<
+      Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+    >;
+    title: string;
+    description: string;
+    color?: string;
+  }) => (
+    <Card className="game-card my-6 relative overflow-hidden group hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <CardHeader className="relative z-10">
+        <CardTitle className="flex items-center gap-3">
+          <Icon
+            className={`h-6 w-6 ${color} group-hover:scale-110 transition-transform duration-300`}
+          />
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="relative z-10">
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  ),
+
+  // Cosmic Table Components
+  CosmicTable: ({
+    className,
+    ...props
+  }: React.HTMLAttributes<HTMLTableElement>) => (
+    <div className="my-8 overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-game-dark/50 to-game-accent/20">
+      <table className={cn("w-full border-collapse", className)} {...props} />
+    </div>
+  ),
+
+  CosmicTableHeader: ({
+    className,
+    ...props
+  }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+    <thead
+      className={cn(
+        "bg-gradient-to-r from-primary/20 to-game-accent/30 border-b border-primary/30",
+        className
+      )}
+      {...props}
+    />
+  ),
+
+  CosmicTableBody: ({
+    className,
+    ...props
+  }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+    <tbody className={className} {...props} />
+  ),
+
+  CosmicTableRow: ({
+    className,
+    ...props
+  }: React.HTMLAttributes<HTMLTableRowElement>) => (
+    <tr
+      className={cn(
+        "border-b border-primary/10 hover:bg-primary/5 transition-colors duration-200",
+        className
+      )}
+      {...props}
+    />
+  ),
+
+  CosmicTableCell: ({
+    className,
+    header = false,
+    ...props
+  }: React.HTMLAttributes<HTMLTableCellElement> & { header?: boolean }) => {
+    const Component = header ? "th" : "td";
+
+    return (
+      <Component
+        className={cn(
+          "px-6 py-4 text-left",
+          header
+            ? "font-semibold text-primary text-sm uppercase tracking-wider"
+            : "text-muted-foreground",
+          className
+        )}
+        {...props}
+      />
+    );
+  },
 };
 
 export { components };

@@ -4,9 +4,9 @@ import { HowItWorks } from "./_components/how-it-works";
 import { CTA } from "./_components/cta";
 
 export const metadata = {
-  title: "Pi Mining Nodes - Turn Exploration into Pi Mining Adventure",
+  title: "HarmonicRealm - Resonate with the Cosmic Lattice",
   description:
-    "Discover real-world nodes, mine Pi cryptocurrency, and earn rewards through location-based gameplay. Join the Pi Network mining revolution.",
+    "Join the Pioneers in discovering Echo Guardians, mining Shares from the infinite Pi digits, and awakening the Harmonic frequencies that bind our reality.",
 };
 
 export default function HomePage() {

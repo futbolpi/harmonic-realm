@@ -22,8 +22,8 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "Pi Quiz",
-  id: "pi-quiz",
+  name: "HarmonicRealm",
+  id: "harmonic-realm",
   network: env.NEXT_PUBLIC_PI_EXPLORER_LINK.includes("testnet")
     ? "testnet"
     : "mainnet",

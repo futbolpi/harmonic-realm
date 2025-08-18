@@ -5,13 +5,17 @@ import { Menu, Zap } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/components/shared/auth/auth-context";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/shared/theme/mode-toggle";
+import { siteConfig } from "@/config/site";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
 
   const navItems = [
     { href: "/", label: "Home" },
@@ -27,7 +31,7 @@ export function Navigation() {
           <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
             <Zap className="h-4 w-4 text-primary" />
           </div>
-          <span className="font-bold text-lg neon-text">Pi Mining Nodes</span>
+          <span className="font-bold text-lg neon-text">{siteConfig.name}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -48,15 +52,9 @@ export function Navigation() {
           <ModeToggle />
 
           <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <Button asChild className="game-button">
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-            ) : (
-              <Button asChild className="game-button">
-                <Link href="/login">Start Mining</Link>
-              </Button>
-            )}
+            <Button asChild className="game-button">
+              <Link href="/login">Begin Your Journey</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu */}
@@ -66,10 +64,14 @@ export function Navigation() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
+
             <SheetContent
               side="right"
-              className="w-80 bg-background/95 backdrop-blur"
+              className="w-80 bg-background/95 backdrop-blur p-4"
             >
+              <SheetTitle className="font-bold text-lg neon-text">
+                {siteConfig.name}
+              </SheetTitle>
               <div className="flex flex-col space-y-6 mt-6">
                 {navItems.map((item) => (
                   <Link
@@ -82,15 +84,9 @@ export function Navigation() {
                   </Link>
                 ))}
                 <div className="pt-4 border-t border-border/40">
-                  {isAuthenticated ? (
-                    <Button asChild className="w-full game-button">
-                      <Link href="/dashboard">Dashboard</Link>
-                    </Button>
-                  ) : (
-                    <Button asChild className="w-full game-button">
-                      <Link href="/login">Start Mining</Link>
-                    </Button>
-                  )}
+                  <Button asChild className="w-full game-button">
+                    <Link href="/login">Begin Your Journey</Link>
+                  </Button>
                 </div>
               </div>
             </SheetContent>

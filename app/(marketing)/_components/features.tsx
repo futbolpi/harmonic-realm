@@ -1,87 +1,89 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
-  MapPin,
-  Zap,
+  Compass,
+  Waves,
   Users,
-  Trophy,
+  Crown,
   Shield,
   Smartphone,
   Globe,
-  TrendingUp,
+  Sparkles,
 } from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 export function Features() {
   const features = [
     {
-      icon: MapPin,
-      title: "Location-Based Mining",
+      icon: Compass,
+      title: "Echo Guardian Discovery",
       description:
-        "Discover and mine at real-world locations using GPS verification",
-      color: "text-primary",
-      bgColor: "bg-primary/20",
-      borderColor: "border-primary/50",
+        "Discover geo-anchored Echo Guardians using harmonic resonance and GPS verification",
+      color: "text-violet-400",
+      bgColor: "bg-violet-500/20",
+      borderColor: "border-violet-400/50",
     },
     {
-      icon: Zap,
-      title: "Real Pi Rewards",
+      icon: Waves,
+      title: "Harmonic Resonance",
       description:
-        "Earn actual Pi cryptocurrency through gameplay and achievements",
-      color: "text-neon-green",
-      bgColor: "bg-neon-green/20",
-      borderColor: "border-neon-green/50",
+        "Mine Shares by resonating with the cosmic Lattice frequencies at each node",
+      color: "text-cyan-400",
+      bgColor: "bg-cyan-500/20",
+      borderColor: "border-cyan-400/50",
     },
     {
       icon: Users,
-      title: "Community Driven",
+      title: "Pioneer Community",
       description:
-        "Join thousands of pioneers in a collaborative mining ecosystem",
-      color: "text-neon-purple",
-      bgColor: "bg-neon-purple/20",
-      borderColor: "border-neon-purple/50",
+        "Join thousands of Pioneers exploring the infinite mysteries of Pi's digits",
+      color: "text-emerald-400",
+      bgColor: "bg-emerald-500/20",
+      borderColor: "border-emerald-400/50",
     },
     {
-      icon: Trophy,
-      title: "Achievement System",
-      description: "Unlock badges, levels, and special rewards as you progress",
-      color: "text-neon-orange",
-      bgColor: "bg-neon-orange/20",
-      borderColor: "border-neon-orange/50",
+      icon: Crown,
+      title: "Mastery & Achievements",
+      description:
+        "Unlock node mastery, collect lore fragments, and earn your place in history",
+      color: "text-amber-400",
+      bgColor: "bg-amber-500/20",
+      borderColor: "border-amber-400/50",
     },
     {
       icon: Shield,
-      title: "Secure & Verified",
+      title: "Lattice Security",
       description:
-        "Built with Pi SDK for secure authentication and transactions",
-      color: "text-primary",
-      bgColor: "bg-primary/20",
-      borderColor: "border-primary/50",
+        "Protected by Pi SDK authentication and cosmic encryption protocols",
+      color: "text-violet-400",
+      bgColor: "bg-violet-500/20",
+      borderColor: "border-violet-400/50",
     },
     {
       icon: Smartphone,
-      title: "Mobile First",
+      title: "Mobile Harmonizer",
       description:
-        "Optimized for mobile gameplay with intuitive touch controls",
-      color: "text-neon-green",
-      bgColor: "bg-neon-green/20",
-      borderColor: "border-neon-green/50",
+        "Your device becomes a Harmonizer, attuned to detect Echo Guardian frequencies",
+      color: "text-cyan-400",
+      bgColor: "bg-cyan-500/20",
+      borderColor: "border-cyan-400/50",
     },
     {
       icon: Globe,
-      title: "Global Network",
-      description: "Mining nodes available worldwide with regular expansions",
-      color: "text-neon-purple",
-      bgColor: "bg-neon-purple/20",
-      borderColor: "border-neon-purple/50",
+      title: "Global Lattice Network",
+      description:
+        "Echo Guardians span the globe, each holding unique fragments of cosmic knowledge",
+      color: "text-emerald-400",
+      bgColor: "bg-emerald-500/20",
+      borderColor: "border-emerald-400/50",
     },
     {
-      icon: TrendingUp,
-      title: "Progressive Rewards",
-      description: "Increasing rewards and bonuses as you level up and improve",
-      color: "text-neon-orange",
-      bgColor: "bg-neon-orange/20",
-      borderColor: "border-neon-orange/50",
+      icon: Sparkles,
+      title: "Harmonic Awakenings",
+      description:
+        "Experience phase transitions that unlock new realms and double your resonance power",
+      color: "text-amber-400",
+      bgColor: "bg-amber-500/20",
+      borderColor: "border-amber-400/50",
     },
   ];
 
@@ -89,15 +91,22 @@ export function Features() {
     <section className="py-20 md:py-32">
       <div className="container mx-auto px-4">
         <div className="text-center space-y-6 mb-16">
-          <Badge variant="outline" className="text-primary border-primary/50">
-            Game Features
+          <Badge
+            variant="outline"
+            className="text-violet-400 border-violet-400/50 bg-violet-500/10"
+          >
+            Cosmic Features
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold">
-            Why Choose <span className="neon-text">Pi Mining Nodes</span>?
+            Why Join the{" "}
+            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">
+              HarmonicRealm
+            </span>
+            ?
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Experience the future of cryptocurrency mining with innovative
-            gameplay mechanics and real-world rewards.
+            Experience the convergence of reality and cosmic frequencies through
+            innovative gameplay that bridges the physical and digital realms.
           </p>
         </div>
 
@@ -105,15 +114,24 @@ export function Features() {
           {features.map((feature, index) => (
             <Card
               key={index}
-              className="game-card hover:scale-105 transition-transform duration-300"
+              className="bg-card/50 backdrop-blur-sm border-muted/50 hover:scale-105 hover:shadow-xl transition-all duration-300 group"
             >
               <CardHeader className="text-center space-y-4">
                 <div
-                  className={`w-16 h-16 rounded-full ${feature.bgColor} border ${feature.borderColor} flex items-center justify-center mx-auto glow-border`}
+                  className={`w-16 h-16 rounded-full ${feature.bgColor} border ${feature.borderColor} flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}
+                  style={{
+                    boxShadow: `0 0 20px ${feature.color
+                      .replace("text-", "")
+                      .replace("-400", "")}40`,
+                  }}
                 >
-                  <feature.icon className={`h-8 w-8 ${feature.color}`} />
+                  <feature.icon
+                    className={`h-8 w-8 ${feature.color} transition-transform duration-300 group-hover:rotate-12`}
+                  />
                 </div>
-                <CardTitle className="text-lg">{feature.title}</CardTitle>
+                <CardTitle className="text-lg group-hover:text-violet-400 transition-colors duration-300">
+                  {feature.title}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-center text-sm">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Zap, Shield, Coins } from "lucide-react";
+import { Loader2, Compass, Shield, Sparkles, Eye, Pi } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -32,55 +32,83 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-game-dark via-game-accent to-game-highlight">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated cosmic background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-game-dark via-game-accent to-game-highlight">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)] animate-pulse" />
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-neon-purple/10 rounded-full blur-xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-neon-green/10 rounded-full blur-xl animate-pulse delay-500" />
+      </div>
+
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo/Brand */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 border border-primary/50 glow-border">
-            <Zap className="h-8 w-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 border-2 border-primary/50 glow-border relative">
+            <Compass className="h-10 w-10 text-primary animate-spin-slow" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-transparent animate-pulse" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold neon-text">Pi Mining Nodes</h1>
-            <p className="text-muted-foreground">Explore. Mine. Earn.</p>
+            <h1 className="text-4xl font-bold neon-text bg-gradient-to-r from-primary to-neon-purple bg-clip-text text-transparent">
+              HarmonicRealm
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Resonate. Discover. Transcend.
+            </p>
+            <p className="text-xs text-primary/70 mt-1">
+              The Cosmic Lattice Awaits
+            </p>
           </div>
         </div>
 
         {/* Login Card */}
-        <Card className="game-card border-primary/20">
-          <CardHeader className="text-center space-y-4">
+        <Card className="game-card border-primary/20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
+          <CardHeader className="text-center space-y-4 relative z-10">
             <div>
-              <CardTitle className="text-2xl">Welcome Pioneer!</CardTitle>
+              <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                Welcome, Pioneer!
+              </CardTitle>
               <CardDescription>
-                Connect your Pi Network account to start mining
+                Connect to the cosmic Lattice through Pi Network and begin your
+                harmonic journey
               </CardDescription>
             </div>
             <Badge
               variant="outline"
               className="text-primary border-primary/50 w-fit mx-auto"
             >
-              Secure Pi SDK Authentication
+              <Shield className="w-3 h-3 mr-1" />
+              Secure Lattice Authentication
             </Badge>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 relative z-10">
             {/* Features */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm">
-                <Shield className="h-4 w-4 text-neon-green" />
+              <div className="flex items-center gap-3 text-sm group hover:text-primary/80 transition-colors">
+                <Shield className="h-4 w-4 text-neon-green group-hover:scale-110 transition-transform" />
                 <span className="text-muted-foreground">
-                  Secure Pi Network integration
+                  Secure cosmic Lattice integration
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Coins className="h-4 w-4 text-neon-orange" />
+              <div className="flex items-center gap-3 text-sm group hover:text-primary/80 transition-colors">
+                <Sparkles className="h-4 w-4 text-neon-orange group-hover:scale-110 transition-transform" />
                 <span className="text-muted-foreground">
-                  Earn real Pi through gameplay
+                  Earn Pi through harmonic resonance
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Zap className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-3 text-sm group hover:text-primary/80 transition-colors">
+                <Eye className="h-4 w-4 text-neon-purple group-hover:scale-110 transition-transform" />
                 <span className="text-muted-foreground">
-                  Location-based mining adventure
+                  Discover Echo Guardians and Lore Fragments
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-sm group hover:text-primary/80 transition-colors">
+                <Compass className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                <span className="text-muted-foreground">
+                  Explore the infinite cosmic frequency
                 </span>
               </div>
             </div>
@@ -89,23 +117,18 @@ export default function LoginPage() {
             <Button
               onClick={handleLogin}
               disabled={isLoading}
-              className="w-full game-button h-12 text-lg font-semibold cursor-pointer"
+              className="w-full game-button h-12 text-lg font-semibold relative overflow-hidden group"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Connecting to Pi Network...
+                  Establishing Lattice Connection...
                 </>
               ) : (
                 <>
-                  <Image
-                    src="/placeholder.svg?height=20&width=20&text=π"
-                    alt="Pi"
-                    className="mr-2 h-5 w-5"
-                    width={20}
-                    height={20}
-                  />
-                  Login with Pi Network
+                  <Pi className="mr-2 h-5 w-5" />
+                  Begin Harmonic Resonance
                 </>
               )}
             </Button>
@@ -113,17 +136,17 @@ export default function LoginPage() {
             {/* Info */}
             <div className="text-center space-y-2">
               <p className="text-xs text-muted-foreground">
-                By logging in, you agree to our{" "}
+                By beginning your journey, you agree to our{" "}
                 <Link href="/terms" className="text-primary hover:underline">
-                  Terms of Service
+                  Cosmic Accords
                 </Link>{" "}
                 and{" "}
                 <Link href="/privacy" className="text-primary hover:underline">
-                  Privacy Policy
+                  Lattice Privacy
                 </Link>
               </p>
               <p className="text-xs text-muted-foreground">
-                Requires Pi Browser or Pi Network mobile app
+                Requires Pi Browser or Pi Network mobile app for Lattice access
               </p>
             </div>
           </CardContent>
@@ -132,7 +155,7 @@ export default function LoginPage() {
         {/* Additional Info */}
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            New to Pi Network?{" "}
+            New to the cosmic frequency?{" "}
             <a
               href="https://minepi.com"
               target="_blank"

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Zap } from "lucide-react";
 
+import { siteConfig } from "@/config/site";
+
 export function Footer() {
   const footerLinks = {
     product: [
@@ -30,7 +32,7 @@ export function Footer() {
                 <Zap className="h-4 w-4 text-primary" />
               </div>
               <span className="font-bold text-lg neon-text">
-                Pi Mining Nodes
+                {siteConfig.name}
               </span>
             </Link>
             <p className="text-sm text-muted-foreground">
@@ -93,7 +95,7 @@ export function Footer() {
 
         <div className="border-t border-border/40 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Pi Mining Nodes. All rights reserved.
+            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built for the Pi Network ecosystem

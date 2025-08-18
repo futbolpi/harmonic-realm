@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Loader2, Compass, Shield, Sparkles, Eye, Pi } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/shared/auth/auth-context";
+import { siteConfig } from "@/config/site";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -45,12 +45,12 @@ export default function LoginPage() {
         {/* Logo/Brand */}
         <div className="text-center space-y-4">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 border-2 border-primary/50 glow-border relative">
-            <Compass className="h-10 w-10 text-primary animate-spin-slow" />
+            <Compass className="h-10 w-10 text-primary" />
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-transparent animate-pulse" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold neon-text bg-gradient-to-r from-primary to-neon-purple bg-clip-text text-transparent">
-              HarmonicRealm
+            <h1 className="text-4xl font-bold neon-text">
+              <Link href={"/"}>{siteConfig.name}</Link>
             </h1>
             <p className="text-muted-foreground text-lg">
               Resonate. Discover. Transcend.
@@ -157,7 +157,7 @@ export default function LoginPage() {
           <p className="text-sm text-muted-foreground">
             New to the cosmic frequency?{" "}
             <a
-              href="https://minepi.com"
+              href="https://minepi.com/gshawn"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"

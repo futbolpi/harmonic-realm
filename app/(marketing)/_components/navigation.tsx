@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Zap } from "lucide-react";
+import { Menu, Compass } from "lucide-react";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -29,7 +29,7 @@ export function Navigation() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
-            <Zap className="h-4 w-4 text-primary" />
+            <Compass className="h-4 w-4 text-primary" />
           </div>
           <span className="font-bold text-lg neon-text">{siteConfig.name}</span>
         </Link>

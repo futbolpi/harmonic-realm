@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -34,13 +34,13 @@ import { MiningSession, useColumns } from "./use-columns";
 
 interface MiningSessionsTableProps {
   sessions: MiningSession[];
-  showUserColumn?: boolean;
+  isNodeContext?: boolean;
   className?: string;
 }
 
 export function MiningSessionsTable({
   sessions,
-  showUserColumn = false,
+  isNodeContext = false,
   className,
 }: MiningSessionsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
@@ -49,7 +49,18 @@ export function MiningSessionsTable({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns = useColumns(showUserColumn);
+  const firstMinerId = useMemo(() => {
+    if (!isNodeContext || sessions.length === 0) return null;
+    const sortedSessions = [...sessions].sort((a, b) => {
+      if (!a.endTime || !b.endTime) {
+        return 0;
+      }
+      return new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+    });
+    return sortedSessions[0]?.user.username;
+  }, [sessions, isNodeContext]);
+
+  const columns = useColumns({ firstMinerId, isNodeContext });
 
   const table = useReactTable({
     data: sessions,

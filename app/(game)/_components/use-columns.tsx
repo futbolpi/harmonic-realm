@@ -2,8 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { ArrowUpDown, Clock, Trophy, Zap } from "lucide-react";
+import { ArrowUpDown, Clock, Crown, Trophy, Zap } from "lucide-react";
 import { format } from "date-fns";
+import Link from "next/link";
 
 import { UserProfile } from "@/lib/schema/user";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,11 @@ import { SessionStatus } from "@/lib/generated/prisma/enums";
 import { Badge } from "@/components/ui/badge";
 
 export type MiningSession = UserProfile["sessions"][number];
+
+type UseColumsProps = {
+  isNodeContext: boolean;
+  firstMinerId: string | null;
+};
 
 const getStatusBadge = (status: SessionStatus) => {
   switch (status) {
@@ -37,7 +43,7 @@ const getStatusBadge = (status: SessionStatus) => {
   }
 };
 
-export const useColumns = (showUserColumn: boolean) => {
+export const useColumns = ({ firstMinerId, isNodeContext }: UseColumsProps) => {
   return useMemo<ColumnDef<MiningSession>[]>(() => {
     const baseColumns: ColumnDef<MiningSession>[] = [
       {
@@ -56,7 +62,11 @@ export const useColumns = (showUserColumn: boolean) => {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-game-accent/60" />
-            <span className="font-medium">{row.original.node.name}</span>
+            <span className="font-medium underline">
+              <Link prefetch={false} href={`/nodes/${row.original.nodeId}`}>
+                {row.original.node.name}
+              </Link>
+            </span>
           </div>
         ),
       },
@@ -83,7 +93,7 @@ export const useColumns = (showUserColumn: boolean) => {
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex items-center justify-center gap-1 text-sm">
             {row.original.node.type.lockInMinutes}m
           </div>
         ),
@@ -102,7 +112,7 @@ export const useColumns = (showUserColumn: boolean) => {
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="flex items-center gap-1 font-medium text-game-accent">
+          <div className="flex items-center justify-center gap-1 font-medium text-game-accent">
             <Trophy className="h-3 w-3" />
             {(row.getValue("minerSharesEarned") as number).toFixed(2)}
           </div>
@@ -128,19 +138,40 @@ export const useColumns = (showUserColumn: boolean) => {
       },
     ];
 
-    if (showUserColumn) {
-      baseColumns.splice(1, 0, {
-        accessorFn: (row) => `${row.user.username}`,
+    if (isNodeContext) {
+      baseColumns.splice(0, 1, {
         id: "username",
+        accessorFn: (row) => `${row.user.username}`,
         header: "Pioneer",
-        cell: ({ row }) => (
-          <span className="text-muted-foreground">
-            {row.original.user.username}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const username = row.original.user.username;
+          const isFirstMiner = isNodeContext && username === firstMinerId;
+
+          return (
+            <div className="flex items-center gap-2">
+              {isFirstMiner && (
+                <Crown className="h-4 w-4 text-yellow-500 animate-pulse" />
+              )}
+              <span
+                className={`${
+                  isFirstMiner
+                    ? "text-yellow-500 font-bold"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {username}
+              </span>
+              {isFirstMiner && (
+                <span className="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full">
+                  First Pioneer
+                </span>
+              )}
+            </div>
+          );
+        },
       });
     }
 
     return baseColumns;
-  }, [showUserColumn]);
+  }, [firstMinerId, isNodeContext]);
 };

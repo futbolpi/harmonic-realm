@@ -7,14 +7,28 @@ export async function getNodes(): Promise<Node[]> {
     select: {
       id: true,
       latitude: true,
+      name: true,
       longitude: true,
       openForMining: true,
       sponsor: true,
       sessions: {
         select: {
-          endTime: true,
+          id: true,
           minerSharesEarned: true,
+          status: true,
+          startTime: true,
+          nodeId: true,
           user: { select: { username: true } },
+          node: {
+            select: {
+              type: { select: { name: true, lockInMinutes: true } },
+              latitude: true,
+              longitude: true,
+              echoIntensity: true,
+              name: true,
+            },
+          },
+          endTime: true,
         },
         where: { status: "COMPLETED", endTime: { not: null } },
       },
@@ -41,14 +55,28 @@ export async function getNode(id: string): Promise<Node | null> {
     select: {
       id: true,
       latitude: true,
+      name: true,
       longitude: true,
       openForMining: true,
       sponsor: true,
       sessions: {
         select: {
-          endTime: true,
+          id: true,
           minerSharesEarned: true,
+          status: true,
+          startTime: true,
+          nodeId: true,
           user: { select: { username: true } },
+          node: {
+            select: {
+              type: { select: { name: true, lockInMinutes: true } },
+              latitude: true,
+              longitude: true,
+              echoIntensity: true,
+              name: true,
+            },
+          },
+          endTime: true,
         },
         where: { status: "COMPLETED", endTime: { not: null } },
       },

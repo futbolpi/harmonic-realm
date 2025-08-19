@@ -1,19 +1,24 @@
 "use client";
 
-import { Star } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/queries/use-profile";
 import { DashboardSkeleton } from "./dashboard-skeleton";
-import { QuickActions } from "./quick-actions";
 import DashboardError from "./dashboard-error";
 import LevelProgress from "./level-progress";
 import QuickStats from "./quick-stats";
-import RecentActivity from "./recent-activity";
-import RecentAchievements from "./recent-achievements";
+import { QuickActions } from "./quick-actions";
+import GlobalPhaseCard from "./global-phase-card";
 
-export default function DashboardClientPage() {
-  const { data, isLoading, isError } = useProfile();
+type DashboardClientPageProps = {
+  currentPhase: number;
+  sessionsCompleted: number;
+};
+
+export default function DashboardClientPage({
+  currentPhase,
+  sessionsCompleted,
+}: DashboardClientPageProps) {
+  const { data: userProfile, isLoading, isError } = useProfile();
 
   // Loading state
   if (isLoading) {
@@ -21,63 +26,55 @@ export default function DashboardClientPage() {
   }
 
   // Error state
-  if (isError || !data) {
+  if (isError) {
     return <DashboardError />;
+  }
+
+  if (!userProfile) {
+    return null;
   }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      {/* Welcome Header */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">
-              Welcome back, {data.username}!
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-neon-purple bg-clip-text text-transparent">
+              Resonance Hub
             </h1>
-            <p className="text-muted-foreground">Ready to explore and mine?</p>
+            <p className="text-muted-foreground">
+              Your harmony with the cosmic Lattice, Pioneer{" "}
+              {userProfile.username}
+            </p>
           </div>
-          <Badge variant="outline" className="text-primary border-primary/50">
-            Level {data.level}
-            {data.level > 1 && (
-              <Star
-                className="h-3 w-3 ml-1 text-neon-green"
-                fill="currentColor"
-              />
-            )}
+          <Badge
+            variant="outline"
+            className="text-primary border-primary/50 bg-primary/10"
+          >
+            Level {userProfile.level}
           </Badge>
         </div>
 
         {/* Level Progress */}
-        <LevelProgress currentLevel={data.level} currentXp={data.xp} />
-      </div>
-
-      {/* Quick Stats */}
-      <QuickStats
-        minerShares={data.sharePoints}
-        nodesMined={data._count.sessions}
-        piEarned={data.totalEarned}
-      />
-
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <QuickActions
-          stats={{
-            achievements: data._count.achievements,
-            recentSessions: data.sessions.slice(0, 3).length,
-            earnings: data.totalEarned,
-            xp: data.xp,
-            totalSessions: data._count.sessions,
-            userId: data.id,
-          }}
+        <LevelProgress
+          currentLevel={userProfile.level}
+          currentXP={userProfile.xp}
         />
       </div>
 
-      {/* Recent Activity */}
-      <RecentActivity sessions={data.sessions.slice(0, 3)} />
+      <QuickStats
+        level={userProfile.level}
+        minerShares={userProfile.sharePoints}
+        nodesMined={userProfile.sessions.length}
+        xp={userProfile.xp}
+      />
 
-      {/* Recent Achievements */}
-      <RecentAchievements achievements={data.achievements} />
+      <GlobalPhaseCard
+        currentPhase={currentPhase}
+        sessionsCompleted={sessionsCompleted}
+      />
+
+      <QuickActions userId={userProfile.id} />
     </div>
   );
 }

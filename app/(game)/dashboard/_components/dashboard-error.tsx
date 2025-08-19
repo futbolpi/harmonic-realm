@@ -18,7 +18,7 @@ const DashboardError = () => {
       <Alert className="max-w-md mx-auto border-destructive/50 bg-destructive/10">
         <AlertCircle className="h-4 w-4 text-destructive" />
         <AlertDescription className="text-destructive">
-          Failed to load profile: {error.message}
+          Failed to load resonance data: {error?.message}
           <Button
             onClick={refreshProfile}
             size="sm"

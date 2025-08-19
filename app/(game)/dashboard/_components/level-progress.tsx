@@ -1,21 +1,22 @@
 import { Progress } from "@/components/ui/progress";
+import { xpForLevel } from "@/lib/utils/xp";
 
-type LevelProgressProps = { currentLevel: number; currentXp: number };
+type LevelProgressProps = { currentLevel: number; currentXP: number };
 
-const LevelProgress = ({ currentXp, currentLevel }: LevelProgressProps) => {
-  const nextLevelXP = 2;
+const LevelProgress = ({ currentXP, currentLevel }: LevelProgressProps) => {
+  const nextLevelXP = xpForLevel(currentLevel + 1);
 
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
         <span className="text-muted-foreground">
-          Progress to Level {currentLevel + 1}
+          Resonance to Level {currentLevel + 1}
         </span>
         <span className="text-primary">
-          {currentXp}/{nextLevelXP} XP
+          {currentXP}/{nextLevelXP} XP
         </span>
       </div>
-      <Progress value={(currentXp / nextLevelXP) * 100} className="h-2" />
+      <Progress value={(currentXP / nextLevelXP) * 100} className="h-2" />
     </div>
   );
 };

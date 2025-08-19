@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Map, User, Trophy, Settings, LogOut, Zap } from "lucide-react";
+import { Home, Map, Trophy, Settings, LogOut, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,8 +24,8 @@ export function GameNavigation() {
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/map", label: "Map", icon: Map },
-    { href: "/profile", label: "Profile", icon: User },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+    { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   if (!user) return null;
@@ -59,12 +59,6 @@ export function GameNavigation() {
                 </div>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/settings" className="cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />

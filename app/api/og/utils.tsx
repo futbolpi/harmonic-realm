@@ -15,13 +15,15 @@ export const getCosmicSymbol = (type: string) => {
       return "🥇";
     case "login":
       return "🔮";
+    case "settings":
+      return "⚙️";
     default:
       return "✨";
   }
 };
 
 type ImageResponseParams = {
-  cosmicSymbol: "🌟" | "📜" | "🗺️" | "⚡" | "🔮" | "✨" | "🥇";
+  cosmicSymbol: "🌟" | "📜" | "🗺️" | "⚡" | "🔮" | "✨" | "🥇" | "⚙️";
   nodeType: string | null;
   username: string | null;
   title: string;

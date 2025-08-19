@@ -6,8 +6,10 @@ import { useTheme } from "next-themes";
 
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { Node } from "@/lib/schema/node";
-import { cn } from "@/lib/utils";
-import { getNodeIcon, MAP_STYLES, NODE_COLORS } from "../utils";
+import { NodeMarker } from "@/app/(game)/_components/node-markers";
+import { UserMarker } from "@/app/(game)/_components/user-markers";
+import { useProfile } from "@/hooks/queries/use-profile";
+import { MAP_STYLES } from "../utils";
 import { NodePopup } from "./node-popup";
 
 type NodesMapProps = {
@@ -33,6 +35,8 @@ const NodesMap = ({
     searchParams: { latitude, longitude },
   } = useMapSearchParams();
   const { resolvedTheme } = useTheme();
+
+  const { data: userProfile } = useProfile();
 
   const userLocation = useMemo(() => {
     return latitude !== null && longitude !== null
@@ -90,23 +94,12 @@ const NodesMap = ({
               handleNodeClick(node);
             }}
           >
-            <div
-              className={cn(
-                "w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white/80 cursor-pointer flex items-center justify-center text-sm md:text-lg transition-all duration-300 hover:scale-110",
-                node.openForMining ? "animate-pulse" : "opacity-75",
-                selectedNode?.id === node.id &&
-                  "ring-4 ring-primary/50 scale-110"
-              )}
-              style={{
-                backgroundColor:
-                  NODE_COLORS[node.type.rarity] || NODE_COLORS["Common"],
-                boxShadow: `0 0 20px ${
-                  NODE_COLORS[node.type.rarity] || NODE_COLORS["Common"]
-                }60`,
-              }}
-            >
-              {getNodeIcon(node)}
-            </div>
+            <NodeMarker
+              nodeRarity={node.type.rarity}
+              isActive={
+                node.openForMining && node.sessions.length < node.type.maxMiners
+              }
+            />
           </Marker>
         ))}
 
@@ -116,7 +109,7 @@ const NodesMap = ({
             longitude={userLocation.longitude}
             latitude={userLocation.latitude}
           >
-            <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white animate-pulse" />
+            <UserMarker isCurrentUser level={userProfile?.level} />
           </Marker>
         )}
 

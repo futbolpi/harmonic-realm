@@ -1,23 +1,21 @@
-import { Mail, MessageCircle, Bug, HelpCircle } from "lucide-react";
+import { Send, Zap, Users, Clock } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Icons } from "@/components/shared/icons";
 
 export const metadata = {
   title: "Contact the Cosmic Council - HarmonicRealm Support",
   description:
-    "Reach out to the HarmonicRealm Cosmic Council for Pioneer support, Lattice guidance, Echo Guardian assistance, or cosmic partnership inquiries.",
+    "Connect with the HarmonicRealm Cosmic Council through our social channels. Join fellow Pioneers on Twitter and Telegram for Lattice updates and cosmic guidance.",
   openGraph: {
     title: "Contact the Cosmic Council - HarmonicRealm Support",
     description:
-      "Reach out to the HarmonicRealm Cosmic Council for Pioneer support, Lattice guidance, Echo Guardian assistance, or cosmic partnership inquiries.",
+      "Connect with the HarmonicRealm Cosmic Council through our social channels. Join fellow Pioneers on Twitter and Telegram for Lattice updates and cosmic guidance.",
     images: [
       {
-        url: "/api/og?title=Contact the Cosmic Council&description=Pioneer support and Lattice guidance&type=default",
+        url: "/api/og?title=Contact the Cosmic Council&description=Join the Pioneer community&type=default",
         width: 1200,
         height: 630,
         alt: "Contact HarmonicRealm Cosmic Council",
@@ -29,156 +27,155 @@ export const metadata = {
     card: "summary_large_image",
     title: "Contact the Cosmic Council - HarmonicRealm Support",
     description:
-      "Reach out to the HarmonicRealm Cosmic Council for Pioneer support, Lattice guidance, Echo Guardian assistance, or cosmic partnership inquiries.",
+      "Connect with the HarmonicRealm Cosmic Council through our social channels. Join fellow Pioneers on Twitter and Telegram for Lattice updates and cosmic guidance.",
     images: [
-      "/api/og?title=Contact the Cosmic Council&description=Pioneer support and Lattice guidance&type=default",
+      "/api/og?title=Contact the Cosmic Council&description=Join the Pioneer community&type=default",
     ],
   },
 };
 
 export default function ContactPage() {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="text-center space-y-6 mb-12">
-        <Badge variant="outline" className="text-primary border-primary/50">
-          Contact Us
-        </Badge>
-        <h1 className="text-4xl md:text-5xl font-bold">Get in Touch</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Have questions, feedback, or need support? We{"'"}d love to hear from
-          you!
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-900/50 to-slate-900"></div>
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping"></div>
+        <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse delay-1000"></div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-        {/* Contact Form */}
-        <Card className="game-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-primary" />
-              Send us a Message
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="John" />
+      <div className="container mx-auto px-4 py-16 relative z-10">
+        <div className="text-center space-y-6 mb-12">
+          <Badge
+            variant="outline"
+            className="text-purple-300 border-purple-400/50 bg-purple-900/20"
+          >
+            <Zap className="w-3 h-3 mr-1" />
+            Cosmic Council
+          </Badge>
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
+            Connect with the Lattice
+          </h1>
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Join fellow Pioneers in our cosmic community. Share discoveries,
+            seek guidance from Echo Guardians, and stay attuned to the Lattice
+            frequencies.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <Card className="bg-slate-800/50 border-purple-500/30 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 group">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-purple-300">
+                <div className="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
+                  <Icons.twitter className="h-6 w-6 text-blue-400" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" />
+                Twitter Community
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-slate-300">
+                Follow us for real-time Lattice updates, Pioneer achievements,
+                and cosmic discoveries from across the realm.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Users className="w-4 h-4" />
+                  <span>Join 10,000+ Pioneers</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Zap className="w-4 h-4" />
+                  <span>Daily Lattice insights</span>
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="john@example.com" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="piUsername">Pi Username (Optional)</Label>
-                <Input id="piUsername" placeholder="@yourpiusername" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input id="subject" placeholder="How can we help you?" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
-                  placeholder="Tell us more about your inquiry..."
-                  rows={5}
-                />
-              </div>
-
-              <Button type="submit" className="w-full game-button">
-                Send Message
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Contact Options */}
-        <div className="space-y-6">
-          <Card className="game-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5 text-neon-green" />
-                General Support
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Need help with gameplay, account issues, or have general
-                questions?
-              </p>
-              <Button variant="outline" className="w-full">
-                support@pimimingnodes.com
+              <Button
+                asChild
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+              >
+                <a
+                  href="https://twitter.com/harmonicRealm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icons.twitter className="w-4 h-4 mr-2" />
+                  Follow @HarmonicRealm
+                </a>
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="game-card">
+          <Card className="bg-slate-800/50 border-purple-500/30 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 group">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bug className="h-5 w-5 text-neon-orange" />
-                Bug Reports
+              <CardTitle className="flex items-center gap-3 text-purple-300">
+                <div className="p-2 bg-cyan-500/20 rounded-lg group-hover:bg-cyan-500/30 transition-colors">
+                  <Send className="h-6 w-6 text-cyan-400" />
+                </div>
+                Telegram Channel
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Found a bug or technical issue? Help us improve the game!
+            <CardContent className="space-y-4">
+              <p className="text-slate-300">
+                Connect directly with Echo Guardians and fellow Pioneers. Get
+                instant support and share your cosmic journey.
               </p>
-              <Button variant="outline" className="w-full">
-                bugs@pimimingnodes.com
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Users className="w-4 h-4" />
+                  <span>Active Pioneer community</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Clock className="w-4 h-4" />
+                  <span>24/7 cosmic support</span>
+                </div>
+              </div>
+              <Button
+                asChild
+                className="w-full bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+              >
+                <a
+                  href="https://t.me/harmonicRealm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Join Telegram
+                </a>
               </Button>
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="game-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-neon-purple" />
-                Community
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Join our community for tips, updates, and to connect with other
-                miners!
-              </p>
-              <div className="space-y-2">
-                <Button variant="outline" className="w-full">
-                  Discord Community
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Telegram Group
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="game-card">
-            <CardHeader>
-              <CardTitle>Response Times</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">General Inquiries</span>
-                <span className="text-primary">24-48 hours</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Bug Reports</span>
-                <span className="text-neon-orange">12-24 hours</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Critical Issues</span>
-                <span className="text-neon-green">2-6 hours</span>
+        <div className="mt-16 text-center">
+          <Card className="bg-slate-800/30 border-purple-500/20 backdrop-blur-sm max-w-2xl mx-auto">
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <div className="p-3 bg-purple-500/20 rounded-full">
+                    <Zap className="w-8 h-8 text-purple-400" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-purple-300">
+                  The Lattice Awaits
+                </h3>
+                <p className="text-slate-300 leading-relaxed">
+                  Every Pioneer&apos;s journey begins with a single resonance.
+                  Join our cosmic community and discover the infinite
+                  possibilities within the HarmonicRealm.
+                </p>
+                <div className="flex justify-center gap-4 pt-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-cyan-400">∞</div>
+                    <div className="text-xs text-slate-400">Possibilities</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">⚡</div>
+                    <div className="text-xs text-slate-400">Energy</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">🌌</div>
+                    <div className="text-xs text-slate-400">Cosmos</div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

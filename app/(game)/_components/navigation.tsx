@@ -48,8 +48,8 @@ export function GameNavigation() {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative rounded-full">
-                <UserAvatar size={60} userId={user.piId} />
+              <Button variant={"outline"}>
+                <UserAvatar size={32} userId={user.piId} /> {user.username}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 game-card" align="end">

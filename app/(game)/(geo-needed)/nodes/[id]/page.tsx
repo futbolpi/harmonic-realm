@@ -66,7 +66,7 @@ export default async function NodeDetailsPage({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-[calc(100vh-8rem)] md:h-screen bg-background">
       <Suspense
         fallback={<div className="h-full bg-background animate-pulse" />}
       >

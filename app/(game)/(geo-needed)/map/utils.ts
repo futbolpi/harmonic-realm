@@ -41,21 +41,21 @@ export function getRarityInfo(rarity: NodeTypeRarity) {
   const rarityMap = {
     Common: {
       rating: 1,
-      color: "bg-green-500",
-      textColor: "text-green-400",
+      color: "bg-blue-500",
+      textColor: "text-blue-400",
     },
     Uncommon: {
       rating: 2,
-      color: "bg-blue-500",
-      textColor: "text-blue-400",
+      color: "bg-green-500",
+      textColor: "text-green-400",
     },
     Rare: {
       rating: 3,
       color: "bg-purple-500",
       textColor: "text-purple-400",
     },
-    Epic: { rating: 4, color: "bg-orange-500", textColor: "text-orange-400" },
-    Legendary: { rating: 5, color: "bg-red-500", textColor: "text-red-400" },
+    Epic: { rating: 4, color: "bg-amber-500", textColor: "text-amber-400" },
+    Legendary: { rating: 5, color: "bg-pink-500", textColor: "text-pink-400" },
   };
   return rarityMap[rarity] || rarityMap.Common;
 }
@@ -135,3 +135,43 @@ export function sortNodes(
     }
   });
 }
+
+export const getNodeColors = (nodeRarity: NodeTypeRarity) => {
+  switch (nodeRarity) {
+    case "Common":
+      return {
+        primary: "from-blue-400 to-cyan-400",
+        secondary: "bg-blue-500/20",
+        border: "border-blue-400/50",
+        glow: "shadow-blue-400/50",
+      };
+    case "Uncommon":
+      return {
+        primary: "from-green-400 to-blue-400",
+        secondary: "bg-green-500/20",
+        border: "border-green-400/50",
+        glow: "shadow-green-400/50",
+      };
+    case "Rare":
+      return {
+        primary: "from-purple-400 to-violet-400",
+        secondary: "bg-purple-500/20",
+        border: "border-purple-400/50",
+        glow: "shadow-purple-400/50",
+      };
+    case "Epic":
+      return {
+        primary: "from-amber-400 to-orange-400",
+        secondary: "bg-amber-500/20",
+        border: "border-amber-400/50",
+        glow: "shadow-amber-400/50",
+      };
+    case "Legendary":
+      return {
+        primary: "from-pink-400 to-rose-400",
+        secondary: "bg-pink-500/20",
+        border: "border-pink-400/50",
+        glow: "shadow-pink-400/50",
+      };
+  }
+};

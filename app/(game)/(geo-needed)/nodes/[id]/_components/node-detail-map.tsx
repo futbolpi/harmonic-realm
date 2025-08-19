@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Map, { Marker, Source, Layer, type MapRef } from "react-map-gl/maplibre";
-import { MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
 import circle from "@turf/circle";
 import { useTheme } from "next-themes";
 
@@ -11,9 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMiningSession } from "@/hooks/queries/use-mining-session";
 import { useLocation } from "@/hooks/use-location";
-import { getRarityInfo, MAP_STYLES } from "../../../map/utils";
+import { UserMarker } from "@/app/(game)/_components/user-markers";
+import { useProfile } from "@/hooks/queries/use-profile";
+import { NodeMarker } from "@/app/(game)/_components/node-markers";
+import { MAP_STYLES } from "../../../map/utils";
 import FloatingControls from "./floating-controls";
 import NodeInfoModal from "./node-info-modal";
+import NodeMiningSessions from "./node-mining-sessions";
 
 interface NodeDetailMapProps {
   node: Node;
@@ -34,6 +36,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
   });
 
   const userLocation = useLocation();
+  const { data: userProfile } = useProfile();
 
   // Create circle for mining radius
   const miningRadius = rangeMeters;
@@ -69,7 +72,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
   }, [mapLoaded, userLocation, node]);
 
   return (
-    <div className="relative h-screen w-full">
+    <div className="relative h-[calc(100vh-8rem)] md:h-screen w-full">
       <Map
         ref={mapRef}
         attributionControl={false}
@@ -110,14 +113,12 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
         {/* Node marker */}
         <Marker longitude={node.longitude} latitude={node.latitude}>
           <div className="relative">
-            <div
-              className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-white text-lg shadow-lg",
-                getRarityInfo(node.type.rarity).color
-              )}
-            >
-              <MapPin className="h-5 w-5" />
-            </div>
+            <NodeMarker
+              nodeRarity={node.type.rarity}
+              isActive={
+                node.openForMining && node.sessions.length < node.type.maxMiners
+              }
+            />
             <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
               <Badge variant="secondary" className="text-xs">
                 {node.type.name}
@@ -132,16 +133,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
             longitude={userLocation.longitude}
             latitude={userLocation.latitude}
           >
-            <div className="relative">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                <div className="w-2 h-2 bg-white rounded-full" />
-              </div>
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
-                <Badge variant="secondary" className="text-xs">
-                  You
-                </Badge>
-              </div>
-            </div>
+            <UserMarker isCurrentUser level={userProfile?.level} />
           </Marker>
         )}
       </Map>
@@ -151,6 +143,10 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
 
       {/* Floating node info - Mobile: Drawer, Desktop: Sheet */}
       <NodeInfoModal node={node} />
+
+      <div className="absolute bottom-4 right-4 z-10">
+        <NodeMiningSessions node={node} />
+      </div>
 
       {/* Status indicator */}
       <div className="absolute top-4 left-28">

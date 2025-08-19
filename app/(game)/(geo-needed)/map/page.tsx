@@ -36,7 +36,7 @@ export default async function MapPage() {
   const nodes = await getNodes();
 
   return (
-    <div className="h-screen w-full relative">
+    <div className="h-[calc(100vh-8rem)] w-full relative">
       <Suspense
         fallback={<div className="h-full w-full bg-muted animate-pulse" />}
       >

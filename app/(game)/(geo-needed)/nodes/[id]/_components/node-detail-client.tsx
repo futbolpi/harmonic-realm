@@ -10,7 +10,6 @@ import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
 import { ActiveMiningDrawer } from "./active-mining-drawer";
 import { CompletedSessionDrawer } from "./completed-session-drawer";
-import NodeMiningSessions from "./node-mining-sessions";
 
 interface NodeDetailClientProps {
   node: Node;
@@ -38,7 +37,7 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
   const showStartDrawer = sessionData?.canMine && !sessionData?.session;
 
   return (
-    <div className="relative h-screen bg-background">
+    <div className="relative bg-background">
       {/* Back button overlay */}
       <div className="absolute top-4 left-4 z-10">
         <Button
@@ -71,10 +70,6 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
 
       {/* Main map component */}
       <NodeDetailMap node={node} />
-
-      <div className="absolute bottom-4 right-4 z-10">
-        <NodeMiningSessions node={node} />
-      </div>
 
       {/* Active mining session drawer - only shown when user is in range with active session */}
       {showActiveDrawer && <ActiveMiningDrawer node={node} />}

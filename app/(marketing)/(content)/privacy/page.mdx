@@ -11,9 +11,32 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export const metadata = {
-  title: "Privacy Policy - HarmonicRealm",
+  title: "Cosmic Privacy Policy - HarmonicRealm Lattice Protection",
   description:
-    "Learn how HarmonicRealm protects your privacy while you explore the cosmic Lattice and resonate with Echo Guardians.",
+    "Learn how HarmonicRealm protects your Pioneer data while you explore the cosmic Lattice, resonate with Echo Guardians, and collect Lore Fragments.",
+  openGraph: {
+    title: "Cosmic Privacy Policy - HarmonicRealm Lattice Protection",
+    description:
+      "Learn how HarmonicRealm protects your Pioneer data while you explore the cosmic Lattice, resonate with Echo Guardians, and collect Lore Fragments.",
+    images: [
+      {
+        url: "/api/og?title=Cosmic Privacy Policy&description=Protecting Pioneer data in the cosmic Lattice&type=default",
+        width: 1200,
+        height: 630,
+        alt: "HarmonicRealm Privacy Policy - Lattice Protection",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cosmic Privacy Policy - HarmonicRealm Lattice Protection",
+    description:
+      "Learn how HarmonicRealm protects your Pioneer data while you explore the cosmic Lattice, resonate with Echo Guardians, and collect Lore Fragments.",
+    images: [
+      "/api/og?title=Cosmic Privacy Policy&description=Protecting Pioneer data in the cosmic Lattice&type=default",
+    ],
+  },
 };
 
 <div className="text-center space-y-6 mb-12">

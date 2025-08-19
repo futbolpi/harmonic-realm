@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import UserAvatar from "@/components/shared/user-avatar";
+import { siteConfig } from "@/config/site";
 
 export function GameNavigation() {
   const { user, logout } = useAuth();
@@ -40,18 +41,15 @@ export function GameNavigation() {
               <Zap className="h-4 w-4 text-primary" />
             </div>
             <span className="font-bold text-lg neon-text hidden sm:block">
-              Pi Mining Nodes
+              {siteConfig.name}
             </span>
           </Link>
 
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-10 w-10 rounded-full"
-              >
-                <UserAvatar size={40} userId={user.piId} />
+              <Button variant="ghost" className="relative rounded-full">
+                <UserAvatar size={60} userId={user.piId} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 game-card" align="end">

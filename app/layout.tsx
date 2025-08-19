@@ -8,6 +8,7 @@ import { AuthProvider } from "@/components/shared/auth/auth-context";
 import TanstackQueryProvider from "@/components/shared/tanstack-query/provider";
 import { PiProvider } from "@/components/shared/pi/pi-provider";
 import { env } from "@/env";
+import { siteConfig } from "@/config/site";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
@@ -37,7 +38,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Pi Mining Nodes - Explore, Mine, Earn",
+  title: `${siteConfig.name} - Explore, Mine, Earn`,
   description:
     "Turn real-world exploration into a Pi mining adventure. Discover nodes, mine Pi, and earn rewards in this location-based game.",
   keywords: [
@@ -49,16 +50,16 @@ export const metadata: Metadata = {
     "cryptocurrency",
   ],
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
-  authors: [{ name: "Pi Mining Nodes Team" }],
+  authors: [{ name: `${siteConfig.name} Team` }],
   openGraph: {
-    title: "Pi Mining Nodes - Explore, Mine, Earn",
+    title: `${siteConfig.name} - Explore, Mine, Earn`,
     description: "Turn real-world exploration into a Pi mining adventure.",
     type: "website",
     images: ["/og-image.jpg"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pi Mining Nodes",
+    title: `${siteConfig.name}`,
     description: "Turn real-world exploration into a Pi mining adventure.",
     images: ["/og-image.jpg"],
   },

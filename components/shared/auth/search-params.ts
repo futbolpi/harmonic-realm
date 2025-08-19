@@ -4,7 +4,7 @@ import {
   parseAsString,
 } from "nuqs/server";
 
-export const defaultRedirect = "/app/dashboard";
+export const defaultRedirect = "/dashboard";
 
 export const authSearchParamsParsers = {
   // Use human-readable variable names throughout your codebase

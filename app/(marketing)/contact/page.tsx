@@ -8,9 +8,32 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export const metadata = {
-  title: "Contact Us - Pi Mining Nodes Support",
+  title: "Contact the Cosmic Council - HarmonicRealm Support",
   description:
-    "Get in touch with the Pi Mining Nodes team for support, feedback, or partnership inquiries. We're here to help!",
+    "Reach out to the HarmonicRealm Cosmic Council for Pioneer support, Lattice guidance, Echo Guardian assistance, or cosmic partnership inquiries.",
+  openGraph: {
+    title: "Contact the Cosmic Council - HarmonicRealm Support",
+    description:
+      "Reach out to the HarmonicRealm Cosmic Council for Pioneer support, Lattice guidance, Echo Guardian assistance, or cosmic partnership inquiries.",
+    images: [
+      {
+        url: "/api/og?title=Contact the Cosmic Council&description=Pioneer support and Lattice guidance&type=default",
+        width: 1200,
+        height: 630,
+        alt: "Contact HarmonicRealm Cosmic Council",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact the Cosmic Council - HarmonicRealm Support",
+    description:
+      "Reach out to the HarmonicRealm Cosmic Council for Pioneer support, Lattice guidance, Echo Guardian assistance, or cosmic partnership inquiries.",
+    images: [
+      "/api/og?title=Contact the Cosmic Council&description=Pioneer support and Lattice guidance&type=default",
+    ],
+  },
 };
 
 export default function ContactPage() {

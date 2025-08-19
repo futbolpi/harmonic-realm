@@ -22,6 +22,59 @@ async function EchoJournalData({ params }: EchoJournalPageProps) {
   }
 }
 
+export async function generateMetadata({ params }: EchoJournalPageProps) {
+  try {
+    const { userId } = await params;
+    const userProfile = await getUserProfile(userId);
+    const title = `${userProfile.username}'s Echo Journal - Cosmic Journey`;
+    const description = `Explore ${userProfile.username}'s Pioneer journey through the cosmic Lattice, including Echo Guardian encounters, collected Lore Fragments, and harmonic progression.`;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: `/api/og?title=${encodeURIComponent(
+              title
+            )}&description=${encodeURIComponent(
+              "Pioneer's cosmic journey through the Lattice"
+            )}&type=journal&username=${encodeURIComponent(
+              userProfile.username
+            )}`,
+            width: 1200,
+            height: 630,
+            alt: `${userProfile.username}'s Echo Journal - HarmonicRealm`,
+          },
+        ],
+        type: "profile",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [
+          `/api/og?title=${encodeURIComponent(
+            title
+          )}&description=${encodeURIComponent(
+            "Pioneer's cosmic journey through the Lattice"
+          )}&type=journal&username=${encodeURIComponent(userProfile.username)}`,
+        ],
+      },
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      title: "Echo Journal - HarmonicRealm",
+      description:
+        "Explore a Pioneer's cosmic journey through the Lattice, including Echo Guardian encounters and collected Lore Fragments.",
+    };
+  }
+}
+
 export default function EchoJournalPage({ params }: EchoJournalPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-game-primary/5">

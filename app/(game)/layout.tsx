@@ -20,13 +20,13 @@ export default function GameLayout({
   const { isAuthenticated, isLoading } = useAuth();
 
   // Redirect to login if accessing protected routes without auth
-  // useEffect(() => {
-  //   if (!isLoading && !isAuthenticated) {
-  //     const serialize = createSerializer(authSearchParamsParsers);
-  //     const redirect = serialize("/login", { redirect: pathname }); // /login?redirect=pathname
-  //     router.push(redirect);
-  //   }
-  // }, [pathname, isAuthenticated, isLoading, router]);
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      const serialize = createSerializer(authSearchParamsParsers);
+      const redirect = serialize("/login", { redirect: pathname }); // /login?redirect=pathname
+      router.push(redirect);
+    }
+  }, [pathname, isAuthenticated, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -39,9 +39,9 @@ export default function GameLayout({
     );
   }
 
-  // if (!isAuthenticated) {
-  //   return null;
-  // }
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-game-dark via-game-accent to-game-highlight">

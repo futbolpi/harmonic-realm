@@ -1,7 +1,27 @@
 import { ImageResponse } from "@vercel/og";
 
+// Generate cosmic symbols based on type
+export const getCosmicSymbol = (type: string) => {
+  switch (type) {
+    case "node":
+      return "🌟";
+    case "journal":
+      return "📜";
+    case "map":
+      return "🗺️";
+    case "dashboard":
+      return "⚡";
+    case "leaderboard":
+      return "🥇";
+    case "login":
+      return "🔮";
+    default:
+      return "✨";
+  }
+};
+
 type ImageResponseParams = {
-  cosmicSymbol: "🌟" | "📜" | "🗺️" | "⚡" | "🔮" | "✨";
+  cosmicSymbol: "🌟" | "📜" | "🗺️" | "⚡" | "🔮" | "✨" | "🥇";
   nodeType: string | null;
   username: string | null;
   title: string;

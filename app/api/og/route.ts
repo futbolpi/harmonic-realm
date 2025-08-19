@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { getImageResponse } from "./utils";
+import { getCosmicSymbol, getImageResponse } from "./utils";
 
 export const runtime = "edge";
 
@@ -15,24 +15,6 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type") || "default";
     const nodeType = searchParams.get("nodeType");
     const username = searchParams.get("username");
-
-    // Generate cosmic symbols based on type
-    const getCosmicSymbol = (type: string) => {
-      switch (type) {
-        case "node":
-          return "🌟";
-        case "journal":
-          return "📜";
-        case "map":
-          return "🗺️";
-        case "dashboard":
-          return "⚡";
-        case "login":
-          return "🔮";
-        default:
-          return "✨";
-      }
-    };
 
     const cosmicSymbol = getCosmicSymbol(type);
 

@@ -36,27 +36,27 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-900/50 to-slate-900"></div>
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-muted/20"></div>
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping"></div>
-        <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-primary rounded-full animate-ping"></div>
+        <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-secondary rounded-full animate-pulse delay-1000"></div>
       </div>
 
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="text-center space-y-6 mb-12">
           <Badge
             variant="outline"
-            className="text-purple-300 border-purple-400/50 bg-purple-900/20"
+            className="text-violet-400 border-violet-400/50 animate-pulse bg-violet-500/10"
           >
             <Zap className="w-3 h-3 mr-1" />
             Cosmic Council
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">
             Connect with the Lattice
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Join fellow Pioneers in our cosmic community. Share discoveries,
             seek guidance from Echo Guardians, and stay attuned to the Lattice
             frequencies.
@@ -64,33 +64,33 @@ export default function ContactPage() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="bg-slate-800/50 border-purple-500/30 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 group">
+          <Card className="bg-card/50 border-border backdrop-blur-sm hover:bg-card/70 transition-all duration-300 group">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-purple-300">
-                <div className="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
-                  <Icons.twitter className="h-6 w-6 text-blue-400" />
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-primary/20 rounded-lg group-hover:bg-primary/30 transition-colors">
+                  <Icons.twitter className="h-6 w-6 text-primary" />
                 </div>
                 Twitter Community
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-slate-300">
+              <p className="text-card-foreground">
                 Follow us for real-time Lattice updates, Pioneer achievements,
                 and cosmic discoveries from across the realm.
               </p>
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users className="w-4 h-4" />
                   <span>Join 10,000+ Pioneers</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Zap className="w-4 h-4" />
                   <span>Daily Lattice insights</span>
                 </div>
               </div>
               <Button
                 asChild
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg hover:shadow-primary/25 transition-all duration-300"
               >
                 <a
                   href="https://twitter.com/harmonicRealm"
@@ -104,33 +104,33 @@ export default function ContactPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-purple-500/30 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 group">
+          <Card className="bg-card/50 border-border backdrop-blur-sm hover:bg-card/70 transition-all duration-300 group">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-purple-300">
-                <div className="p-2 bg-cyan-500/20 rounded-lg group-hover:bg-cyan-500/30 transition-colors">
-                  <Send className="h-6 w-6 text-cyan-400" />
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-secondary/20 rounded-lg group-hover:bg-secondary/30 transition-colors">
+                  <Send className="h-6 w-6 text-secondary" />
                 </div>
                 Telegram Channel
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-slate-300">
+              <p className="text-card-foreground">
                 Connect directly with Echo Guardians and fellow Pioneers. Get
                 instant support and share your cosmic journey.
               </p>
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users className="w-4 h-4" />
                   <span>Active Pioneer community</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
                   <span>24/7 cosmic support</span>
                 </div>
               </div>
               <Button
                 asChild
-                className="w-full bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+                className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground border-0 shadow-lg hover:shadow-secondary/25 transition-all duration-300"
               >
                 <a
                   href="https://t.me/harmonicRealm"
@@ -146,34 +146,34 @@ export default function ContactPage() {
         </div>
 
         <div className="mt-16 text-center">
-          <Card className="bg-slate-800/30 border-purple-500/20 backdrop-blur-sm max-w-2xl mx-auto">
+          <Card className="bg-card/30 border-border/50 backdrop-blur-sm max-w-2xl mx-auto">
             <CardContent className="pt-6">
               <div className="space-y-4">
                 <div className="flex justify-center">
-                  <div className="p-3 bg-purple-500/20 rounded-full">
-                    <Zap className="w-8 h-8 text-purple-400" />
+                  <div className="p-3 bg-accent/20 rounded-full">
+                    <Zap className="w-8 h-8 text-accent" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-purple-300">
-                  The Lattice Awaits
-                </h3>
-                <p className="text-slate-300 leading-relaxed">
+                <h3 className="text-2xl font-bold">The Lattice Awaits</h3>
+                <p className="text-card-foreground leading-relaxed">
                   Every Pioneer&apos;s journey begins with a single resonance.
                   Join our cosmic community and discover the infinite
                   possibilities within the HarmonicRealm.
                 </p>
                 <div className="flex justify-center gap-4 pt-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-cyan-400">∞</div>
-                    <div className="text-xs text-slate-400">Possibilities</div>
+                    <div className="text-2xl font-bold text-secondary">∞</div>
+                    <div className="text-xs text-muted-foreground">
+                      Possibilities
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-400">⚡</div>
-                    <div className="text-xs text-slate-400">Energy</div>
+                    <div className="text-2xl font-bold text-accent">⚡</div>
+                    <div className="text-xs text-muted-foreground">Energy</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-400">🌌</div>
-                    <div className="text-xs text-slate-400">Cosmos</div>
+                    <div className="text-2xl font-bold text-primary">🌌</div>
+                    <div className="text-xs text-muted-foreground">Cosmos</div>
                   </div>
                 </div>
               </div>

@@ -30,6 +30,7 @@ interface LoreFragmentsGalleryProps {
 }
 
 export function LoreFragmentsGallery({ userId }: LoreFragmentsGalleryProps) {
+  console.log({ userId });
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 

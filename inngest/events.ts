@@ -1,7 +1,3 @@
-import { GamePhaseTrigger, NodeTypeRarity } from "@/lib/generated/prisma/enums";
-
-export type Layers = "environmental";
-
 export type AchievementsCheckTriggers =
   | "miningCompleted"
   | "upgradePurchased"
@@ -15,41 +11,13 @@ interface UserCreated {
   };
 }
 
-export interface NodeSpawnRequestEvent {
-  name: "node.spawn.request";
-  data: {
-    totalPioneers: number;
-    targetRegion?: string;
-    spawnTime?: Date;
-    gameEventType?: GamePhaseTrigger;
-    loreBoost?: boolean;
-    phase?: number;
-    layers?: Layers[]; // For lore layers
-  };
-  id?: string; // For dedup
-}
-
-export interface GameGenesisStartEvent {
-  name: "game.genesis.start";
+export interface InitialPhaseStartEvent {
+  name: "phase/generate.initial";
   id?: string;
 }
 
-export interface LoreBoostEvent {
-  name: "lore.boost";
-  data: {
-    region: string;
-    rarity: NodeTypeRarity;
-    storyTheme: string;
-  };
-  id?: string;
-}
-
-export interface NextPhaseEvent {
-  name: "game.phase.next";
-  data: {
-    phase: number;
-    triggeringUserId: string;
-  };
+export interface NextPhaseStartEvent {
+  name: "phase/generate.next";
   id?: string;
 }
 
@@ -82,11 +50,9 @@ export interface AchievementsCheckEvent {
 }
 
 export type Events =
-  | NodeSpawnRequestEvent
-  | LoreBoostEvent
-  | GameGenesisStartEvent
-  | NextPhaseEvent
   | UserCreated
   | PhaseCompletedEvent
   | CosmicHeraldEvent
+  | InitialPhaseStartEvent
+  | NextPhaseStartEvent
   | AchievementsCheckEvent;

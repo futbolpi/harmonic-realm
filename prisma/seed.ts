@@ -1,7 +1,7 @@
 import { achievementsData } from "@/config/achievements-data";
-import prisma from "../lib/prisma";
 import { nodesData, nodeTypesData } from "@/lib/seed/node-data";
 import { miningSessionsData, usersData } from "@/lib/seed/user-data";
+import prisma from "@/lib/prisma";
 
 async function seedAchievements() {
   for (const ach of achievementsData) {
@@ -20,7 +20,6 @@ async function seedNodesAndTypes() {
       await tx.nodeType.upsert({
         where: { id: nt.id },
         update: {
-          cellId: nt.cellId,
           description: nt.description,
           extendedLore: nt.extendedLore,
           baseYieldPerMinute: nt.baseYieldPerMinute,
@@ -29,7 +28,6 @@ async function seedNodesAndTypes() {
           rarity: nt.rarity,
           iconUrl: nt.iconUrl,
           phase: nt.phase,
-          echoIntensity: nt.echoIntensity,
         },
         create: nt,
       });

@@ -2,7 +2,6 @@
 model NodeType {
     id                 String         @id
     name               String
-    cellId             String
     description        String // Basic flavor text
     extendedLore       String? // Optional boosted lore for engaging stories (e.g., AI-generated epics)
     baseYieldPerMinute Float
@@ -11,7 +10,6 @@ model NodeType {
     rarity             NodeTypeRarity
     iconUrl            String?
     phase              Int? // Genesis phase (e.g., 1 for initial, null for non-phased-release)
-    echoIntensity      Float          @default(1.0) // Lore modifier for resonance
 
     // Relations
     nodes   Node[]

@@ -25,6 +25,7 @@ model MiningSession {
     node Node @relation(fields: [nodeId], references: [id])
 
     @@unique([userId, nodeId])
+    @@index([latitudeBin, longitudeBin]) // For efficient queries on latitudeBin/longitudeBin
     @@map("mining_sessions")
 }
 

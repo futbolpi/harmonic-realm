@@ -6,6 +6,7 @@ model GamePhase {
     triggerType   GamePhaseTrigger // 'threshold' or 'timed'
     threshold     Int? // Mining sessions if threshold
     loreNarrative String // AI-generated phase story
+    halvingFactor Float // node halving factor
 
     startTime DateTime  @default(now())
     endTime   DateTime?

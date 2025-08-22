@@ -63,28 +63,45 @@ interface GenerateParams {
   phase: number;
 }
 
+/**
+ * Returns the system and user prompts for Vercel AI SDK object generation,
+ * tailored to HarmonicRealm’s lore and mechanics.
+ *
+ * @param phase   – Current Harmonic Awakening phase (e.g. 1, 2)
+ * @param  rarity  – NodeType rarity tier ("Common", "Uncommon", "Rare", "Epic", "Legendary")
+ * @returns prompts
+ */
+function createNodeTypePrompts(phase: number, rarity: NodeTypeRarity) {
+  const systemPrompt = `
+You are ${siteConfig.name}’s AI Lore Artisan. Your task is to craft metadata for a NodeType, a cosmic Pi-frequency beacon seeded on the Lattice. Each NodeType name, lore snippet, extendedLore, and iconography must align with its rarity tier and the current Harmonic Awakening phase.
+
+Requirements:
+- Use these game terms: Pioneer, Harmonizer, Lattice, resonance, Echo Guardian, Pi, cosmic frequency grid.
+- Rarity tiers: Common (grounded, subtle hum), Uncommon (gentle pulse), Rare (clear resonance), Epic (throbbing echo), Legendary (celestial chorus).
+- Phases denote global halving events and new node phenomena; weave phase flavor into the narrative.
+- Output a valid JSON object with exactly these keys:
+  • name: concise, evocative title  
+  • lore: 1–2 sentences describing the node’s immediate significance  
+  • extendedLore: 2–3 paragraphs of deeper myth, referencing Pi, Lattice, echoes, phase-specific lore and calls to adventure.
+  • iconography:Choose an emoji or short label (e.g., "🏞️" for Common, "🌌" for Legendary)  
+
+Do not include any extra fields, markdown, or commentary—only the object.
+`.trim();
+
+  const userPrompt = `
+Phase: ${phase}
+Rarity: ${rarity}
+
+Generate the NodeType metadata accordingly.
+`.trim();
+
+  return { systemPrompt, userPrompt };
+}
+
 async function getNodeTypeLore(params: GenerateParams): Promise<Lore> {
   // region = cellid
   const { rarity, phase } = params;
-
-  const descriptionLength = {
-    Common: "20-50",
-    Uncommon: "30-70",
-    Rare: "50-100",
-    Epic: "100-200",
-    Legendary: "150-300",
-  }[rarity];
-
-  const systemPrompt = `You are a master storyteller in the ${siteConfig.name} universe, weaving cosmic myths and adventures that captivate players with vivid imagery, ancient legends, and calls to heroic deeds. Ensure every narrative is immersive, tying into Pi's blockchain essence and regional lore.`;
-  const userPrompt = `
-Generate a NodeType object for the ${siteConfig.name} game with rarity "${rarity}" and phase ${phase}:
-- Name: NodeType name
-- Iconography: Choose an emoji or short label (e.g., "🏞️" for Common, "🌌" for Legendary)
-- Lore: Write an engaging, immersive story snippet (${descriptionLength} characters) with cosmic Pi themes, myths, and player hooks (e.g., "Venture into the void where ancient Pi guardians await your claim!").
-- Extended Lore: epic extension (200-500 chars) building on description with deeper narratives, twists, and calls to adventure.
-
-Return an object matching the NodeType schema. Ensure lores are vivid, story-driven, and engaging to draw players in.
-  `;
+  const { systemPrompt, userPrompt } = createNodeTypePrompts(phase, rarity);
 
   try {
     const { object: nodeType } = await generateObject({

@@ -8,17 +8,20 @@ import LevelProgress from "./level-progress";
 import QuickStats from "./quick-stats";
 import { QuickActions } from "./quick-actions";
 import GlobalPhaseCard from "./global-phase-card";
+import GenesisPhaseCard from "./genesis-phase-card";
 
 type DashboardClientPageProps = {
-  currentPhase: number;
+  currentPhase?: number;
   sessionsCompleted: number;
   nextPhaseThreshold: number;
+  harmonizerCount: number;
 };
 
 export default function DashboardClientPage({
   currentPhase,
   sessionsCompleted,
   nextPhaseThreshold,
+  harmonizerCount,
 }: DashboardClientPageProps) {
   const { data: userProfile, isLoading, isError } = useProfile();
 
@@ -71,11 +74,15 @@ export default function DashboardClientPage({
         xp={userProfile.xp}
       />
 
-      <GlobalPhaseCard
-        currentPhase={currentPhase}
-        sessionsCompleted={sessionsCompleted}
-        nextPhaseThreshold={nextPhaseThreshold}
-      />
+      {currentPhase ? (
+        <GlobalPhaseCard
+          currentPhase={currentPhase}
+          sessionsCompleted={sessionsCompleted}
+          nextPhaseThreshold={nextPhaseThreshold}
+        />
+      ) : (
+        <GenesisPhaseCard harmonizerCount={harmonizerCount} />
+      )}
 
       <QuickActions userId={userProfile.id} />
     </div>

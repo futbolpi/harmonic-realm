@@ -50,7 +50,7 @@ const QuickStats = ({
         <CardContent className="p-4 text-center">
           <MapPin className="h-8 w-8 text-neon-green mx-auto mb-2" />
           <div className="text-2xl font-bold text-primary">{nodesMined}</div>
-          <p className="text-xs text-muted-foreground">Sessions Complete</p>
+          <p className="text-xs text-muted-foreground">Sessions Completed</p>
         </CardContent>
       </Card>
     </div>

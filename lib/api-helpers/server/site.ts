@@ -39,9 +39,9 @@ export const getSiteStats = async () => {
     rank: index + 1,
   }));
 
-  const nextPhaseThreshold = await calculatePhaseThreshold(
-    latestPhase?.phaseNumber || 2
-  );
+  const nextPhase = latestPhase?.phaseNumber ? latestPhase.phaseNumber + 1 : 2;
+
+  const nextPhaseThreshold = await calculatePhaseThreshold(nextPhase);
 
   return {
     latestPhase,

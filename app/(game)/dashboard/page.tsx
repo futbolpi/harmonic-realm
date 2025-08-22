@@ -31,14 +31,19 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
-  const { latestPhase, sessionsCompleted, nextPhaseThreshold } =
-    await getSiteStats();
+  const {
+    latestPhase,
+    sessionsCompleted,
+    nextPhaseThreshold,
+    pioneersAggregate,
+  } = await getSiteStats();
 
   return (
     <DashboardClientPage
-      currentPhase={latestPhase?.phaseNumber || 1}
+      currentPhase={latestPhase?.phaseNumber}
       sessionsCompleted={sessionsCompleted}
       nextPhaseThreshold={nextPhaseThreshold}
+      harmonizerCount={pioneersAggregate._count.id}
     />
   );
 }

@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { Compass, Sparkles, ArrowRight, Waves, Eye } from "lucide-react";
+import { Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Stats from "./stats";
+import StatsLoading from "./stats-loading";
 
 export function Hero() {
   return (
@@ -101,26 +104,9 @@ export function Hero() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
-            <div className="text-center group">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
-                1000+
-              </div>
-              <p className="text-sm text-muted-foreground">Active Pioneers</p>
-            </div>
-            <div className="text-center group">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
-                500+
-              </div>
-              <p className="text-sm text-muted-foreground">Echo Guardians</p>
-            </div>
-            <div className="text-center group">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-400 to-violet-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
-                π 10K+
-              </div>
-              <p className="text-sm text-muted-foreground">Shares Awakened</p>
-            </div>
-          </div>
+          <Suspense fallback={<StatsLoading />}>
+            <Stats />
+          </Suspense>
         </div>
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { calculatePhaseThreshold } from "@/lib/node-spawn/phase-threshold";
 import prisma from "@/lib/prisma";
 
 export const getSiteStats = async () => {
@@ -32,5 +33,15 @@ export const getSiteStats = async () => {
     rank: index + 1,
   }));
 
-  return { latestPhase, sessionsCompleted, leaderboard, pioneersAggregate };
+  const nextPhaseThreshold = await calculatePhaseThreshold(
+    latestPhase?.phaseNumber || 2
+  );
+
+  return {
+    latestPhase,
+    sessionsCompleted,
+    leaderboard,
+    pioneersAggregate,
+    nextPhaseThreshold,
+  };
 };

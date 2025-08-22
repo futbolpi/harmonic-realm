@@ -12,11 +12,13 @@ import GlobalPhaseCard from "./global-phase-card";
 type DashboardClientPageProps = {
   currentPhase: number;
   sessionsCompleted: number;
+  nextPhaseThreshold: number;
 };
 
 export default function DashboardClientPage({
   currentPhase,
   sessionsCompleted,
+  nextPhaseThreshold,
 }: DashboardClientPageProps) {
   const { data: userProfile, isLoading, isError } = useProfile();
 
@@ -72,6 +74,7 @@ export default function DashboardClientPage({
       <GlobalPhaseCard
         currentPhase={currentPhase}
         sessionsCompleted={sessionsCompleted}
+        nextPhaseThreshold={nextPhaseThreshold}
       />
 
       <QuickActions userId={userProfile.id} />

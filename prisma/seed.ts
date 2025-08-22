@@ -98,8 +98,10 @@ async function seedUsersAndSessions() {
 
 async function main() {
   await seedAchievements();
-  await seedNodesAndTypes();
-  await seedUsersAndSessions();
+  if (process.env.NODE_ENV === "development") {
+    await seedNodesAndTypes();
+    await seedUsersAndSessions();
+  }
 }
 
 main()

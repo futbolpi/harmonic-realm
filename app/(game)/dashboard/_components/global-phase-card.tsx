@@ -4,23 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatNumber } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import { calculatePhaseThreshold } from "@/lib/node-spawn/phase-threshold";
 
 type GlobalPhaseCardProps = {
   currentPhase: number;
   sessionsCompleted: number;
+  nextPhaseThreshold: number;
 };
 
 const GlobalPhaseCard = ({
   currentPhase,
   sessionsCompleted,
+  nextPhaseThreshold,
 }: GlobalPhaseCardProps) => {
   const nextPhase = currentPhase + 1;
-  const sessionsNeeded = calculatePhaseThreshold(nextPhase);
   const description =
     "The Next Harmonic Awakening approaches as Pioneers across the Lattice contribute their resonance...";
 
-  const phaseProgress = (sessionsCompleted / sessionsNeeded) * 100;
+  const phaseProgress = (sessionsCompleted / nextPhaseThreshold) * 100;
 
   return (
     <Card className="game-card relative overflow-hidden">
@@ -44,7 +44,8 @@ const GlobalPhaseCard = ({
               Sessions toward Phase {nextPhase}
             </span>
             <span className="text-primary font-medium">
-              {formatNumber(sessionsCompleted)} / {formatNumber(sessionsNeeded)}
+              {formatNumber(sessionsCompleted)} /{" "}
+              {formatNumber(nextPhaseThreshold)}
             </span>
           </div>
           <Progress value={phaseProgress} className="h-3 bg-muted/20">

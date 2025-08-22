@@ -7,6 +7,7 @@ import { NodeTypeRarity } from "../generated/prisma/enums";
 import { model } from "../utils/ai";
 import { NodeTypeCreateManyInput } from "../generated/prisma/models";
 import { generateLore } from "./generate-lore";
+import { getNumberOfPhaseNodes, PIONEERSCALE } from "./quota";
 
 type Lore = {
   name: string;
@@ -15,27 +16,40 @@ type Lore = {
   iconography?: string;
 };
 
-const lockInMap: Record<NodeTypeRarity, number> = {
-  Common: 6,
-  Uncommon: 12,
-  Rare: 36,
-  Epic: 72,
-  Legendary: 144,
-};
-const yieldMap: Record<NodeTypeRarity, number> = {
-  Common: 10,
-  Uncommon: 50,
-  Rare: 200,
-  Epic: 1000,
-  Legendary: 5000,
-};
-const minersMap: Record<NodeTypeRarity, number> = {
-  Common: 50,
-  Uncommon: 200,
-  Rare: 500,
-  Epic: 1000,
-  Legendary: 2000,
-};
+// Base constants (tunable)
+const BASE_LOCK_IN = 2; // Minutes
+const BASE_YIELD = 10; // Shares/min
+const BASE_MINERS = 50; // Slots
+
+// Get lockInMinute
+function getLockInMinute(rarity: NodeTypeRarity, phase: number): number {
+  const rarityIndex =
+    ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"].indexOf(rarity) + 1;
+  const phaseFactor = 1 + (phase - 1) * 0.2;
+  return Math.round(BASE_LOCK_IN * rarityIndex * phaseFactor);
+}
+
+// Get baseYieldPerMinute
+function getBaseYieldPerMinute(rarity: NodeTypeRarity, phase: number): number {
+  const rarityIndex =
+    ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"].indexOf(rarity) + 1;
+  const rarityMultiplier = 1 + Math.log2(rarityIndex + 1) * 10; // Log-scaled ~1 to ~50
+  const phaseHalving = Math.pow(2, phase - 1);
+  return (BASE_YIELD * rarityMultiplier) / phaseHalving;
+}
+
+// Get maxMiners (async for pioneers fetch)
+function getMaxMiners(rarity: NodeTypeRarity, phase: number): number {
+  const rarityIndex =
+    ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"].indexOf(rarity) + 1;
+  // From formula
+  const totalNodes = getNumberOfPhaseNodes(phase);
+
+  return Math.max(
+    1,
+    Math.floor(BASE_MINERS * (totalNodes / rarityIndex) * PIONEERSCALE)
+  ); // Min 1 slot
+}
 
 const nodeTypeSchema = z.object({
   name: z.string(),
@@ -83,17 +97,14 @@ Return an object matching the NodeType schema. Ensure lores are vivid, story-dri
     });
     return nodeType;
   } catch {
-    const { name, lore, extendedLore } = generateLore(rarity, phase);
-    return { name, lore, extendedLore };
+    return generateLore(rarity, phase);
   }
 }
 
 async function generateNodeType(
   params: GenerateParams
 ): Promise<NodeTypeCreateManyInput> {
-  // region = cellid
   const { rarity, phase } = params;
-  const baseYield = 1.0 / phase;
 
   const { extendedLore, lore, name, iconography } = await getNodeTypeLore(
     params
@@ -102,9 +113,9 @@ async function generateNodeType(
   const enriched: NodeTypeCreateManyInput = {
     id: uuidv4(),
     name,
-    baseYieldPerMinute: yieldMap[rarity] * baseYield,
-    lockInMinutes: lockInMap[rarity],
-    maxMiners: minersMap[rarity],
+    baseYieldPerMinute: getBaseYieldPerMinute(rarity, phase),
+    lockInMinutes: getLockInMinute(rarity, phase),
+    maxMiners: getMaxMiners(rarity, phase),
     rarity,
     iconUrl: iconography,
     description: lore,

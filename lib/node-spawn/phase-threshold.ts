@@ -1,24 +1,33 @@
+import { subDays } from "date-fns";
+
+import prisma from "@/lib/prisma";
+
 /**
- * Calculates the mining session threshold for triggering phase p, based on the Pi Cosmos lore
- * where collective echoes (sessions) harmonize the lattice, with Fibonacci scaling for progression,
- * pi for cosmic essence, and escalation for diminishing returns as nodes halve.
+ * Updated: Calculates mining session threshold for phase p, dynamically scaling with active players for sustainability.
+ * Lore: "Harmonic Convergence" – thresholds reflect the converging series of Pi, scaled by collective resonance (active players),
+ * with logarithmic growth to ensure infinite yet challenging progression, preventing stagnation and encouraging global harmonization.
  * @param phase game phase
  * @returns mining session threshold
  */
-export function calculatePhaseThreshold(phase: number): number {
+export async function calculatePhaseThreshold(phase: number): Promise<number> {
   if (phase < 2)
     throw new Error("Phase must be at least 2 for threshold calculations");
 
-  const pi = Math.PI; // 3.14159, the cosmic constant
-  const cosmicBaseline = 500_000; // Base sessions, tuned for ~1-month phase with 1.2M players
-  const fibonacci = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]; // Up to phase 10; extend as needed
-  if (phase > fibonacci.length - 1)
-    throw new Error("Phase exceeds Fibonacci sequence limit");
+  const pi = Math.PI; // Cosmic constant
+  const baseline = 1_000;
 
-  const escalationFactor = 1 + (phase - 1) * 0.5; // 50% harder per phase, reflecting halving
-  const threshold = Math.round(
-    pi * fibonacci[phase] * cosmicBaseline * escalationFactor
-  );
+  // Dynamic: Active players (e.g., unique users with sessions in last 30 days)
+  const thirtyDaysAgo = subDays(new Date(), 30);
+  const activePlayers = await prisma.miningSession
+    .aggregate({
+      where: { startTime: { gte: thirtyDaysAgo } },
+      _count: { userId: true }, // Unique users
+    })
+    .then((agg) => agg._count.userId || 1); // Min 1
 
-  return threshold;
+  const growthFactor = Math.log2(phase) * Math.sqrt(activePlayers); // Log for slow growth, sqrt for player scaling
+  const threshold = Math.round(pi * baseline * growthFactor);
+
+  // Caps for balance: Min 100k (achievable), max 10M (prevent overload)
+  return Math.max(100_000, Math.min(10_000_000, threshold));
 }

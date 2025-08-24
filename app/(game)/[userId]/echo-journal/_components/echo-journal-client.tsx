@@ -1,4 +1,5 @@
-import { BookOpen, Map, Trophy, Zap } from "lucide-react";
+import { BookOpen, Clock, Map, Zap } from "lucide-react";
+import { Suspense } from "react";
 
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserProfile } from "@/lib/schema/user";
@@ -8,6 +9,8 @@ import { MiningPathMap } from "./mining-path-map";
 import BackButton from "./back-button";
 import EchoJournalTabs from "./echo-journal-tabs";
 import { ComingSoon } from "./coming-soon";
+import { UserMasteriesLoading } from "./user-masteries-loading";
+import { UserMasteries } from "./user-masteries";
 
 interface EchoJournalClientProps {
   userProfile: UserProfile;
@@ -52,12 +55,12 @@ export function EchoJournalClient({ userProfile }: EchoJournalClientProps) {
               <span className="hidden sm:inline">Journey Map</span>
             </TabsTrigger>
             <TabsTrigger value="sessions" className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
+              <Clock className="h-4 w-4" />
               <span className="hidden sm:inline">Sessions</span>
             </TabsTrigger>
-            <TabsTrigger value="shop" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              <span className="hidden sm:inline">Upgrades</span>
+            <TabsTrigger value="mastery" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              <span className="hidden sm:inline">Mastery</span>
             </TabsTrigger>
             <TabsTrigger value="lore" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
@@ -72,15 +75,17 @@ export function EchoJournalClient({ userProfile }: EchoJournalClientProps) {
           <TabsContent value="sessions" className="space-y-4">
             <div className="bg-card/50 backdrop-blur-sm rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Zap className="h-5 w-5 text-game-accent" />
+                <Clock className="h-5 w-5 text-game-accent" />
                 Mining Sessions
               </h2>
               <MiningSessionsTable sessions={sessions} />
             </div>
           </TabsContent>
 
-          <TabsContent value="shop" className="space-y-4">
-            <ComingSoon feature="upgrade-shop" />
+          <TabsContent value="mastery" className="space-y-4">
+            <Suspense fallback={<UserMasteriesLoading />}>
+              <UserMasteries userId={userProfile.id} />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="lore" className="space-y-4">

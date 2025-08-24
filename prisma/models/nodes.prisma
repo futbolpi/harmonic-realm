@@ -12,8 +12,9 @@ model NodeType {
     phase              Int? // Genesis phase (e.g., 1 for initial, null for non-phased-release)
 
     // Relations
-    nodes   Node[]
-    mastery UserNodeMastery[]
+    nodes    Node[]
+    mastery  UserNodeMastery[]
+    upgrades UserNodeUpgrade[]
 
     @@index([rarity, phase]) // For efficient queries on rarity/phase
     @@map("node_types")
@@ -46,12 +47,13 @@ model UserNodeUpgrade {
     createdAt DateTime @default(now())
 
     userId     String
-    nodeTypeId Int
+    nodeTypeId String
     level      Int    @default(1)
     effectPct  Float  @default(0.0)
 
     // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    nodeType NodeType @relation(fields: [nodeTypeId], references: [id], onDelete: Cascade)
 
     @@unique([userId, nodeTypeId])
     @@map("user_node_upgrades")
@@ -63,12 +65,11 @@ model UserNodeMastery {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    userId         String
-    nodeTypeId     String
-    level          Int    @default(0)
-    totalSessions  Int    @default(0)
-    totalTimeSpent Int    @default(0) // in minutes
-    bonusPercent   Float  @default(0.0)
+    userId            String
+    nodeTypeId        String
+    level             Int    @default(0)
+    sessionsCompleted Int    @default(0)
+    bonusPercent      Float  @default(0.0)
 
     // Relations
     user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)

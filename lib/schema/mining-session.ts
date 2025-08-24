@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { SessionStatus } from "../generated/prisma/enums";
+import { MasteryInfoSchema } from "./mastery";
 
 // Mining session schemas
 export const MiningSessionSchema = z
@@ -37,18 +38,14 @@ export const CompleteMiningSchema = z.object({
   longitude: z.number().min(-180).max(180),
 });
 
-export const MiningSessionResponseSchema = z.object({
+export const MiningSessionAssetsSchema = z.object({
   session: MiningSessionSchema,
-  canMine: z.boolean(),
-  reason: z.string().optional(),
-  userDistance: z.number().optional(), // renamed from distanceToNode for clarity
-  isWithinRange: z.boolean().optional(), // added boolean for range check
-  requiredDistance: z.number().default(100), // meters
+  masteryInfo: MasteryInfoSchema,
 });
 
 export type MiningSession = z.infer<typeof MiningSessionSchema>;
 export type StartMiningRequest = z.infer<typeof StartMiningSchema>;
-export type MiningSessionResponse = z.infer<typeof MiningSessionResponseSchema>;
+export type MiningSessionAssets = z.infer<typeof MiningSessionAssetsSchema>;
 export type CompleteMiningRequest = z.infer<typeof CompleteMiningSchema>;
 export type CompleteMiningResponse = z.infer<
   typeof CompleteMiningResponseSchema

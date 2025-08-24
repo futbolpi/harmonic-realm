@@ -13,6 +13,7 @@ import {
 import { calculateMinerShares, calculateMiningXp } from "@/lib/utils/mining";
 import { binLatLon } from "@/lib/node-spawn/region-metrics";
 import { inngest } from "@/inngest/client";
+import { updateMasteryProgression } from "@/lib/utils/mastery";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -71,6 +72,7 @@ export const completeMiningSession = async (
     const maxMiners = session.node.type.maxMiners;
     const activeMiners = completedSessions + 1;
     const durationMinutes = session.node.type.lockInMinutes;
+    const nodeTypeId = session.node.typeId;
 
     // 2. Compute durations and constraints
 
@@ -96,17 +98,22 @@ export const completeMiningSession = async (
 
     // 3. Gather upgrade & mastery bonuses
 
-    const [upgrades, mastery] = await Promise.all([
-      prisma.userNodeUpgrade.findMany({ where: { userId } }),
-      prisma.userNodeMastery.findFirst({
+    const [upgrade, mastery] = await Promise.all([
+      prisma.userNodeUpgrade.findUnique({
         where: {
-          userId,
-          nodeTypeId: session.node.typeId,
+          userId_nodeTypeId: { userId, nodeTypeId },
         },
+        select: { effectPct: true },
+      }),
+      prisma.userNodeMastery.findUnique({
+        where: {
+          userId_nodeTypeId: { userId, nodeTypeId },
+        },
+        select: { bonusPercent: true },
       }),
     ]);
 
-    const upgradeBonusPct = upgrades.reduce((sum, u) => sum + u.effectPct, 0);
+    const upgradeBonusPct = upgrade?.effectPct ?? 0;
     const masteryBonusPct = mastery ? mastery.bonusPercent : 0;
     // add algorithm later
     const miniTaskMultiplier = 1;
@@ -151,8 +158,12 @@ export const completeMiningSession = async (
       }),
     ]);
 
-    // 6. Award XP & handle level-up
-    await awardXp(userId, xpGained);
+    // 6. Award XP and mastery & handle level-up
+    // get returned value for good user experience
+    await Promise.all([
+      awardXp(userId, xpGained),
+      updateMasteryProgression(userId, nodeTypeId, 1, prisma),
+    ]);
 
     // 7. check if user is eligible for Surge Survivor achievement
     if (activeMiners === maxMiners) {

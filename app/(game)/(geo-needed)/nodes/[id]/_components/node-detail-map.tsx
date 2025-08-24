@@ -16,6 +16,9 @@ import { MAP_STYLES } from "../../../map/utils";
 import FloatingControls from "./floating-controls";
 import NodeInfoModal from "./node-info-modal";
 import NodeMiningSessions from "./node-mining-sessions";
+import { UserNodeMastery } from "./user-node-mastery";
+import { Button } from "@/components/ui/button";
+import { Zap } from "lucide-react";
 
 interface NodeDetailMapProps {
   node: Node;
@@ -142,10 +145,19 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
       <FloatingControls mapRef={mapRef} node={node} />
 
       {/* Floating node info - Mobile: Drawer, Desktop: Sheet */}
-      <NodeInfoModal node={node} />
 
-      <div className="absolute bottom-4 right-4 z-10">
+      <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+        <NodeInfoModal node={node} />
         <NodeMiningSessions node={node} />
+        <UserNodeMastery
+          nodeId={node.id}
+          nodeType={node.type}
+          trigger={
+            <Button size="icon" className="rounded-full shadow-lg">
+              <Zap className="h-4 w-4" />
+            </Button>
+          }
+        />
       </div>
 
       {/* Status indicator */}

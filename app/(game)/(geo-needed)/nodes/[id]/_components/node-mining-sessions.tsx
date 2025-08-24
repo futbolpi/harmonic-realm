@@ -17,9 +17,8 @@ const NodeMiningSessions = ({ node }: NodeMiningSessionsProps) => {
   return (
     <Credenza>
       <CredenzaTrigger asChild>
-        <Button variant="secondary" size="sm" className="shadow-lg">
-          <History className="h-4 w-4 mr-2" />
-          Sessions
+        <Button size="icon" className="shadow-lg rounded-full">
+          <History className="h-4 w-4" />
         </Button>
       </CredenzaTrigger>
       <CredenzaContent className="max-w-4xl max-h-[80vh] overflow-hidden">

@@ -88,13 +88,16 @@ export async function awardXp(userId: string, xpGained: number) {
   // 2. Compute new level based on updated XP
   const newLevel = calculateLevelFromXp(user.xp);
 
+  let leveledUp = false;
+
   // 3. If user has leveled up, persist the new level
   if (newLevel > user.level) {
     await prisma.user.update({
       where: { id: userId },
       data: { level: newLevel },
     });
+    leveledUp = true;
   }
 
-  return { xp: user.xp, level: newLevel };
+  return { xp: user.xp, level: newLevel, leveledUp };
 }

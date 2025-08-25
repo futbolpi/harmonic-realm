@@ -4,6 +4,7 @@ import {
   MiningSessionAssets,
 } from "@/lib/schema/mining-session";
 import { getMasteryInfo } from "@/lib/utils/mastery";
+import { getUserEchoTransmission } from "./echoes";
 
 export async function getMiningSession({
   nodeId,
@@ -22,6 +23,8 @@ export async function getMiningSession({
       startTime: true,
       status: true,
       updatedAt: true,
+      echoTransmissionApplied: true,
+      timeReductionPercent: true,
     },
   });
 }
@@ -33,7 +36,7 @@ export async function getMiningSessionAssets({
   nodeId: string;
   userId: string;
 }): Promise<MiningSessionAssets> {
-  const [session, nodeTypeId] = await Promise.all([
+  const [session, nodeTypeId, echoInfo] = await Promise.all([
     prisma.miningSession.findUnique({
       where: { userId_nodeId: { nodeId, userId } },
       select: {
@@ -44,12 +47,15 @@ export async function getMiningSessionAssets({
         startTime: true,
         status: true,
         updatedAt: true,
+        echoTransmissionApplied: true,
+        timeReductionPercent: true,
       },
     }),
     prisma.node.findUnique({ where: { id: nodeId }, select: { typeId: true } }),
+    getUserEchoTransmission(userId),
   ]);
 
   const masteryInfo = await getMasteryInfo(userId, prisma, nodeTypeId?.typeId);
 
-  return { session, masteryInfo };
+  return { session, masteryInfo, echoInfo };
 }

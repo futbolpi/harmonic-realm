@@ -14,13 +14,13 @@ model User {
     archivedAt DateTime?
 
     // Relations
-    sessions       MiningSession[]
-    upgrades       UserNodeUpgrade[]
-    mastery        UserNodeMastery[]
-    firmwareBoosts FirmwareBoost[]
-    redemptions    ShareRedemption[]
-    achievements   UserAchievement[]
-    payments       PiPayment[]
+    sessions         MiningSession[]
+    mastery          UserNodeMastery[]
+    firmwareBoosts   FirmwareBoost[]
+    redemptions      ShareRedemption[]
+    achievements     UserAchievement[]
+    payments         PiPayment[]
+    echoTransmission EchoTransmission? // One-to-one relationship
 
     @@map("users")
 }

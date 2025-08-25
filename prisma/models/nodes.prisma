@@ -12,9 +12,8 @@ model NodeType {
     phase              Int? // Genesis phase (e.g., 1 for initial, null for non-phased-release)
 
     // Relations
-    nodes    Node[]
-    mastery  UserNodeMastery[]
-    upgrades UserNodeUpgrade[]
+    nodes   Node[]
+    mastery UserNodeMastery[]
 
     @@index([rarity, phase]) // For efficient queries on rarity/phase
     @@map("node_types")
@@ -39,24 +38,6 @@ model Node {
 
     @@index([phase]) // Efficient phase-based queries
     @@map("nodes")
-}
-
-// User node upgrades
-model UserNodeUpgrade {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-
-    userId     String
-    nodeTypeId String
-    level      Int    @default(1)
-    effectPct  Float  @default(0.0)
-
-    // Relations
-    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    nodeType NodeType @relation(fields: [nodeTypeId], references: [id], onDelete: Cascade)
-
-    @@unique([userId, nodeTypeId])
-    @@map("user_node_upgrades")
 }
 
 // User node mastery

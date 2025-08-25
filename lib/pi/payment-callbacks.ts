@@ -1,4 +1,4 @@
-import { OnIncompletePaymentFound, PiCallbacks, PiPayment } from "@/types/pi";
+import { OnIncompletePaymentFound, PaymentCallbacks } from "@/types/pi";
 import axiosClient, { axiosConfig } from "../site/client";
 
 export const onIncompletePaymentFound: OnIncompletePaymentFound = async (
@@ -8,23 +8,25 @@ export const onIncompletePaymentFound: OnIncompletePaymentFound = async (
   return axiosClient.post("/payments/incomplete", { payment });
 };
 
-const onReadyForServerApproval = async (paymentId: string) => {
-  console.log("onReadyForServerApproval", paymentId);
-  axiosClient.post(`/payments/approve`, { paymentId }, axiosConfig);
-};
+const onReadyForServerApproval: PaymentCallbacks["onReadyForServerApproval"] =
+  async (paymentId) => {
+    console.log("onReadyForServerApproval", paymentId);
+    axiosClient.post(`/payments/approve`, { paymentId }, axiosConfig);
+  };
 
-const onReadyForServerCompletion = async (paymentId: string, txid: string) => {
-  console.log("onReadyForServerCompletion", paymentId, txid);
-  axiosClient.post(`/payments/complete`, { paymentId, txid }, axiosConfig);
-};
+const onReadyForServerCompletion: PaymentCallbacks["onReadyForServerCompletion"] =
+  async (paymentId, txid) => {
+    console.log("onReadyForServerCompletion", paymentId, txid);
+    axiosClient.post(`/payments/complete`, { paymentId, txid }, axiosConfig);
+  };
 
-const onCancel = (paymentId: string) => {
+const onCancel: PaymentCallbacks["onCancel"] = (paymentId) => {
   console.log("onCancel", paymentId);
 
   return axiosClient.post("/payments/cancel", { paymentId });
 };
 
-const onError = (error: Error, payment?: PiPayment) => {
+const onError: PaymentCallbacks["onError"] = (error, payment) => {
   console.error("onError", error);
   if (payment) {
     console.log(payment);
@@ -32,7 +34,7 @@ const onError = (error: Error, payment?: PiPayment) => {
   }
 };
 
-export const piPaymentCallbacks: PiCallbacks = {
+export const piPaymentCallbacks: PaymentCallbacks = {
   onCancel,
   onError,
   onReadyForServerApproval,

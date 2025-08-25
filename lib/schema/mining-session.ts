@@ -2,15 +2,18 @@ import { z } from "zod";
 
 import { SessionStatus } from "../generated/prisma/enums";
 import { MasteryInfoSchema } from "./mastery";
+import { EchoTransmissionSchema } from "./echo";
 
 // Mining session schemas
 export const MiningSessionSchema = z
   .object({
     id: z.string(),
+    echoTransmissionApplied: z.boolean(),
     status: z.enum(SessionStatus),
     createdAt: z.string().transform((val) => new Date(val)),
     updatedAt: z.string().transform((val) => new Date(val)),
     minerSharesEarned: z.number(),
+    timeReductionPercent: z.number(),
     startTime: z.string().transform((val) => new Date(val)),
     endTime: z
       .string()
@@ -41,6 +44,7 @@ export const CompleteMiningSchema = z.object({
 export const MiningSessionAssetsSchema = z.object({
   session: MiningSessionSchema,
   masteryInfo: MasteryInfoSchema,
+  echoInfo: EchoTransmissionSchema,
 });
 
 export type MiningSession = z.infer<typeof MiningSessionSchema>;

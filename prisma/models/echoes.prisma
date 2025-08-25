@@ -1,0 +1,31 @@
+// User-level Echo Transmission subscription
+model EchoTransmission {
+    id     String @id @default(cuid())
+    userId String @unique // One-to-one with User
+
+    // Resonator Status
+    chargeLevel   Int                 @default(0) // 0-100, depletes on use
+    lastChargedAt DateTime?
+    expiresAt     DateTime?
+    status        EchoResonatorStatus @default(EXPIRED)
+
+    // Usage History
+    usedNodeIds     String[] // Array of nodes where transmission was applied
+    totalUsageCount Int      @default(0)
+
+    // Pioneer Level Benefits
+    maxTimeReduction Int @default(25) // 25-40% based on mastery/level
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("echo_transmissions")
+}
+
+enum EchoResonatorStatus {
+    EXPIRED // Needs Pi Ad to recharge
+    CHARGED // Ready for use (within 1 hour)
+    DEPLETED // Used once, needs recharging
+}

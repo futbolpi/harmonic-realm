@@ -98,13 +98,7 @@ export const completeMiningSession = async (
 
     // 3. Gather upgrade & mastery bonuses
 
-    const [upgrade, mastery] = await Promise.all([
-      prisma.userNodeUpgrade.findUnique({
-        where: {
-          userId_nodeTypeId: { userId, nodeTypeId },
-        },
-        select: { effectPct: true },
-      }),
+    const [mastery] = await Promise.all([
       prisma.userNodeMastery.findUnique({
         where: {
           userId_nodeTypeId: { userId, nodeTypeId },
@@ -113,7 +107,6 @@ export const completeMiningSession = async (
       }),
     ]);
 
-    const upgradeBonusPct = upgrade?.effectPct ?? 0;
     const masteryBonusPct = mastery ? mastery.bonusPercent : 0;
     // add algorithm later
     const miniTaskMultiplier = 1;
@@ -122,7 +115,6 @@ export const completeMiningSession = async (
     const sharesEarned = calculateMinerShares({
       baseYieldPerMinute: session.node.type.baseYieldPerMinute,
       durationMinutes,
-      upgradeBonusPct,
       masteryBonusPct,
       miniTaskMultiplier,
       maxMiners,
@@ -131,7 +123,6 @@ export const completeMiningSession = async (
 
     const xpGained = calculateMiningXp({
       durationMinutes,
-      upgradeBonusPct,
       masteryBonusPct,
       miniTaskMultiplier,
     });

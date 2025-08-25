@@ -1,6 +1,8 @@
 // This is a client-side module for Pi SDK integration
 "use client";
 
+import { toast } from "sonner";
+
 import { PiSDK } from "@/types/pi";
 
 // Mock Pi SDK for development (replace with actual SDK in production)
@@ -33,6 +35,26 @@ export const mockPiSDK: PiSDK = {
   },
   init({ version, sandbox }) {
     console.log({ version, sandbox });
+  },
+  async nativeFeaturesList() {
+    return ["ad_network", "inline_media", "request_permission"];
+  },
+  openShareDialog(title, message) {
+    toast.success(title, { description: message });
+  },
+  Ads: {
+    async showAd(adType) {
+      return { type: adType, result: "AD_CLOSED" };
+    },
+    async isAdReady(adType) {
+      return { ready: true, type: adType };
+    },
+    async requestAd(adType) {
+      return { result: "AD_LOADED", type: adType };
+    },
+  },
+  async openUrlInSystemBrowser(url) {
+    console.log(url);
   },
 };
 

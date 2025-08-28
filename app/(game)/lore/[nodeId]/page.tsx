@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { BookOpen, Coins, Share2, Zap } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getLore } from "./services";
@@ -8,7 +9,6 @@ import HeroSection from "./_components/hero-section";
 import LoreNarrative from "./_components/lore-narrative";
 import StakingSection from "./_components/staking-section";
 import SharingSection from "./_components/sharing-section";
-import { BookOpen, Coins, Share2, Zap } from "lucide-react";
 
 interface LorePageProps {
   params: Promise<{ nodeId: string }>;
@@ -49,7 +49,7 @@ export async function generateMetadata({
     lore.mysticInterpretation?.slice(0, 80) + "..." ||
     "Unveil cosmic secrets in the Lattice!";
   const primaryColor = lore.cosmeticThemes?.primaryColors?.[0] || "#228B22";
-  const rarity = lore.node.rarity;
+  const rarity = lore.node.type.rarity;
   const url = `/api/og/lore?nodeId=${encodeURIComponent(
     nodeId.slice(0, 5) + "..."
   )}&city=${encodeURIComponent(city)}&teaser=${encodeURIComponent(

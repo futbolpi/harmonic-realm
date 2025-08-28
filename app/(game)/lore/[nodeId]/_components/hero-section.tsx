@@ -23,8 +23,8 @@ export default function HeroSection({ lore }: HeroSectionProps) {
   const { resolvedTheme } = useTheme();
 
   const initialViewState = {
-    latitude: lore.node.lat,
-    longitude: lore.node.long,
+    latitude: lore.node.latitude,
+    longitude: lore.node.longitude,
     zoom: 16,
   };
 
@@ -81,19 +81,20 @@ export default function HeroSection({ lore }: HeroSectionProps) {
 
               <Marker
                 key={lore.nodeId}
-                longitude={lore.node.long}
-                latitude={lore.node.lat}
+                longitude={lore.node.longitude}
+                latitude={lore.node.latitude}
               >
-                <NodeMarker nodeRarity={lore.node.rarity} />
+                <NodeMarker nodeRarity={lore.node.type.rarity} />
               </Marker>
             </Map>
           </div>
           <div className="w-full md:w-1/2 flex flex-wrap gap-2 justify-center mt-4 md:mt-0">
-            <Badge variant="secondary">Rarity: {lore.node.rarity}</Badge>
-            <Badge variant="secondary">Type: {lore.node.type}</Badge>
+            <Badge variant="secondary">Rarity: {lore.node.type.rarity}</Badge>
+            <Badge variant="secondary">Type: {lore.node.type.name}</Badge>
             <Badge variant="secondary">Level: {lore.currentLevel}/5</Badge>
             <Badge variant="secondary">
-              Pi Staked: {lore.totalPiStaked} by {lore.contributors.length}
+              Pi Staked: {lore.totalPiStaked.toDecimalPlaces(2).toString()} by{" "}
+              {lore.stakes.length}
             </Badge>
             <Button variant="ghost" onClick={toggleAudio}>
               <Volume2 className="mr-2" /> {isPlaying ? "Pause" : "Play"}{" "}

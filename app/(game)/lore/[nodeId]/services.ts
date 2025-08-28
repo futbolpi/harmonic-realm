@@ -1,102 +1,92 @@
-import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import { Decimal } from "@prisma/client/runtime/library";
+
+import {
+  ContributionTier,
+  NodeTypeRarity,
+  PaymentStatus,
+} from "@/lib/generated/prisma/enums";
+import prisma from "@/lib/prisma";
 
 // lib/types/lore.ts
 export interface LocationLore {
   id: string;
   nodeId: string;
-  country?: string;
-  state?: string;
-  city?: string;
-  basicHistory?: string;
-  culturalSignificance?: string;
-  mysticInterpretation?: string;
-  epicNarrative?: string;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  basicHistory: string | null;
+  culturalSignificance: string | null;
+  mysticInterpretation: string | null;
+  epicNarrative: string | null;
   legendaryTale: string | null;
-  cosmeticThemes?: {
+  cosmeticThemes: {
     primaryColors: string[];
     secondaryColors: string[];
     effects: string[];
     ambientSounds: string[];
-  };
-  audioThemes?: {
+  } | null;
+  audioThemes: {
     baseFrequency: number;
     harmonics: number[];
     instruments: string[];
-  };
+  } | null;
   currentLevel: number;
-  totalPiStaked: string; // Decimal as string for precision
+  totalPiStaked: Decimal; // Decimal as string for precision
   generationStatus: string;
   node: {
-    rarity: NodeTypeRarity;
-    type: string;
-    lat: number;
-    long: number;
-    distance: number;
+    type: { rarity: NodeTypeRarity; id: string; name: string };
+    latitude: number;
+    longitude: number;
   };
-  contributors: Array<{
-    username: string;
-    tier: string;
-    avatar: string;
-  }>;
+  stakes: {
+    paymentStatus: PaymentStatus;
+    piAmount: Decimal;
+    contributionTier: ContributionTier | null;
+    user: {
+      id: string;
+      username: string;
+    };
+  }[];
 }
 
 export async function getLore(nodeId: string): Promise<LocationLore | null> {
   // Mocked data - in prod, query DB (e.g., Prisma) and return null for non-existent nodes
-  if (nodeId === "47") {
-    // Simulate non-existent node
-    return null;
-  }
+  const locationLore = await prisma.locationLore.findUnique({
+    where: { nodeId },
+    select: {
+      id: true,
+      nodeId: true,
+      legendaryTale: true,
+      currentLevel: true,
+      totalPiStaked: true,
+      generationStatus: true,
+      country: true,
+      state: true,
+      city: true,
+      basicHistory: true,
+      culturalSignificance: true,
+      mysticInterpretation: true,
+      epicNarrative: true,
+      cosmeticThemes: true,
+      audioThemes: true,
+      node: {
+        select: {
+          latitude: true,
+          longitude: true,
+          type: { select: { id: true, name: true, rarity: true } },
+        },
+      },
+      stakes: {
+        where: { paymentStatus: "COMPLETED" },
+        select: {
+          piAmount: true,
+          paymentStatus: true,
+          contributionTier: true,
+          user: { select: { id: true, username: true } },
+        },
+      },
+    },
+  });
 
-  // Mocked data for nodeId '47' (Stonehenge example)
-  return {
-    id: `lore-${nodeId}`,
-    nodeId,
-    country: "United Kingdom",
-    state: "Wiltshire",
-    city: "Amesbury",
-    basicHistory:
-      "Archaeological evidence suggests this location was significant to ancient civilizations, with structures dating back to 3000 BCE.",
-    culturalSignificance:
-      "Cultural legends tell of druidic rituals and astronomical alignments, serving as a ceremonial site for millennia.",
-    mysticInterpretation:
-      "The Lattice recognizes this as a Temporal Anchor where ancient Druids first sensed Pi's infinite rhythm, binding stone to cosmic frequencies.",
-    epicNarrative:
-      "Here stands the Great Circle of Infinite Resonance, where mortal minds first touched the eternal mathematics that bind reality, echoing through the digits of Pi.",
-    legendaryTale: null, // Locked at level 4 for mock
-    cosmeticThemes: {
-      primaryColors: ["#228B22", "#32CD32", "#006400"],
-      secondaryColors: ["#F5F5DC", "#E6E6FA", "#F0F8FF"],
-      effects: ["particle-glow", "nature-spirits", "ancient-growth"],
-      ambientSounds: ["forest-ambience", "wind-through-trees"],
-    },
-    audioThemes: {
-      baseFrequency: 432,
-      harmonics: [648, 864, 1080],
-      instruments: ["flute", "nature-sounds", "harmonic-drone"],
-    },
-    currentLevel: 3, // Mock: Levels 1-3 unlocked
-    totalPiStaked: "8.5",
-    generationStatus: "COMPLETE",
-    node: {
-      // Extended mock for node info
-      rarity: "Epic",
-      type: "Temporal Anchor",
-      lat: 51.1789,
-      long: -1.8262,
-      distance: 2, // km from user (mock)
-    },
-    contributors: [
-      // Mock contributors for spotlight
-      {
-        username: "PioneerX",
-        tier: "Lattice Architect",
-        avatar: "/avatars/pioneerx.png",
-      },
-      {
-        username: "EchoFan",
-        tier: "Resonance Patron",
-        avatar: "/avatars/echofan.png",
-      },
-    ],
-  };
+  return locationLore;
 }

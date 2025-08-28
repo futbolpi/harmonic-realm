@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { Decimal } from "@prisma/client/runtime/library";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,7 +34,7 @@ const stakeSchema = z.object({
 interface StakingSectionProps {
   nodeId: string;
   currentLevel: number;
-  totalPiStaked: string;
+  totalPiStaked: Decimal;
 }
 
 export default function StakingSection({
@@ -85,7 +86,8 @@ export default function StakingSection({
       <CardContent>
         <Progress value={progress} className="mb-4" />
         <p className="mb-4">
-          Current Level: {currentLevel}/5 | Total Pi: {totalPiStaked}
+          Current Level: {currentLevel}/5 | Total Pi:{" "}
+          {totalPiStaked.toDecimalPlaces(2).toString()}
         </p>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

@@ -14,13 +14,13 @@ model User {
     archivedAt DateTime?
 
     // Relations
-    sessions         MiningSession[]
-    mastery          UserNodeMastery[]
-    firmwareBoosts   FirmwareBoost[]
-    redemptions      ShareRedemption[]
-    achievements     UserAchievement[]
-    payments         PiPayment[]
-    echoTransmission EchoTransmission? // One-to-one relationship
+    sessions          MiningSession[]
+    mastery           UserNodeMastery[]
+    firmwareBoosts    FirmwareBoost[]
+    redemptions       ShareRedemption[]
+    achievements      UserAchievement[]
+    echoTransmission  EchoTransmission? // One-to-one relationship
+    loreContributions LocationLoreStake[] // New: Pi staking for lore
 
     @@map("users")
 }

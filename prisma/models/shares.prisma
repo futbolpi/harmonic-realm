@@ -1,0 +1,37 @@
+// Share redemptions
+model ShareRedemption {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    userId         String
+    sharesRedeemed Float
+    piReceived     Float
+    redemptionRate Float
+
+    // Status
+    status      PaymentStatus @default(PENDING)
+    processedAt DateTime?
+
+    // Pi Network Integration
+    piTxId      String?
+    piPaymentId String?
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("share_redemptions")
+}
+
+enum PaymentType {
+    LOCATION_LORE
+    AWAKENING
+    SHARE_REDEMPTION
+}
+
+enum PaymentStatus {
+    PENDING
+    PROCESSING
+    COMPLETED
+    FAILED
+    CANCELLED
+}

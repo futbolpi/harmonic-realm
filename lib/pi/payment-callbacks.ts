@@ -1,4 +1,4 @@
-import { OnIncompletePaymentFound, PaymentCallbacks } from "@/types/pi";
+import { OnIncompletePaymentFound, PiPaymentCallbacks } from "@/types/pi";
 import axiosClient, { axiosConfig } from "../site/client";
 
 export const onIncompletePaymentFound: OnIncompletePaymentFound = async (
@@ -8,25 +8,25 @@ export const onIncompletePaymentFound: OnIncompletePaymentFound = async (
   return axiosClient.post("/payments/incomplete", { payment });
 };
 
-const onReadyForServerApproval: PaymentCallbacks["onReadyForServerApproval"] =
+const onReadyForServerApproval: PiPaymentCallbacks["onReadyForServerApproval"] =
   async (paymentId) => {
     console.log("onReadyForServerApproval", paymentId);
     axiosClient.post(`/payments/approve`, { paymentId }, axiosConfig);
   };
 
-const onReadyForServerCompletion: PaymentCallbacks["onReadyForServerCompletion"] =
+const onReadyForServerCompletion: PiPaymentCallbacks["onReadyForServerCompletion"] =
   async (paymentId, txid) => {
     console.log("onReadyForServerCompletion", paymentId, txid);
     axiosClient.post(`/payments/complete`, { paymentId, txid }, axiosConfig);
   };
 
-const onCancel: PaymentCallbacks["onCancel"] = (paymentId) => {
+const onCancel: PiPaymentCallbacks["onCancel"] = (paymentId) => {
   console.log("onCancel", paymentId);
 
   return axiosClient.post("/payments/cancel", { paymentId });
 };
 
-const onError: PaymentCallbacks["onError"] = (error, payment) => {
+const onError: PiPaymentCallbacks["onError"] = (error, payment) => {
   console.error("onError", error);
   if (payment) {
     console.log(payment);
@@ -34,7 +34,7 @@ const onError: PaymentCallbacks["onError"] = (error, payment) => {
   }
 };
 
-export const piPaymentCallbacks: PaymentCallbacks = {
+export const piPaymentCallbacks: PiPaymentCallbacks = {
   onCancel,
   onError,
   onReadyForServerApproval,

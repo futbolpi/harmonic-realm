@@ -54,9 +54,10 @@ type AuthResult = {
 export type PiMetadata = {
   type: PaymentType;
   modelId: string;
+  level?: number;
 };
 
-export type PaymentData = {
+export type PiPaymentData = {
   amount: number;
   memo: string;
   metadata: PiMetadata;
@@ -65,6 +66,13 @@ export type PaymentData = {
 type Direction = "user_to_app" | "app_to_user";
 type AppNetwork = "Pi Network" | "Pi Testnet";
 type Scope = "username" | "payments" | "wallet_address";
+
+export interface PiPaymentResult {
+  paymentId: string;
+  status: "pending" | "approved" | "completed" | "cancelled" | "failed";
+  amount?: number;
+  txid?: string;
+}
 
 export type PaymentDTO = {
   // Payment data:
@@ -97,7 +105,7 @@ export type PaymentDTO = {
   };
 };
 
-export type PaymentCallbacks = {
+export type PiPaymentCallbacks = {
   onReadyForServerApproval: (paymentId: string) => void;
   onReadyForServerCompletion: (paymentId: string, txid: string) => void;
   onCancel: (paymentId: string) => void;
@@ -112,7 +120,7 @@ export interface PiSDK {
   ) => Promise<AuthResult>;
   createPayment: (
     payment: PaymentData,
-    callbacks: PaymentCallbacks
+    callbacks: PiPaymentCallbacks
   ) => Promise<void>;
   init: ({ version, sandbox }: { version: string; sandbox: boolean }) => void;
   nativeFeaturesList: () => Promise<Array<NativeFeature>>;

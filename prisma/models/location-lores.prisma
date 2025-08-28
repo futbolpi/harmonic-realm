@@ -1,0 +1,126 @@
+model LocationLore {
+  id     String @id @default(cuid())
+  nodeId String @unique
+
+  // Geographic Data (cached from reverse geocoding)
+  country  String?
+  state    String?
+  city     String?
+  district String?
+  address  String?
+  postcode String?
+
+  // Raw reverse geocoding response (for fallback/debugging)
+  /// [LocationContext]
+  reverseGeoData Json?
+
+  // Lore Content Tiers (progressively unlocked)
+  basicHistory         String? // Level 1: 0.5 Pi
+  culturalSignificance String? // Level 2: 2 Pi total  
+  mysticInterpretation String? // Level 3: 5 Pi total
+  epicNarrative        String? // Level 4: 10 Pi total
+  legendaryTale        String? // Level 5: 20 Pi total
+
+  // Visual Themes (unlocked with lore)
+  /// [CosmeticTheme]
+  cosmeticThemes Json? // Color schemes, effects, etc.
+  /// [AudioTheme]
+  audioThemes    Json? // Ambient sounds, music
+
+  // Funding Progress
+  currentLevel  Int     @default(0) // 0-5
+  totalPiStaked Decimal @default(0) @db.Decimal(10, 4)
+
+  // Generation Status
+  generationStatus LoreGenerationStatus @default(PENDING)
+  generationError  String?
+  lastGeneratedAt  DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  node   Node                @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  stakes LocationLoreStake[]
+
+  @@index([currentLevel], name: "lore_level_idx")
+  @@index([totalPiStaked], name: "pi_staked_idx")
+  @@index([generationStatus], name: "generation_status_idx")
+  @@map("location_lore")
+}
+
+model LocationLoreStake {
+  id               String            @id @default(cuid())
+  userId           String
+  nodeId           String
+  piAmount         Decimal           @db.Decimal(10, 4)
+  targetLevel      Int // Which lore level they're contributing to
+  paymentStatus    PaymentStatus     @default(PENDING)
+  contributionTier ContributionTier? // Recognition level earned
+
+  // Pi Payment Data
+  paymentId       String? // Pi Network payment ID
+  piTransactionId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user         User         @relation(fields: [userId], references: [id])
+  locationLore LocationLore @relation(fields: [nodeId], references: [nodeId])
+
+  @@index([userId], name: "stake_user_idx")
+  @@index([nodeId], name: "stake_node_idx")
+  @@index([paymentStatus], name: "payment_status_idx")
+  @@map("location_lore_stakes")
+}
+
+model LoreGenerationJob {
+  id          String    @id @default(cuid())
+  nodeId      String
+  targetLevel Int // Which lore level to generate
+  status      JobStatus @default(PENDING)
+
+  // Job Data
+  inngestEventId String? // Inngest workflow run ID
+  /// [LocationContext]
+  geoData        Json? // Cached reverse geocoding data
+  aiPrompt       String? // Generated prompt for AI
+  aiResponse     String? // Raw AI response
+  error          String?
+
+  // Timing
+  startedAt   DateTime?
+  completedAt DateTime?
+  retryCount  Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status], name: "job_status_idx")
+  @@index([nodeId], name: "job_node_idx")
+  @@map("lore_generation_jobs")
+}
+
+enum LoreGenerationStatus {
+  PENDING
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum ContributionTier {
+  ECHO_SUPPORTER // 0.1+ Pi
+  RESONANCE_PATRON // 1+ Pi
+  LATTICE_ARCHITECT // 10+ Pi
+  COSMIC_FOUNDER // 50+ Pi
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  RETRYING
+}

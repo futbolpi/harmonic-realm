@@ -30,7 +30,7 @@ import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-asset
 import { getPiSDK } from "@/components/shared/pi/pi-sdk";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { applyEchoTransmission } from "@/actions/mining/apply-echo-transmission";
+import { applyEchoTransmission } from "@/actions/echo/apply-echo-transmission";
 import { displayInterstitialAd, showRewardedAd } from "../_utils/pi-ads";
 
 interface ActiveMiningDrawerProps {

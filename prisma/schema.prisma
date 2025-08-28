@@ -3,6 +3,12 @@ generator client {
   output   = "../lib/generated/prisma"
 }
 
+generator json {
+  provider  = "prisma-json-types-generator"
+  namespace = "PrismaJson"
+  allowAny  = false
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

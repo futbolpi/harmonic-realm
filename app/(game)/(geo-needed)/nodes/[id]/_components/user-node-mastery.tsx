@@ -38,7 +38,6 @@ export function UserNodeMastery({
 }: UserNodeMasteryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading: loading } = useMiningSessionAssets(nodeId);
-  console.log({ data });
 
   const defaultTrigger = (
     <Button variant="outline" size="sm" className="gap-2">

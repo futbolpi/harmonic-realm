@@ -243,7 +243,7 @@ async function updateMasteryProgression(
   // First, get the current mastery state or prepare to create new one
   const existingMastery = await prisma.userNodeMastery.findUnique({
     where: {
-      userId_nodeTypeId: { userId, nodeTypeId },
+      user_node_mastery_unique: { userId, nodeTypeId },
     },
     include: {
       nodeType: {
@@ -282,7 +282,7 @@ async function updateMasteryProgression(
   // Update or create the mastery record
   const updatedMastery = await prisma.userNodeMastery.upsert({
     where: {
-      userId_nodeTypeId: { userId, nodeTypeId },
+      user_node_mastery_unique: { userId, nodeTypeId },
     },
     create: {
       userId,
@@ -327,7 +327,7 @@ async function getMasteryInfo(
   const availableThresholds = calculateMasteryThresholds();
 
   const mastery = await prisma.userNodeMastery.findUnique({
-    where: { userId_nodeTypeId: { userId, nodeTypeId } },
+    where: { user_node_mastery_unique: { userId, nodeTypeId } },
     include: { nodeType: { select: { rarity: true } } },
   });
 

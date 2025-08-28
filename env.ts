@@ -28,6 +28,9 @@ export const env = createEnv({
     // REDIS
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
     UPSTASH_REDIS_REST_URL: z.url(),
+
+    // LOCATIONIQ
+    LOCATIONIQ_API_KEY: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.url(),
@@ -68,5 +71,8 @@ export const env = createEnv({
     // REDIS
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+
+    // LOCATIONIQ
+    LOCATIONIQ_API_KEY: process.env.LOCATIONIQ_API_KEY,
   },
 });

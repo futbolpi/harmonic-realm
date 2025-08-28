@@ -18,7 +18,8 @@ import NodeInfoModal from "./node-info-modal";
 import NodeMiningSessions from "./node-mining-sessions";
 import { UserNodeMastery } from "./user-node-mastery";
 import { Button } from "@/components/ui/button";
-import { Zap } from "lucide-react";
+import { BookOpen, Zap } from "lucide-react";
+import Link from "next/link";
 
 interface NodeDetailMapProps {
   node: Node;
@@ -158,6 +159,11 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
             </Button>
           }
         />
+        <Button asChild size="icon" className="rounded-full shadow-lg">
+          <Link href={`/nodes/${node.id}/lore`}>
+            <BookOpen className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
 
       {/* Status indicator */}

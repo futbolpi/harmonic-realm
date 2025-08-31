@@ -101,7 +101,7 @@ export const completeMiningSession = async (
     const [mastery] = await Promise.all([
       prisma.userNodeMastery.findUnique({
         where: {
-          userId_nodeTypeId: { userId, nodeTypeId },
+          user_node_mastery_unique: { userId, nodeTypeId },
         },
         select: { bonusPercent: true },
       }),

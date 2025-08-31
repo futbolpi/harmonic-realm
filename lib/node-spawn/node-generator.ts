@@ -6,6 +6,8 @@ import { NodeTypeRarity } from "../generated/prisma/enums";
 import { NodeCreateManyInput } from "../generated/prisma/models";
 import { redis } from "../redis";
 import { generateLore, getRarityElements } from "./generate-lore";
+import { env } from "@/env";
+import { BIN_SIZE } from "./region-metrics";
 
 type GlobalCache = {
   pi_digits: string | null;
@@ -39,7 +41,7 @@ function getFactorial(n: number): Decimal {
 }
 
 // Chudnovsky algorithm for Pi digits using Decimal.js
-async function computePiDigits(digits: number): Promise<string> {
+export async function computePiDigits(digits: number): Promise<string> {
   Decimal.set({ precision: digits + 10 });
   let pi = new Decimal(0);
   const iterations = Math.ceil(digits / 14) + 1; // ~14 digits per iter
@@ -79,10 +81,11 @@ async function getPiDigits(): Promise<string> {
 }
 
 // Pi-seeded point
-async function piSeededPoint(
+export async function piSeededPoint(
   offset: number
 ): Promise<{ lat: number; lng: number }> {
   const digits = await getPiDigits();
+
   const chunkSize = 10;
   offset = offset % (digits.length - chunkSize * 2); // Wrap if overflow
   const lngFrac = parseInt(digits.slice(offset, offset + chunkSize), 10) / 1e10;
@@ -113,7 +116,7 @@ async function loadLandGeoJson(): Promise<
     return parsed;
   }
   // Load and store
-  const res = await fetch("/geojson/world-land.json");
+  const res = await fetch(`${env.NEXT_PUBLIC_APP_URL}/geojson/world-land.json`);
   const geojson = await res.json();
   globalCache[cacheKey] = geojson;
   await redis.set(cacheKey, JSON.stringify(geojson));
@@ -121,7 +124,7 @@ async function loadLandGeoJson(): Promise<
 }
 
 // Fixed isOnLand: Loop over features
-async function isOnLand(lng: number, lat: number): Promise<boolean> {
+export async function isOnLand(lng: number, lat: number): Promise<boolean> {
   const geojson = await loadLandGeoJson();
   const point = turf.point([lng, lat]);
   for (const feature of geojson.features) {
@@ -230,9 +233,9 @@ export async function generateNodes({
         point = await piSeededPoint(offset);
         const [latBin, lngBin] = selectedBin.binId.split("_").map(Number);
         const latMin = latBin * 1.0;
-        const latMax = latMin + 1.0;
+        const latMax = latMin + BIN_SIZE;
         const lngMin = lngBin * 1.0;
-        const lngMax = lngMin + 1.0;
+        const lngMax = lngMin + BIN_SIZE;
         point.lat = latMin + ((point.lat + 90) / 180) * (latMax - latMin);
         point.lng = lngMin + ((point.lng + 180) / 360) * (lngMax - lngMin);
         offset += 20;

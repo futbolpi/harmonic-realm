@@ -33,12 +33,15 @@ export const generateInitialPhase = inngest.createFunction(
 
     // Step 3: Generate and store NodeTypes (small, one step)
     const nodeTypes = await step.run("generate-node-types", async () => {
-      const types = await generateNodeTypes(phase.id); // Assume generateNodeTypes returns array
-      await prisma.nodeType.createMany({
-        data: types,
+      const types = await generateNodeTypes(phase.phaseNumber); // Assume generateNodeTypes returns array
+      return types;
+    });
+
+    await step.run("save-node-types", async () => {
+      return prisma.nodeType.createMany({
+        data: nodeTypes,
         skipDuplicates: true,
       });
-      return types;
     });
 
     // Prepare rarityToIdMap from nodeTypes
@@ -54,7 +57,7 @@ export const generateInitialPhase = inngest.createFunction(
       rarityToIdMap[type.rarity] = type.id;
     });
 
-    // Step 4: Batch generate and store nodes
+    // Step 5: Batch generate and store nodes
     const batchSize = 1000;
     const numBatches = Math.ceil(totalNodes / batchSize);
     let remainingNodes = totalNodes;
@@ -84,23 +87,22 @@ export const generateInitialPhase = inngest.createFunction(
       remainingNodes -= currentBatchSize;
     }
 
-    // Step 5: update game phase narrative.
-    // Note: Original uses all nodes for narrative; to batch, could aggregate, but keep as is (query DB or accumulate)
-    const narrativeNodes = await step.run(
-      "fetch-nodes-for-narrative",
-      async () => {
-        const nodes = await prisma.node.findMany({
-          where: { phase: phase.phaseNumber },
-          select: { name: true, lore: true },
-          take: 5,
-        });
-        return nodes;
-      }
-    );
+    // Step 6: update game phase narrative.
+    // Note: use the nodetypes this time
+    const types = nodeTypes.map((nt) => ({
+      name: nt.name,
+      lore: nt.description,
+    }));
 
     const loreNarrative = await step.run(
       "trigger-awakening",
-      async () => await triggerNetworkAwakening(narrativeNodes, "global")
+      async () =>
+        await triggerNetworkAwakening({
+          phase: phaseNumber,
+          region: "Earth",
+          totalNodes,
+          types,
+        })
     );
 
     await step.run(
@@ -112,7 +114,7 @@ export const generateInitialPhase = inngest.createFunction(
         })
     );
 
-    // Step 6: Notify ecosystem of genesis completion
+    // Step 7: Notify ecosystem of genesis completion
     await inngest.send({
       name: "game.phase.completed",
       data: {

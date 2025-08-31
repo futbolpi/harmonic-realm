@@ -10,7 +10,13 @@ const openrouter = createOpenRouter({
   apiKey: env.OPENROUTER_API_KEY,
 });
 
-export const openrouterModel = openrouter("google/gemini-2.0-flash-exp:free");
+const zai = "z-ai/glm-4.5-air:free";
+const qwen3 = "qwen/qwen3-coder:free";
+const moonshotai = "moonshotai/kimi-k2:free";
+const tngtech = "tngtech/deepseek-r1t2-chimera:free";
+const openRouterModels = { zai, qwen3, moonshotai, tngtech };
+
+export const openrouterModel = openrouter(openRouterModels.moonshotai);
 
 export const model =
   siteConfig.network === "mainnet" ? xaiModel : openrouterModel;

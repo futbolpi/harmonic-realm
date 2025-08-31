@@ -6,6 +6,7 @@ import { generateNodes } from "@/lib/node-spawn/node-generator";
 import { getNumberOfPhaseNodes } from "@/lib/node-spawn/quota";
 import { getBinId } from "@/lib/node-spawn/region-metrics";
 import prisma from "@/lib/prisma";
+import { halvingFormula } from "@/lib/utils";
 
 // Next phase workflow
 export const generateNextPhase = inngest.createFunction(
@@ -42,7 +43,7 @@ export const generateNextPhase = inngest.createFunction(
           phaseNumber,
           loreNarrative: "",
           triggerType: "THRESHOLD", // Or dynamic
-          halvingFactor,
+          halvingFactor: halvingFormula(phaseNumber, 1),
           totalNodes,
         },
       });
@@ -68,12 +69,15 @@ export const generateNextPhase = inngest.createFunction(
 
     // Step 5: Generate and store NodeTypes
     const nodeTypes = await step.run("generate-node-types", async () => {
-      const types = await generateNodeTypes(phase.phaseNumber);
-      await prisma.nodeType.createMany({
-        data: types,
+      const types = await generateNodeTypes(phase.phaseNumber); // Assume generateNodeTypes returns array
+      return types;
+    });
+
+    await step.run("save-node-types", async () => {
+      return prisma.nodeType.createMany({
+        data: nodeTypes,
         skipDuplicates: true,
       });
-      return types;
     });
 
     // Prepare rarityToIdMap
@@ -121,21 +125,21 @@ export const generateNextPhase = inngest.createFunction(
     }
 
     // Step 7: Update game phase narrative (similar to initial)
-    const narrativeNodes = await step.run(
-      "fetch-nodes-for-narrative",
-      async () => {
-        const nodes = await prisma.node.findMany({
-          where: { phase: phase.phaseNumber },
-          select: { name: true, lore: true },
-          take: 5,
-        });
-        return nodes;
-      }
-    );
+    // Note: use the nodetypes this time
+    const types = nodeTypes.map((nt) => ({
+      name: nt.name,
+      lore: nt.description,
+    }));
 
     const loreNarrative = await step.run(
       "trigger-awakening",
-      async () => await triggerNetworkAwakening(narrativeNodes, "global")
+      async () =>
+        await triggerNetworkAwakening({
+          phase: phaseNumber,
+          region: "Earth",
+          totalNodes,
+          types,
+        })
     );
 
     await step.run(

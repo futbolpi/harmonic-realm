@@ -24,18 +24,6 @@ export const achievementsData = [
     isActive: true,
   },
   {
-    name: "Echo Amplifier",
-    description:
-      "Purchase your first upgrade, infusing your firmware with enhanced resonance.",
-    icon: "echo-amplifier.png",
-    category: "PROGRESSION",
-    requirementType: "UPGRADES_PURCHASED",
-    upgradesPurchasedRequired: 1,
-    reward: 150,
-    rarity: "UNCOMMON",
-    isActive: true,
-  },
-  {
     name: "Harmonic Initiate",
     description:
       "Reach level 5 through accumulated XP, attuning to the Lattice's basic rhythms.",

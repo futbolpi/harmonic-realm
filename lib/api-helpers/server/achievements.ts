@@ -23,13 +23,6 @@ export async function checkAchievementRequirement(
       return ach.uniqueRealmsRequired === null
         ? false
         : realms.length >= ach.uniqueRealmsRequired;
-    case "UPGRADES_PURCHASED":
-      const upgrades = await prisma.userNodeUpgrade.count({
-        where: { userId },
-      });
-      return ach.upgradesPurchasedRequired === null
-        ? false
-        : upgrades >= ach.upgradesPurchasedRequired;
     case "PLAYER_LEVEL":
       const user = await prisma.user.findUnique({
         where: { id: userId },

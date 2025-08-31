@@ -9,7 +9,6 @@ model Achievement {
     requirementType                AchievementRequirementType? // Changed to enum
     miningSessionsRequired         Int?
     uniqueRealmsRequired           Int?
-    upgradesPurchasedRequired      Int?
     playerLevelRequired            Int?
     masteryLevelRequired           Int?
     phaseTriggeredRequired         Int?
@@ -73,7 +72,6 @@ enum AchievementRarity {
 enum AchievementRequirementType {
     MINING_SESSIONS
     UNIQUE_REALMS_MINED
-    UPGRADES_PURCHASED
     PLAYER_LEVEL
     MASTERY_LEVEL
     PHASE_TRIGGERED

@@ -3,6 +3,7 @@ import { subDays, subHours } from "date-fns";
 
 import { nodesData, nodeTypesData } from "./node-data";
 import { MiningSession } from "../generated/prisma/client";
+import { binLatLon } from "../node-spawn/region-metrics";
 
 // 10 User instances with varying progress
 export const usersData = [
@@ -167,6 +168,10 @@ export const miningSessionsData = (() => {
       const shares = isCompleted
         ? nodeType.baseYieldPerMinute * nodeType.lockInMinutes
         : 0;
+      const { latitudeBin, longitudeBin } = binLatLon(
+        node.latitude,
+        node.longitude
+      );
 
       sessions.push({
         id: `session_${i + 1}_${j + 1}_${uuidv4().slice(0, 8)}`,
@@ -176,10 +181,12 @@ export const miningSessionsData = (() => {
         nodeId: node.id,
         startTime,
         endTime,
-        latitudeBin: Math.floor(node.latitude / 10) * 10,
-        longitudeBin: Math.floor(node.longitude / 10) * 10,
+        latitudeBin,
+        longitudeBin,
         minerSharesEarned: shares,
         status,
+        echoTransmissionApplied: false,
+        timeReductionPercent: 0,
       });
     }
   }

@@ -58,3 +58,18 @@ export function isWithinMiningRange(
   const distance = calculateDistance(userLat, userLon, nodeLat, nodeLon) * 1000; // Convert to meters;
   return distance <= MINING_RANGE_METERS;
 }
+
+/**
+ * Calculates a halving value based on phase and base value
+ * Phase 1: returns base value
+ * Phase 2: returns base value / 2
+ * Phase 3: returns base value / 4
+ * Phase n: returns base value / (2^(n-1))
+ */
+export function halvingFormula(phase: number, baseValue: number): number {
+  if (phase < 1) {
+    throw new Error("Phase must be 1 or greater");
+  }
+
+  return baseValue / Math.pow(2, phase - 1);
+}

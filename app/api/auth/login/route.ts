@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { isValidAccessToken } from "@/lib/pi/platform-api-client";
 import prisma from "@/lib/prisma";
-// import { inngest } from "@/inngest/client";
 import { authResultSchema, defaultSession } from "@/lib/schema/auth";
+import { GENESIS_THRESHOLD, siteConfig } from "@/config/site";
+import { InngestEventDispatcher } from "@/inngest/dispatcher";
 
 // login
 export async function POST(request: NextRequest) {
@@ -44,28 +45,41 @@ export async function POST(request: NextRequest) {
       return Response.json(updatedUser);
     }
 
-    // create user
-    const newUser = await prisma.user.create({
-      data: {
-        accessToken: auth.accessToken,
-        piId: auth.user.uid,
-        username: auth.user.username,
-      },
-      select: { username: true, piId: true },
+    // create user and check if number of users === GENESIS_THRESHOLD
+    //  then call the initiate genesis workflow
+
+    const newUser = await prisma.$transaction(async (tx) => {
+      // create new user
+
+      const createdUser = await tx.user.create({
+        data: {
+          accessToken: auth.accessToken,
+          piId: auth.user.uid,
+          username: auth.user.username,
+        },
+        select: { username: true, piId: true },
+      });
+
+      const [noOfUsers, genesisPhase] = await Promise.all([
+        tx.user.count(),
+        tx.gamePhase.findUnique({
+          where: { phaseNumber: 1, triggerType: "GENESIS" },
+        }),
+      ]);
+
+      if (noOfUsers === GENESIS_THRESHOLD && !genesisPhase) {
+        await InngestEventDispatcher.startGenesisPhase();
+      }
+
+      return createdUser;
     });
 
     // send tg message of new user
-    // const message = `<b>New ${siteConfig.name} User Alert!</b>
+    const content = `<b>New ${siteConfig.name} User Alert!</b>
 
-    // Welcome  ${newUser.username}
-    // `;
-    // await inngest.send({
-    //   name: "notifications/telegram.send-message",
-    //   data: {
-    //     message,
-    //     type: "DEV_MODE",
-    //   },
-    // });
+    Welcome  ${newUser.username}
+    `;
+    await InngestEventDispatcher.sendHeraldAnnouncement(content, "bug");
 
     // revalidate path or tag
     revalidatePath("/");

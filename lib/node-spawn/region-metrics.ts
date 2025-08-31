@@ -1,4 +1,4 @@
-const BIN_SIZE = 10;
+export const BIN_SIZE = 10;
 
 // Utility: Bin lat/lon (call when creating MiningSession, e.g., in API)
 export function binLatLon(

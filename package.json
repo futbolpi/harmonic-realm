@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "tsx --env-file=.env coverage/index.ts"
   },
   "dependencies": {
     "@ai-sdk/xai": "^2.0.7",

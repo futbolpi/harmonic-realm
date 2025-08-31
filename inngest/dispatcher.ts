@@ -68,6 +68,31 @@ export class InngestEventDispatcher {
   }
 
   /**
+   * Dispatch cosmic herald announcement
+   */
+  static async sendHeraldAnnouncement(
+    content: string,
+    messageType: "bug" | "announcement"
+  ) {
+    return await inngest.send({
+      name: "cosmic-herald-announcement",
+      data: {
+        content,
+        messageType,
+      },
+    });
+  }
+
+  /**
+   * Start Genesis Phase Node Generation
+   */
+  static async startGenesisPhase() {
+    return await inngest.send({
+      name: "phase/generate.initial",
+    });
+  }
+
+  /**
    * Batch send multiple events
    */
   static async sendBatch(events: Array<Events>) {

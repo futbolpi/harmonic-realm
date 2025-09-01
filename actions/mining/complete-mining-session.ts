@@ -40,6 +40,8 @@ export const completeMiningSession = async (
       },
       select: {
         startTime: true,
+        echoTransmissionApplied: true,
+        timeReductionPercent: true,
         nodeId: true,
         node: {
           select: {
@@ -78,7 +80,12 @@ export const completeMiningSession = async (
 
     const lockInDurationMs = durationMinutes * 60 * 1000;
     const now = new Date();
-    const leastLockinTime = session.startTime.getTime() + lockInDurationMs;
+    let leastLockinTime = session.startTime.getTime() + lockInDurationMs;
+
+    // reduce least lockintime if echoTransmissionApplied
+    if (!!session.echoTransmissionApplied && session.timeReductionPercent > 0) {
+      leastLockinTime = leastLockinTime * (session.timeReductionPercent / 100);
+    }
 
     // ensure now > startTime + nodeType lockInMinutes
     if (now.getTime() <= leastLockinTime) {

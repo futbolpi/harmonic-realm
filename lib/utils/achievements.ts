@@ -7,7 +7,7 @@ export function getRelevantCategories(
 ): AchievementCategory[] {
   switch (eventType) {
     case "miningCompleted":
-      return ["MINING", "EXPLORATION", "MASTERY", "SPECIAL"];
+      return ["MINING", "EXPLORATION", "MASTERY", "SPECIAL", "PROGRESSION"];
     case "upgradePurchased":
       return ["PROGRESSION"];
     case "boostUsed":

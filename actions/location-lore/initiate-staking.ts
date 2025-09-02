@@ -104,7 +104,7 @@ export async function initiateLocationLoreStaking(
     // Create stake record (pending payment)
     const stake = await prisma.locationLoreStake.create({
       data: {
-        userId: user.id,
+        userId: user.piId,
         nodeId,
         piAmount: new Decimal(piAmount),
         targetLevel,

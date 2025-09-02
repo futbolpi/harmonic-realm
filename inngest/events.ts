@@ -1,3 +1,4 @@
+import { PaymentType } from "@/lib/generated/prisma/enums";
 import {
   CosmeticTheme,
   LocationContext,
@@ -202,6 +203,17 @@ export interface SystemHealthAlertEvent {
   };
 }
 
+export interface AppToUserPaymentEvent {
+  name: "payments/app-to-user";
+  data: {
+    amount: number;
+    memo: string;
+    modelId: string;
+    type: PaymentType;
+    uid: string;
+  };
+}
+
 export type Events =
   | UserCreated
   | PhaseCompletedEvent
@@ -221,4 +233,5 @@ export type Events =
   | PiPaymentCompletedEvent
   | PiPaymentFailedEvent
   | PiPaymentProcessedEvent
-  | SystemHealthAlertEvent;
+  | SystemHealthAlertEvent
+  | AppToUserPaymentEvent;

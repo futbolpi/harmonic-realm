@@ -67,7 +67,7 @@ model LocationLoreStake {
   updatedAt DateTime @updatedAt
 
   // Relationships
-  user         User         @relation(fields: [userId], references: [id])
+  user         User         @relation(fields: [userId], references: [piId])
   locationLore LocationLore @relation(fields: [nodeId], references: [nodeId])
 
   @@index([userId], name: "stake_user_idx")

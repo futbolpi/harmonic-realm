@@ -196,7 +196,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
         </TabsContent>
 
         <TabsContent value="stakes">
-          <LoreStakesTable />
+          <LoreStakesTable nodeId={nodeId} />
         </TabsContent>
 
         <TabsContent value="details" className="space-y-6">

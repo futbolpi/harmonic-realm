@@ -26,10 +26,6 @@ export const generateLocationLore = inngest.createFunction(
     name: "Generate Location Lore",
     concurrency: [
       {
-        scope: "account",
-        limit: 10, // Max 10 concurrent lore generations per account
-      },
-      {
         scope: "fn",
         limit: 50, // Max 50 total concurrent generations
       },

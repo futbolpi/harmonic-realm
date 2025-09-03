@@ -1,41 +1,14 @@
-"use client";
-
 import { Users, Coins, Clock } from "lucide-react";
+import { Decimal } from "@prisma/client/runtime/library";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import UserAvatar from "@/components/shared/user-avatar";
+import prisma from "@/lib/prisma";
+
+type LoreStakesTableProps = { nodeId: string };
 
 // Mock data - replace with actual data fetching
-const mockStakes = [
-  {
-    id: "1",
-    user: { name: "Pioneer Alpha", id: "user_1" },
-    piAmount: 2.5,
-    targetLevel: 2,
-    contributionTier: "RESONANCE_PATRON",
-    createdAt: new Date("2024-01-15"),
-    paymentStatus: "COMPLETED",
-  },
-  {
-    id: "2",
-    user: { name: "Cosmic Explorer", id: "user_2" },
-    piAmount: 1.0,
-    targetLevel: 2,
-    contributionTier: "RESONANCE_PATRON",
-    createdAt: new Date("2024-01-14"),
-    paymentStatus: "COMPLETED",
-  },
-  {
-    id: "3",
-    user: { name: "Echo Seeker", id: "user_3" },
-    piAmount: 0.5,
-    targetLevel: 1,
-    contributionTier: "ECHO_SUPPORTER",
-    createdAt: new Date("2024-01-13"),
-    paymentStatus: "COMPLETED",
-  },
-];
 
 const TIER_COLORS = {
   ECHO_SUPPORTER: "bg-blue-100 text-blue-800",
@@ -51,10 +24,25 @@ const TIER_NAMES = {
   COSMIC_FOUNDER: "Cosmic Founder",
 };
 
-export function LoreStakesTable() {
-  const stakes = mockStakes;
+export async function LoreStakesTable({ nodeId }: LoreStakesTableProps) {
+  // const stakes = mockStakes;
+  const stakes = await prisma.locationLoreStake.findMany({
+    where: { nodeId },
+    select: {
+      piAmount: true,
+      createdAt: true,
+      id: true,
+      targetLevel: true,
+      paymentStatus: true,
+      contributionTier: true,
+      user: { select: { id: true, username: true } },
+    },
+  });
   const totalContributors = stakes.length;
-  const totalPiStaked = stakes.reduce((sum, stake) => sum + stake.piAmount, 0);
+  const totalPiStaked = stakes.reduce(
+    (sum, stake) => sum.add(stake.piAmount),
+    new Decimal(0)
+  );
 
   return (
     <div className="space-y-6">
@@ -80,7 +68,7 @@ export function LoreStakesTable() {
                 Total Staked
               </span>
             </div>
-            <p className="text-2xl font-bold">{totalPiStaked} Pi</p>
+            <p className="text-2xl font-bold">{totalPiStaked.toFixed(2)} Pi</p>
           </CardContent>
         </Card>
 
@@ -127,10 +115,10 @@ export function LoreStakesTable() {
                       {/* User info and date */}
                       <div className="flex items-center justify-between mb-2">
                         <p className="font-medium truncate">
-                          {stake.user.name}
+                          {stake.user.username}
                         </p>
                         <p className="text-sm font-bold text-accent flex-shrink-0">
-                          {stake.piAmount} Pi
+                          {stake.piAmount.toFixed(2)} Pi
                         </p>
                       </div>
 

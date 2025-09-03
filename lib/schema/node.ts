@@ -28,6 +28,7 @@ export const NodeSchema = z.object({
   openForMining: z.boolean(),
   sponsor: z.string().nullable(),
   sessions: z.array(NodeSessionSchema),
+  locationLore: z.object({ id: z.string() }).nullable(),
   type: z.object({
     id: z.string(),
     name: z.string(),

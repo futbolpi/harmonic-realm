@@ -160,7 +160,11 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
           }
         />
         <Button asChild size="icon" className="rounded-full shadow-lg">
-          <Link href={`/lore/${node.id}`}>
+          <Link
+            href={
+              !node.locationLore ? `/nodes/${node.id}/lore` : `/lore/${node.id}`
+            }
+          >
             <BookOpen className="h-4 w-4" />
           </Link>
         </Button>

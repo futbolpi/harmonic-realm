@@ -11,6 +11,7 @@ export async function getNodes(): Promise<Node[]> {
       longitude: true,
       openForMining: true,
       sponsor: true,
+      locationLore: { select: { id: true } },
       sessions: {
         select: {
           id: true,
@@ -59,6 +60,7 @@ export async function getNode(id: string): Promise<Node | null> {
       longitude: true,
       openForMining: true,
       sponsor: true,
+      locationLore: { select: { id: true } },
       sessions: {
         select: {
           id: true,

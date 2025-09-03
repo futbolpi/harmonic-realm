@@ -7,6 +7,7 @@ import { achievementUnlockWorkflow } from "@/inngest/workflows/achievements/achi
 import { generateInitialPhase } from "@/inngest/workflows/phases/initial-phase-workflow";
 import { generateNextPhase } from "@/inngest/workflows/phases/threshold-phase-workflow";
 import { generateLocationLore } from "@/inngest/workflows/location-lores/generate-location-lore";
+import { appToUserPayment } from "@/inngest/workflows/payments/app-to-user";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -19,5 +20,6 @@ export const { GET, POST, PUT } = serve({
     generateInitialPhase,
     generateNextPhase,
     generateLocationLore,
+    appToUserPayment,
   ],
 });

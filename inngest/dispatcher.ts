@@ -1,6 +1,7 @@
 import { LoreLevel } from "@/lib/node-lore/location-lore";
 import { HealthStatus, OverallHealth } from "@/types/system";
 import { PiMetadata } from "@/types/pi";
+import { PaymentType } from "@/lib/generated/prisma/enums";
 import { inngest } from "./client";
 import { Events } from "./events";
 
@@ -80,6 +81,28 @@ export class InngestEventDispatcher {
         content,
         messageType,
       },
+    });
+  }
+
+  /**
+   * Start Genesis Phase Node Generation
+   */
+  static async sendAppToUserPayment({
+    amount,
+    memo,
+    modelId,
+    uid,
+    type,
+  }: {
+    amount: number;
+    memo: string;
+    modelId: string;
+    uid: string;
+    type: PaymentType;
+  }) {
+    return await inngest.send({
+      name: "payments/app-to-user",
+      data: { amount, memo, modelId, type, uid },
     });
   }
 

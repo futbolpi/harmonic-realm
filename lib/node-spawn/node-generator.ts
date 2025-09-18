@@ -1,5 +1,10 @@
 import * as turf from "@turf/turf";
-import { FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import type {
+  FeatureCollection,
+  GeoJsonProperties,
+  MultiPolygon,
+  Polygon,
+} from "geojson";
 import Decimal from "decimal.js";
 import { promises as fs } from "fs";
 
@@ -84,20 +89,33 @@ async function getPiDigits(): Promise<string> {
   return digits;
 }
 
-// Pi-seeded point
-export async function piSeededPoint(
-  offset: number
-): Promise<{ lat: number; lng: number }> {
-  const digits = await getPiDigits();
+// Pi-seeded point (updated for efficiency and diversity)
+export function piSeededPoint(
+  offset: number,
+  digits: string, // New parameter: pre-loaded digits
+  chunkSize: number = 10 // Make configurable if needed
+): { lat: number; lng: number } {
+  const maxOffset = digits.length - chunkSize * 2;
+  if (maxOffset < 0) {
+    throw new Error("Insufficient digits provided for coordinate generation");
+  }
 
-  const chunkSize = 10;
-  offset = offset % (digits.length - chunkSize * 2); // Wrap if overflow
-  const lngFrac = parseInt(digits.slice(offset, offset + chunkSize), 10) / 1e10;
+  // Enhanced offset: Use modulo for wrapping, but add hashing for better distribution
+  // This prevents clustering from sequential offsets
+  offset = Math.abs(offset); // Ensure non-negative
+  const hashedOffset = (offset * 2654435761) % maxOffset; // Simple hash (Knuth's multiplicative hash) for pseudo-random spacing
+
+  const lngFrac =
+    parseInt(digits.slice(hashedOffset, hashedOffset + chunkSize), 10) / 1e10;
   const latFrac =
-    parseInt(digits.slice(offset + chunkSize, offset + 2 * chunkSize), 10) /
-    1e10;
+    parseInt(
+      digits.slice(hashedOffset + chunkSize, hashedOffset + 2 * chunkSize),
+      10
+    ) / 1e10;
+
   const lng = lngFrac * 360 - 180;
   const lat = getDegrees(Math.asin(latFrac * 2 - 1));
+
   return { lat, lng };
 }
 
@@ -131,8 +149,11 @@ async function loadLandGeoJson(): Promise<
 }
 
 // Fixed isOnLand: Loop over features
-export async function isOnLand(lng: number, lat: number): Promise<boolean> {
-  const geojson = await loadLandGeoJson();
+export function isOnLand(
+  lng: number,
+  lat: number,
+  geojson: FeatureCollection<MultiPolygon | Polygon, GeoJsonProperties>
+): boolean {
   const point = turf.point([lng, lat]);
   for (const feature of geojson.features) {
     if (turf.booleanPointInPolygon(point, feature)) {
@@ -179,11 +200,15 @@ export async function generateNodes({
   ];
   const probs = [0.5, 0.25, 0.15, 0.09, 0.01];
   const nodes: NodeCreateManyInput[] = [];
-  let offset = (phaseId - 1) * 100000 + batch * 1000;
+  let offset = (phaseId - 1) * 100000 + batch * 5000;
   let maxActivity = 0;
   const adaptiveFraction = 0.7; // 70% adaptive, 30% uniform
   const numAdaptive = Math.floor(currentBatchSize * adaptiveFraction);
   const numUniform = currentBatchSize - numAdaptive;
+
+  const pidigits = await getPiDigits();
+  const geojson = await loadLandGeoJson();
+  const offsetStep = 1;
 
   if (adaptive && binActivities && binActivities.length > 0) {
     maxActivity = binActivities.reduce(
@@ -203,17 +228,17 @@ export async function generateNodes({
     for (let i = 0; i < numUniform; i++) {
       let point: { lat: number; lng: number };
       do {
-        point = await piSeededPoint(offset);
-        offset += 20;
-      } while (!(await isOnLand(point.lng, point.lat)));
+        point = piSeededPoint(offset, pidigits);
+        offset += offsetStep;
+      } while (!isOnLand(point.lng, point.lat, geojson));
 
       const selectedRarity = chooseWeighted(rarities, probs);
       const typeId = rarityToIdMap[selectedRarity];
       const echoIntensity =
         parseInt(
-          (await getPiDigits()).slice(
-            offset % (await getPiDigits()).length,
-            (offset % (await getPiDigits()).length) + 5
+          pidigits.slice(
+            offset % pidigits.length,
+            (offset % pidigits.length) + 5
           ),
           10
         ) / 99999;
@@ -237,7 +262,7 @@ export async function generateNodes({
       const selectedBin = binActivities[binIndex];
       let point: { lat: number; lng: number };
       do {
-        point = await piSeededPoint(offset);
+        point = piSeededPoint(offset, pidigits);
         const [latBin, lngBin] = selectedBin.binId.split("_").map(Number);
         const latMin = latBin * 1.0;
         const latMax = latMin + BIN_SIZE;
@@ -245,8 +270,8 @@ export async function generateNodes({
         const lngMax = lngMin + BIN_SIZE;
         point.lat = latMin + ((point.lat + 90) / 180) * (latMax - latMin);
         point.lng = lngMin + ((point.lng + 180) / 360) * (lngMax - lngMin);
-        offset += 20;
-      } while (!(await isOnLand(point.lng, point.lat)));
+        offset += offsetStep;
+      } while (!isOnLand(point.lng, point.lat, geojson));
 
       const selectedRarity = chooseWeighted(rarities, probs);
       const typeId = rarityToIdMap[selectedRarity];
@@ -268,17 +293,17 @@ export async function generateNodes({
     for (let i = 0; i < currentBatchSize; i++) {
       let point: { lat: number; lng: number };
       do {
-        point = await piSeededPoint(offset);
-        offset += 20;
-      } while (!(await isOnLand(point.lng, point.lat)));
+        point = piSeededPoint(offset, pidigits);
+        offset += offsetStep;
+      } while (!isOnLand(point.lng, point.lat, geojson));
 
       const selectedRarity = chooseWeighted(rarities, probs);
       const typeId = rarityToIdMap[selectedRarity];
       const echoIntensity =
         parseInt(
-          (await getPiDigits()).slice(
-            offset % (await getPiDigits()).length,
-            (offset % (await getPiDigits()).length) + 5
+          pidigits.slice(
+            offset % pidigits.length,
+            (offset % pidigits.length) + 5
           ),
           10
         ) / 99999;

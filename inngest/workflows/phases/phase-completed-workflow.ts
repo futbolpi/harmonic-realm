@@ -1,5 +1,7 @@
 import { inngest } from "@/inngest/client";
 import prisma from "@/lib/prisma";
+import { InngestEventDispatcher } from "@/inngest/dispatcher";
+import { generatePhaseAnnouncement } from "./utils";
 
 // New workflow: Triggered after phase completion (from genesis or nextPhase).
 // Announces the new phase via a lore-themed announcement workflow.
@@ -42,13 +44,14 @@ export const phaseCompletedWorkflow = inngest.createFunction(
     }
 
     // Step 2: Invoke announcement workflow
-    await inngest.send({
-      name: "cosmic-herald-announcement",
-      data: {
-        messageType: "announcement",
-        content: `The Lattice awakens to Phase ${phase}! ${nodesSpawned} new nodes pulse with cosmic energy. Pioneers, harmonize and claim your destiny!`,
-        phase,
-      },
+    const phaseName = phase === 1 ? "Genesis" : `Threshold ${phase}`;
+    const content = generatePhaseAnnouncement(nodesSpawned, phaseName);
+
+    await step.run("send-new-phase-announcement", async () => {
+      await InngestEventDispatcher.sendHeraldAnnouncement(
+        content,
+        "announcement"
+      );
     });
 
     return { status: "Phase completion processed", phase };

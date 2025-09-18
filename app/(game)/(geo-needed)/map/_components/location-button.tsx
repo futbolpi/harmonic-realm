@@ -32,6 +32,7 @@ const LocationButton = () => {
       disabled={buttonDisabled}
       size="sm"
       className="game-button cursor-pointer shadow-lg"
+      id="location-button"
     >
       {buttonDisabled ? (
         <Loader2 className="h-4 w-4 animate-spin" />

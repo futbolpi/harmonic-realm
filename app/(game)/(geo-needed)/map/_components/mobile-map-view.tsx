@@ -15,6 +15,7 @@ import NodesMap from "./nodes-map";
 import { MapControlModal } from "./map-control-modal";
 import { NodesListModal } from "./nodes-list-modal";
 import useCurrentLocation from "../../_components/location-provider";
+import MapHelp from "./map-help";
 
 interface MobileMapViewProps {
   nodes: Node[];
@@ -91,6 +92,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
 
   return (
     <div className="h-full w-full relative">
+      <div id="maplibregl-canvas"></div>
       {/* Map - takes 90% of screen */}
       <NodesMap
         filteredAndSortedNodes={filteredAndSortedNodes}
@@ -103,9 +105,17 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
       />
 
       {/* Mobile Controls - Floating Action Buttons */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
-        {/* Location Button */}
-        <LocationButton />
+      <div
+        className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start"
+        id="start-mining"
+      >
+        <div className="flex gap-2">
+          {/* Location Button */}
+          <LocationButton />
+
+          {/* Map Tour Button */}
+          <MapHelp />
+        </div>
 
         {/* Node Count Badge */}
         <Badge

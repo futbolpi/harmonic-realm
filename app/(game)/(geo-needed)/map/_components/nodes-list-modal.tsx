@@ -45,7 +45,7 @@ export function NodesListModal({
 
   return (
     <>
-      <Button onClick={handleOpen} className="shadow-lg">
+      <Button onClick={handleOpen} className="shadow-lg" id="list-button">
         <List className="h-4 w-4 mr-2" />
         Nodes List
       </Button>

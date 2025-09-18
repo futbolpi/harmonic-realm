@@ -41,7 +41,7 @@ export default function DashboardClientPage({
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="space-y-2">
+      <div className="space-y-2" id="dashboard">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-neon-purple bg-clip-text text-transparent">

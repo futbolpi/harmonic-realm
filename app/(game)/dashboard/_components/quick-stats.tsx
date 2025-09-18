@@ -17,7 +17,7 @@ const QuickStats = ({
   xp,
 }: QuickStatsProps) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4" id="stats">
       <Card className="game-card">
         <CardContent className="p-4 text-center">
           <Coins className="h-8 w-8 text-neon-orange mx-auto mb-2" />

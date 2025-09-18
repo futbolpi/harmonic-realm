@@ -23,7 +23,7 @@ const GlobalPhaseCard = ({
   const phaseProgress = (sessionsCompleted / nextPhaseThreshold) * 100;
 
   return (
-    <Card className="game-card relative overflow-hidden">
+    <Card className="game-card relative overflow-hidden" id="phase-progress">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-neon-purple/5 to-neon-orange/5 animate-pulse" />
       <CardHeader className="relative">
         <CardTitle className="flex items-center gap-2">

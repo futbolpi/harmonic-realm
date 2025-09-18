@@ -20,7 +20,7 @@ export function MapControlModal({ nodes }: MapControlModalProps) {
   return (
     <Credenza>
       <CredenzaTrigger asChild>
-        <Button className="shadow-lg">
+        <Button className="shadow-lg" id="filter-button">
           <Filter className="h-4 w-4 mr-2" />
           Filters & Sort
         </Button>

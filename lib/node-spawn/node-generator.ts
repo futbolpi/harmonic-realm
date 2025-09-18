@@ -1,12 +1,12 @@
 import * as turf from "@turf/turf";
 import { FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import Decimal from "decimal.js";
+import { promises as fs } from "fs";
 
 import { NodeTypeRarity } from "../generated/prisma/enums";
 import { NodeCreateManyInput } from "../generated/prisma/models";
 import { redis } from "../redis";
 import { generateLore, getRarityElements } from "./generate-lore";
-import { env } from "@/env";
 import { BIN_SIZE } from "./region-metrics";
 
 type GlobalCache = {
@@ -74,7 +74,11 @@ async function getPiDigits(): Promise<string> {
     return redisValue;
   }
   // Compute and store
-  const digits = await computePiDigits(1000000);
+  const file = await fs.readFile(
+    process.cwd() + "/contents/assets/pidigits.txt",
+    "utf8"
+  );
+  const digits = file.slice(2);
   globalCache[cacheKey] = digits;
   await redis.set(cacheKey, digits); // Optional TTL: await redis.set(cacheKey, digits, { ex: 86400 });
   return digits;
@@ -116,8 +120,11 @@ async function loadLandGeoJson(): Promise<
     return parsed;
   }
   // Load and store
-  const res = await fetch(`${env.NEXT_PUBLIC_APP_URL}/geojson/world-land.json`);
-  const geojson = await res.json();
+  const file = await fs.readFile(
+    process.cwd() + "/contents/assets/world-land.json",
+    "utf8"
+  );
+  const geojson = JSON.parse(file);
   globalCache[cacheKey] = geojson;
   await redis.set(cacheKey, JSON.stringify(geojson));
   return geojson;

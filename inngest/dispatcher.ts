@@ -1,5 +1,4 @@
 import { LoreLevel } from "@/lib/node-lore/location-lore";
-import { HealthStatus, OverallHealth } from "@/types/system";
 import { PiMetadata } from "@/types/pi";
 import { PaymentType } from "@/lib/generated/prisma/enums";
 import { inngest } from "./client";
@@ -45,25 +44,6 @@ export class InngestEventDispatcher {
         userId,
         amount,
         metadata,
-      },
-    });
-  }
-
-  /**
-   * Dispatch system health alert
-   */
-  static async sendHealthAlert(
-    component: string,
-    status: HealthStatus,
-    details: OverallHealth
-  ) {
-    return await inngest.send({
-      name: "system/health.alert",
-      data: {
-        component,
-        status,
-        details,
-        timestamp: new Date().toISOString(),
       },
     });
   }

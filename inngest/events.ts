@@ -6,7 +6,6 @@ import {
   LoreLevel,
 } from "@/lib/node-lore/location-lore";
 import { PiMetadata } from "@/types/pi";
-import { HealthStatus, OverallHealth } from "@/types/system";
 
 export type AchievementsCheckTriggers =
   | "miningCompleted"
@@ -193,16 +192,6 @@ export interface PiPaymentFailedEvent {
   };
 }
 
-export interface SystemHealthAlertEvent {
-  name: "system/health.alert";
-  data: {
-    component: string;
-    status: HealthStatus;
-    details: OverallHealth;
-    timestamp: string;
-  };
-}
-
 export interface AppToUserPaymentEvent {
   name: "payments/app-to-user";
   data: {
@@ -233,5 +222,4 @@ export type Events =
   | PiPaymentCompletedEvent
   | PiPaymentFailedEvent
   | PiPaymentProcessedEvent
-  | SystemHealthAlertEvent
   | AppToUserPaymentEvent;

@@ -11,6 +11,7 @@ import type {
   HealthStatus,
 } from "@/lib/node-lore/location-lore";
 import { LORE_LEVELS } from "@/lib/node-lore/location-lore";
+import { siteConfig } from "@/config/site";
 import { openrouterModel, xaiModel } from "../utils/ai";
 
 /**
@@ -24,7 +25,8 @@ export class AILoreGeneratorService {
     openrouter: openrouterModel,
   };
 
-  private readonly defaultProvider: LoreAiProvider = "openrouter";
+  private readonly defaultProvider: LoreAiProvider =
+    siteConfig.network === "testnet" ? "openrouter" : "xai";
   private readonly maxRetries = 3;
 
   constructor() {}

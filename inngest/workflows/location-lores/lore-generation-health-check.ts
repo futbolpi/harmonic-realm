@@ -4,6 +4,8 @@ import { inngest } from "@/inngest/client";
 import { aiLoreGenerator } from "@/lib/node-lore/ai-lore-generator";
 import { locationIQ } from "@/lib/node-lore/locationiq";
 import prisma from "@/lib/prisma";
+import { InngestEventDispatcher } from "@/inngest/dispatcher";
+import { generateHealthCheckMessage } from "./utils";
 
 /**
  * WORKFLOW: Health Check for Lore Generation System
@@ -16,7 +18,7 @@ export const loreGenerationHealthCheck = inngest.createFunction(
     name: "Lore Generation Health Check",
   },
   {
-    cron: "TZ=UTC */15 * * * *", // change to every 3 hours
+    cron: "0 13 * * *", // every 1pm
   },
   async ({ step, logger }) => {
     logger.info("Running lore generation health check");
@@ -108,19 +110,12 @@ export const loreGenerationHealthCheck = inngest.createFunction(
     });
 
     // Send alert if system is unhealthy
-    if (overallHealth.status === "unhealthy") {
-      await step.sendEvent("send-health-alert", [
-        {
-          name: "system/health.alert",
-          data: {
-            component: "lore-generation",
-            status: overallHealth.status,
-            details: overallHealth,
-            timestamp: new Date().toISOString(),
-          },
-        },
-      ]);
-    }
+
+    const content = generateHealthCheckMessage(overallHealth);
+
+    await step.run("send-health-check-message", async () => {
+      await InngestEventDispatcher.sendHeraldAnnouncement(content, "bug");
+    });
 
     return overallHealth;
   }

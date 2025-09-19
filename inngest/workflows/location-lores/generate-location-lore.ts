@@ -27,7 +27,7 @@ export const generateLocationLore = inngest.createFunction(
     concurrency: [
       {
         scope: "fn",
-        limit: 50, // Max 50 total concurrent generations
+        limit: 5, // Max 5 total concurrent generations
       },
     ],
   },

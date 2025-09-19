@@ -7,7 +7,7 @@ export const achievementUnlockWorkflow = inngest.createFunction(
   {
     id: "game-achievement-unlock",
     retries: 3,
-    concurrency: { limit: 20 },
+    concurrency: { limit: 5 },
   },
   { event: "game.achievement.check" },
   async ({ event, step }) => {

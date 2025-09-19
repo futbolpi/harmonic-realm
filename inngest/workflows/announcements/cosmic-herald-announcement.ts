@@ -1,6 +1,13 @@
+import axios from "axios";
+
 import { siteConfig } from "@/config/site";
 import { env } from "@/env";
 import { inngest } from "@/inngest/client";
+
+const telegramClient = axios.create({
+  baseURL: "https://api.telegram.org",
+  timeout: 10000,
+});
 
 export const cosmicHeraldAnnouncement = inngest.createFunction(
   {
@@ -23,12 +30,12 @@ export const cosmicHeraldAnnouncement = inngest.createFunction(
           } else {
             chatId = env.TELEGRAM_PUBLIC_CHANNEL;
           }
-          await fetch(
-            `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+          await telegramClient.post(
+            `/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
             {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ chat_id: chatId, text: content }),
+              chat_id: chatId,
+              text: content,
+              parse_mode: "HTML",
             }
           );
         } else {
@@ -38,12 +45,12 @@ export const cosmicHeraldAnnouncement = inngest.createFunction(
         if (isProd) {
           chatId = env.TELEGRAM_PRIVATE_CHANNEL;
 
-          await fetch(
-            `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+          await telegramClient.post(
+            `/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
             {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ chat_id: chatId, text: content }),
+              chat_id: chatId,
+              text: content,
+              parse_mode: "HTML",
             }
           );
         } else {

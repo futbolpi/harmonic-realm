@@ -4,16 +4,11 @@ import type React from "react";
 import { createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useQueryStates } from "nuqs";
 import { toast } from "sonner";
 
 import { getPiSDK } from "@/components/shared/pi/pi-sdk";
 import { UserSession, userSessionSchema } from "@/lib/schema/auth";
 import { onIncompletePaymentFound } from "@/lib/pi/payment-callbacks";
-import {
-  authSearchParamsParsers,
-  authSearchParamsUrlKeys,
-} from "./search-params";
 import { signIn, verifyToken } from "./utils";
 
 // Auth types
@@ -40,9 +35,6 @@ const USER_DATA_KEY = "pi_mining_nodes_user";
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [{ referral }] = useQueryStates(authSearchParamsParsers, {
-    urlKeys: authSearchParamsUrlKeys,
-  });
 
   // Auth query
   const { data: authState, isLoading } = useQuery({
@@ -112,6 +104,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Verify token with backend, upsert user accesstoken,
       // username and piuserid, use new function
+
+      const params = new URLSearchParams(document.location.search);
+      const referral = params.get("ref");
 
       const session = await signIn({
         accessToken,

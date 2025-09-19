@@ -8,6 +8,7 @@ import {
   Sparkles,
   LucideProps,
 } from "lucide-react";
+import type { MDXComponents } from "mdx/types";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -320,6 +321,6 @@ const components = {
       />
     );
   },
-};
+} satisfies MDXComponents;
 
 export { components };

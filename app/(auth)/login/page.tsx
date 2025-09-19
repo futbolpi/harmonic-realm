@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+
+import AuthLoading from "@/components/shared/auth/auth-loading";
 import LoginPageClient from "../_components/login-page-client";
 
 export const metadata = {
@@ -30,5 +33,9 @@ export const metadata = {
 };
 
 export default function LoginPage() {
-  return <LoginPageClient />;
+  return (
+    <Suspense fallback={<AuthLoading />}>
+      <LoginPageClient />;
+    </Suspense>
+  );
 }

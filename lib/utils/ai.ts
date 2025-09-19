@@ -17,4 +17,5 @@ const openRouterModels = { zai, qwen3, moonshotai, tngtech };
 
 export const openrouterModel = openrouter(openRouterModels.moonshotai);
 
-export const model = env.NODE_ENV === "production" ? xaiModel : openrouterModel;
+export const model = xaiModel;
+// export const model = env.NODE_ENV === "production" ? xaiModel : openrouterModel;

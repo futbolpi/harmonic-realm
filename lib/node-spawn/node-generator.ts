@@ -129,22 +129,21 @@ async function loadLandGeoJson(): Promise<
     return globalCache[cacheKey];
   }
   // Redis check
-  const redisValue = await redis.get<string>(cacheKey);
+  const redisValue = await redis.get<FeatureCollection<MultiPolygon | Polygon>>(
+    cacheKey
+  );
   if (redisValue) {
-    const parsed = JSON.parse(redisValue) as FeatureCollection<
-      MultiPolygon | Polygon
-    >;
-    globalCache[cacheKey] = parsed;
-    return parsed;
+    globalCache[cacheKey] = redisValue;
+    return redisValue;
   }
   // Load and store
   const file = await fs.readFile(
     process.cwd() + "/contents/assets/world-land.json",
     "utf8"
   );
-  const geojson = JSON.parse(file);
+  const geojson = JSON.parse(file) as FeatureCollection<MultiPolygon | Polygon>;
   globalCache[cacheKey] = geojson;
-  await redis.set(cacheKey, JSON.stringify(geojson));
+  await redis.set(cacheKey, geojson);
   return geojson;
 }
 

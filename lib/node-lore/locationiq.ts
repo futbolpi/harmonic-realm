@@ -110,7 +110,7 @@ export class LocationIQService {
       this.cache.set(key, context);
     } else {
       // Upstash Redis cache with 24h expiry
-      await this.cache.setex(key, 86400, JSON.stringify(context));
+      await this.cache.setex<LocationContext>(key, 86400, context);
     }
   }
 
@@ -201,9 +201,9 @@ export class LocationIQService {
           return this.cache.get(cacheKey)!;
         }
       } else {
-        const cached = await this.cache.get<string>(cacheKey);
+        const cached = await this.cache.get<LocationContext>(cacheKey);
         if (cached) {
-          return JSON.parse(cached);
+          return cached;
         }
       }
     }

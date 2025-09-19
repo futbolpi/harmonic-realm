@@ -6,10 +6,10 @@ import { LoreStakeDetails } from "@/lib/schema/location-lore";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: Promise<string> } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = await params.id;
+    const { id } = await params;
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

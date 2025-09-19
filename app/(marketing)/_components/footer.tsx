@@ -15,9 +15,9 @@ export function Footer() {
       { href: "/terms", label: "Terms of Service" },
     ],
     community: [
-      { href: "/discord", label: "Discord" },
       { href: "/telegram", label: "Telegram" },
-      { href: "/twitter", label: "Twitter" },
+      { href: "/twitter", label: "X (Twitter)" },
+      { href: "/github", label: "Github" },
     ],
   };
 

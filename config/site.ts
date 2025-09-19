@@ -19,6 +19,11 @@ export type SiteConfig = {
   id: string;
   name: string;
   network: "testnet" | "mainnet";
+  links: {
+    twitter: string;
+    github: string;
+    telegram: string;
+  };
 };
 
 export const siteConfig: SiteConfig = {
@@ -27,6 +32,11 @@ export const siteConfig: SiteConfig = {
   network: env.NEXT_PUBLIC_PI_EXPLORER_LINK.includes("testnet")
     ? "testnet"
     : "mainnet",
+  links: {
+    twitter: "https://x.com/MitimaraPi",
+    github: "https://github.com/futbolpi/harmonic-realm",
+    telegram: "https://t.me/HarmonicRealm",
+  },
 };
 
 export const SiteId = `${siteConfig.name}-${siteConfig.network}`;

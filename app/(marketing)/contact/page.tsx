@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/shared/icons";
+import { siteConfig } from "@/config/site";
 
 export const metadata = {
   title: "Contact the Cosmic Council - HarmonicRealm Support",
@@ -93,7 +94,7 @@ export default function ContactPage() {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg hover:shadow-primary/25 transition-all duration-300"
               >
                 <a
-                  href="https://twitter.com/harmonicRealm"
+                  href={siteConfig.links.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -133,7 +134,7 @@ export default function ContactPage() {
                 className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground border-0 shadow-lg hover:shadow-secondary/25 transition-all duration-300"
               >
                 <a
-                  href="https://t.me/harmonicRealm"
+                  href={siteConfig.links.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

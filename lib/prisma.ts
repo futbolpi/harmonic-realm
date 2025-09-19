@@ -2,7 +2,11 @@
 // defined in the global scope. This is because the global object is only
 // defined in the global scope in Node.js and not in the browser.
 
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
+
 import { PrismaClient } from "@/lib/generated/prisma/client";
+import { env } from "@/env";
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit.
@@ -12,12 +16,22 @@ import { PrismaClient } from "@/lib/generated/prisma/client";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    // log: ["query", "info", "warn", "error"], // Logging for debugging
-  });
+export type GetDbParams = {
+  connectionString: string;
+};
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export function getDb({ connectionString }: GetDbParams) {
+  const adapter =
+    env.NODE_ENV !== "production"
+      ? new PrismaPg({ connectionString })
+      : new PrismaNeon({ connectionString });
 
+  const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
+
+  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+  return prisma;
+}
+
+const prisma = getDb({ connectionString: env.DATABASE_URL });
 export default prisma;

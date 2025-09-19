@@ -2,7 +2,6 @@ import { xai } from "@ai-sdk/xai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 import { env } from "@/env";
-import { siteConfig } from "@/config/site";
 
 export const xaiModel = xai("grok-3");
 
@@ -18,5 +17,4 @@ const openRouterModels = { zai, qwen3, moonshotai, tngtech };
 
 export const openrouterModel = openrouter(openRouterModels.moonshotai);
 
-export const model =
-  siteConfig.network === "mainnet" ? xaiModel : openrouterModel;
+export const model = env.NODE_ENV === "production" ? xaiModel : openrouterModel;

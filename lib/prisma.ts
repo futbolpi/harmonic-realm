@@ -26,12 +26,14 @@ export function getDb({ connectionString }: GetDbParams) {
       ? new PrismaPg({ connectionString })
       : new PrismaNeon({ connectionString });
 
-  const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
-
-  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  const prisma = new PrismaClient({ adapter });
 
   return prisma;
 }
 
-const prisma = getDb({ connectionString: env.DATABASE_URL });
+export const prisma =
+  globalForPrisma.prisma || getDb({ connectionString: env.DATABASE_URL });
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
 export default prisma;

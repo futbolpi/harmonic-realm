@@ -30,14 +30,19 @@ export const cosmicHeraldAnnouncement = inngest.createFunction(
           } else {
             chatId = env.TELEGRAM_PUBLIC_CHANNEL;
           }
-          await telegramClient.post(
-            `/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-            {
-              chat_id: chatId,
-              text: content,
-              parse_mode: "HTML",
-            }
-          );
+
+          try {
+            await telegramClient.post(
+              `/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+              {
+                chat_id: chatId,
+                text: content,
+                parse_mode: "HTML",
+              }
+            );
+          } catch (error) {
+            console.log({ error });
+          }
         } else {
           console.log(`[DEV ${messageType.toUpperCase()}]: ${content}`);
         }
@@ -45,14 +50,18 @@ export const cosmicHeraldAnnouncement = inngest.createFunction(
         if (isProd) {
           chatId = env.TELEGRAM_PRIVATE_CHANNEL;
 
-          await telegramClient.post(
-            `/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-            {
-              chat_id: chatId,
-              text: content,
-              parse_mode: "HTML",
-            }
-          );
+          try {
+            await telegramClient.post(
+              `/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+              {
+                chat_id: chatId,
+                text: content,
+                parse_mode: "HTML",
+              }
+            );
+          } catch (error) {
+            console.log({ error });
+          }
         } else {
           console.error(`[DEV BUG]: ${content}`);
         }

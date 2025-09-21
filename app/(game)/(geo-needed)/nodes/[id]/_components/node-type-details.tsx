@@ -47,7 +47,7 @@ const NodeTypeDetails = ({
             Base Yield Rate:
           </span>
           <span className="text-sm font-medium">
-            {nodeType.baseYieldPerMinute}/min
+            {nodeType.baseYieldPerMinute.toFixed(1)}/min
           </span>
         </div>
         <div className="flex items-center justify-between">

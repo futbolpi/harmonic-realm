@@ -18,7 +18,7 @@ import {
   CredenzaTitle,
   CredenzaContent,
 } from "@/components/credenza";
-import { getRarityInfo } from "../../../map/utils";
+import { getRarityInfo } from "../../../../map/utils";
 
 interface StartMiningDrawerProps {
   node: Node;

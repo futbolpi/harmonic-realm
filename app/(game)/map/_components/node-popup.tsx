@@ -62,7 +62,7 @@ export function NodePopup({
         <div className="text-center p-2 rounded bg-muted/20">
           <Zap className="h-4 w-4 text-neon-green mx-auto mb-1" />
           <div className="text-sm font-bold text-neon-green">
-            {node.type.baseYieldPerMinute}π/min
+            {node.type.baseYieldPerMinute.toFixed(1)}π/min
           </div>
           <div className="text-xs text-muted-foreground">Yield</div>
         </div>

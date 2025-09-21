@@ -1,6 +1,6 @@
 "use client";
 
-import { Filter, SortAsc } from "lucide-react";
+import { Filter, Navigation, SortAsc } from "lucide-react";
 import { useMemo } from "react";
 
 import {
@@ -15,9 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
-import { getRarityInfo } from "../utils";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { SortBy, sortBy as sortByValues } from "../search-params";
-import LocationError from "./location-error";
 
 interface MapControlsProps {
   nodes: Node[];
@@ -25,23 +24,38 @@ interface MapControlsProps {
 
 export function MapControls({ nodes }: MapControlsProps) {
   const { searchParams, updateSearchParams, isLoading } = useMapSearchParams();
-  const { sortBy, rarityFilter, nodeTypeFilter } = searchParams;
+  const { sortBy, rarityFilter, nodeTypeFilter, latitude, longitude } =
+    searchParams;
+
+  // no user location no sort by distance
+  const noLocation = latitude === null || longitude === null;
 
   // Get unique node types and rarities for filters
   const nodeTypes = useMemo(
     () => [...new Set(nodes.map((node) => node.type.name))],
     [nodes]
   );
-  const rarities = useMemo(
-    () =>
-      [...new Set(nodes.map((node) => node.type.rarity))].sort(
-        (a, b) => getRarityInfo(a).rating - getRarityInfo(b).rating
-      ),
-    [nodes]
-  );
+
+  const rarities: NodeTypeRarity[] = [
+    "Common",
+    "Uncommon",
+    "Rare",
+    "Epic",
+    "Legendary",
+  ];
 
   return (
     <div className="space-y-6">
+      {noLocation && (
+        <Alert>
+          <Navigation />
+          <AlertTitle>
+            Use the Navigation Beacon to reveal your current position within the
+            Lattice.
+          </AlertTitle>
+        </Alert>
+      )}
+
       {/* Sort Section */}
       <div className="space-y-3">
         <div className="flex items-center gap-2">
@@ -64,6 +78,7 @@ export function MapControls({ nodes }: MapControlsProps) {
                 key={`sort-by-${value}`}
                 value={value}
                 className="capitalize"
+                disabled={noLocation && value === "distance"}
               >
                 {value}
               </SelectItem>
@@ -133,8 +148,6 @@ export function MapControls({ nodes }: MapControlsProps) {
           </Select>
         </div>
       </div>
-
-      <LocationError />
     </div>
   );
 }

@@ -9,7 +9,8 @@ import { Node } from "@/lib/schema/node";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
-import { MAP_STYLES } from "../utils";
+import { cn } from "@/lib/utils";
+import { getRarityInfo, MAP_STYLES } from "../utils";
 import { NodePopup } from "./node-popup";
 
 type NodesMapProps = {
@@ -38,26 +39,29 @@ const NodesMap = ({
 
   const { data: userProfile } = useProfile();
 
+  const renderedNodes = useMemo(() => {
+    return filteredAndSortedNodes.map((node) => ({
+      ...node,
+      nodeColor: getRarityInfo(node.type.rarity),
+    }));
+  }, [filteredAndSortedNodes]);
+
   const userLocation = useMemo(() => {
     return latitude !== null && longitude !== null
       ? { latitude, longitude }
       : null;
   }, [latitude, longitude]);
 
-  const hasNodes = filteredAndSortedNodes.length > 0;
+  const hasNodes = renderedNodes.length > 0;
 
   // Set initial viewport
   const initialViewState = useMemo(() => {
     return {
-      latitude: hasNodes
-        ? filteredAndSortedNodes[0].latitude
-        : latitude ?? 40.7128,
-      longitude: hasNodes
-        ? filteredAndSortedNodes[0].longitude
-        : longitude ?? -74.006,
+      latitude: hasNodes ? renderedNodes[0].latitude : latitude ?? 40.7128,
+      longitude: hasNodes ? renderedNodes[0].longitude : longitude ?? -74.006,
       zoom: hasNodes ? 16 : 12,
     };
-  }, [hasNodes, latitude, longitude, filteredAndSortedNodes]);
+  }, [hasNodes, latitude, longitude, renderedNodes]);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -84,7 +88,7 @@ const NodesMap = ({
         onClick={() => setShowPopup(false)}
       >
         {/* Node Markers */}
-        {filteredAndSortedNodes.map((node) => (
+        {renderedNodes.map((node) => (
           <Marker
             key={node.id}
             longitude={node.longitude}
@@ -95,10 +99,15 @@ const NodesMap = ({
             }}
           >
             <NodeMarker
-              nodeRarity={node.type.rarity}
-              isActive={
-                node.openForMining && node.sessions.length < node.type.maxMiners
-              }
+              nodeColor={node.nodeColor}
+              // isActive={
+              //   node.openForMining && node.sessions.length < node.type.maxMiners
+              // }
+              // isDiscovered={true}
+              className={cn(
+                selectedNode?.id === node.id &&
+                  "ring-4 ring-primary/50 scale-110"
+              )}
             />
           </Marker>
         ))}

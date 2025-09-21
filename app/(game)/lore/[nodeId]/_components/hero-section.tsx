@@ -6,7 +6,7 @@ import { motion } from "framer-motion"; // For animations
 import Map, { Marker } from "react-map-gl/maplibre";
 import { useTheme } from "next-themes";
 
-import { MAP_STYLES } from "@/app/(game)/(geo-needed)/map/utils";
+import { MAP_STYLES } from "@/app/(game)/map/utils";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

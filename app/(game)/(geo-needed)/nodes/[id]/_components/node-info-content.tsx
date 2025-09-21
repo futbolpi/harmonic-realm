@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { cn } from "@/lib/utils";
 import { useMiningSession } from "@/hooks/queries/use-mining-session";
-import { getRarityInfo } from "../../../map/utils";
+import { getRarityInfo } from "../../../../map/utils";
 
 type NodeInfoContentProps = { node: Node };
 
@@ -47,7 +47,7 @@ export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
         <div className="text-center p-3 rounded-lg bg-muted/20">
           <Zap className="h-5 w-5 text-neon-green mx-auto mb-1" />
           <div className="text-lg font-bold text-neon-green">
-            {node.type.baseYieldPerMinute}π
+            {node.type.baseYieldPerMinute.toFixed(1)}π
           </div>
           <div className="text-xs text-muted-foreground">Per Minute</div>
         </div>

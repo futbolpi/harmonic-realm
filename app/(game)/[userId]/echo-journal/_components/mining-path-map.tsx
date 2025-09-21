@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/lib/schema/user";
-import { MAP_STYLES } from "@/app/(game)/(geo-needed)/map/utils";
+import { MAP_STYLES } from "@/app/(game)/map/utils";
 
 type MiningSession = UserProfile["sessions"];
 

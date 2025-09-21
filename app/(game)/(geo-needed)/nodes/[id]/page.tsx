@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: NodeDetailsPageProps) {
           url: `/api/og?title=${encodeURIComponent(
             node.type.name + " Echo Guardian"
           )}&description=${encodeURIComponent(
-            `Earn ${node.type.baseYieldPerMinute} Shares per minute`
+            `Earn ${node.type.baseYieldPerMinute.toFixed(1)} Shares per minute`
           )}&type=node&nodeType=${encodeURIComponent(node.type.name)}`,
           width: 1200,
           height: 630,
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: NodeDetailsPageProps) {
         `/api/og?title=${encodeURIComponent(
           node.type.name + " Echo Guardian"
         )}&description=${encodeURIComponent(
-          `Earn ${node.type.baseYieldPerMinute} Shares per minute`
+          `Earn ${node.type.baseYieldPerMinute.toFixed(1)} Shares per minute`
         )}&type=node&nodeType=${encodeURIComponent(node.type.name)}`,
       ],
     },

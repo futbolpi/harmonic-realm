@@ -84,7 +84,7 @@ export const tutorialSteps: Tour[] = [
         title: "Begin Your Journey",
         content:
           "You're now ready to begin mining the cosmic frequencies. Approach Nodes in the physical world to start your first session. The closer you are, the stronger the resonance. May the Lattice guide your path, Pioneer.",
-        selector: "#maplibregl-canvas",
+        selector: "#map-canvas",
         side: "bottom",
         showControls: true,
         showSkip: false,
@@ -143,7 +143,7 @@ export const tutorialSteps: Tour[] = [
         title: "The Lattice Grid Revealed",
         content:
           "Behold the cosmic map - a visualization of the Lattice's infinite grid overlaid upon our reality. Each pulsing point represents a Node where Pi's mathematical essence creates tangible anchor points in spacetime.",
-        selector: "#maplibregl-canvas",
+        selector: "#map-canvas",
         side: "bottom",
         showControls: true,
         showSkip: true,
@@ -190,7 +190,7 @@ export const tutorialSteps: Tour[] = [
         icon: "💎",
         title: "Node Resonance Signatures",
         content:
-          "Each Node pulses with a unique color signature based on its rarity. Common Nodes glow green, while Legendary Nodes emit brilliant purple light. The brighter the pulse, the more active the Node's mining potential.",
+          "Each Node pulses with a unique color signature based on its rarity. Common Nodes glow blue, while Legendary Nodes emit brilliant pink light. The brighter the pulse, the more active the Node's mining potential.",
         selector: ".maplibregl-marker",
         side: "left",
         showControls: true,

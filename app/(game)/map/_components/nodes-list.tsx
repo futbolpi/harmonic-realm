@@ -89,7 +89,7 @@ export function NodesList({
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="flex items-center gap-1">
                 <Zap className="h-3 w-3 text-neon-green" />
-                <span>{node.type.baseYieldPerMinute}π/min</span>
+                <span>{node.type.baseYieldPerMinute.toFixed(1)}π/min</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3 text-neon-orange" />

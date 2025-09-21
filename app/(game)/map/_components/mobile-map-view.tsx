@@ -3,18 +3,15 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { MapRef } from "react-map-gl/maplibre";
 import { useRouter } from "next/navigation";
-import { AlertCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
 import NodesMap from "./nodes-map";
 import { MapControlModal } from "./map-control-modal";
 import { NodesListModal } from "./nodes-list-modal";
-import useCurrentLocation from "../../_components/location-provider";
 import MapHelp from "./map-help";
 
 interface MobileMapViewProps {
@@ -39,9 +36,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
 
   // Selection and location state
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const {
-    state: { error: locationError },
-  } = useCurrentLocation();
+
   const [showPopup, setShowPopup] = useState(false);
 
   const userLocation = useMemo(() => {
@@ -92,7 +87,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
 
   return (
     <div className="h-full w-full relative">
-      <div id="maplibregl-canvas"></div>
+      <div id="map-canvas"></div>
       {/* Map - takes 90% of screen */}
       <NodesMap
         filteredAndSortedNodes={filteredAndSortedNodes}
@@ -137,15 +132,6 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
           />
         </div>
       </div>
-
-      {locationError && (
-        <div className="absolute top-16 left-4 right-4 z-10">
-          <Alert variant={"destructive"}>
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle className="text-sm">{locationError.message}</AlertTitle>
-          </Alert>
-        </div>
-      )}
     </div>
   );
 }

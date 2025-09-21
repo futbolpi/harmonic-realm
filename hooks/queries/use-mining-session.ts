@@ -55,7 +55,7 @@ export function useMiningSession(node: UseMininingSessionParams) {
     : null;
 
   // calculate max miners reached
-  const maxMinersReached = maxMiners >= completedMiners;
+  const maxMinersReached = maxMiners <= completedMiners;
 
   const canMine = isInRange && openForMining && !maxMinersReached;
 

@@ -12,7 +12,7 @@ import { useLocation } from "@/hooks/use-location";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
-import { MAP_STYLES } from "../../../map/utils";
+import { MAP_STYLES } from "../../../../map/utils";
 import FloatingControls from "./floating-controls";
 import NodeInfoModal from "./node-info-modal";
 import NodeMiningSessions from "./node-mining-sessions";

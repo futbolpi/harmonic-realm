@@ -6,7 +6,7 @@ import { useTransition } from "react";
 import {
   mapSearchParamsParsers,
   mapSearchParamsUrlKeys,
-} from "@/app/(game)/(geo-needed)/map/search-params";
+} from "@/app/(game)/map/search-params";
 
 export function useMapSearchParams() {
   const [isLoading, startTransition] = useTransition();

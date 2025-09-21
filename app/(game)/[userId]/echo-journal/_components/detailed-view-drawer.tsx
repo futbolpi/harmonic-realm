@@ -105,7 +105,7 @@ const DetailedViewDrawer = ({
                   <Sparkles className="h-4 w-4 text-yellow-400" />
                   <div>
                     <div className="text-lg font-bold">
-                      {mastery.nodeType.baseYieldPerMinute}
+                      {mastery.nodeType.baseYieldPerMinute.toFixed(1)}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Base Yield/Min

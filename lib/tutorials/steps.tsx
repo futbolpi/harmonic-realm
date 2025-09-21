@@ -29,8 +29,6 @@ export const tutorialSteps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 8,
-        prevRoute: "/dashboard",
-        nextRoute: "/dashboard",
       },
       {
         icon: "🌙",
@@ -43,8 +41,6 @@ export const tutorialSteps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 8,
-        prevRoute: "/dashboard",
-        nextRoute: "/dashboard",
       },
       {
         icon: "🗺️",
@@ -57,8 +53,6 @@ export const tutorialSteps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 8,
-        prevRoute: "/dashboard",
-        nextRoute: "/dashboard",
       },
       {
         icon: "📖",
@@ -71,8 +65,6 @@ export const tutorialSteps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 8,
-        prevRoute: "/dashboard",
-        nextRoute: "/dashboard",
       },
       {
         icon: "🏆",
@@ -86,14 +78,13 @@ export const tutorialSteps: Tour[] = [
         pointerPadding: 10,
         pointerRadius: 8,
         nextRoute: "/map",
-        prevRoute: "/dashboard",
       },
       {
         icon: "⛏️",
         title: "Begin Your Journey",
         content:
           "You're now ready to begin mining the cosmic frequencies. Approach Nodes in the physical world to start your first session. The closer you are, the stronger the resonance. May the Lattice guide your path, Pioneer.",
-        selector: "#start-mining",
+        selector: "#maplibregl-canvas",
         side: "bottom",
         showControls: true,
         showSkip: false,

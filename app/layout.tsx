@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Lora, Space_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { NextStepProvider, NextStep } from "nextstepjs";
 
 import { ThemeProvider } from "@/components/shared/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -10,8 +9,7 @@ import TanstackQueryProvider from "@/components/shared/tanstack-query/provider";
 import { PiProvider } from "@/components/shared/pi/pi-provider";
 import { env } from "@/env";
 import { siteConfig } from "@/config/site";
-import { tutorialSteps } from "@/lib/tutorials/steps";
-import { CustomNextStepCard } from "@/components/shared/custom-nextstep-card";
+import NextStepProvider from "@/components/shared/next-step/next-step-provider";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
@@ -88,14 +86,7 @@ export default function RootLayout({
             <div vaul-drawer-wrapper="" className="bg-background">
               <NuqsAdapter>
                 <AuthProvider>
-                  <NextStepProvider>
-                    <NextStep
-                      steps={tutorialSteps}
-                      cardComponent={CustomNextStepCard}
-                    >
-                      {children}
-                    </NextStep>
-                  </NextStepProvider>
+                  <NextStepProvider>{children}</NextStepProvider>
                 </AuthProvider>
               </NuqsAdapter>
             </div>

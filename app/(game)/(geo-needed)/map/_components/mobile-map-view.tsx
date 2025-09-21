@@ -105,10 +105,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
       />
 
       {/* Mobile Controls - Floating Action Buttons */}
-      <div
-        className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start"
-        id="start-mining"
-      >
+      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
         <div className="flex gap-2">
           {/* Location Button */}
           <LocationButton />

@@ -4,10 +4,14 @@ import { X, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 import type React from "react";
 import { motion } from "framer-motion";
 import { CardComponentProps } from "nextstepjs";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+const allowedRoutes = ["/dashboard", "/map"];
 
 export function CustomNextStepCard({
   step,
@@ -17,6 +21,14 @@ export function CustomNextStepCard({
   prevStep,
   skipTour,
 }: CardComponentProps) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!allowedRoutes.includes(pathname) && !!skipTour) {
+      skipTour();
+    }
+  }, [pathname, skipTour]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}

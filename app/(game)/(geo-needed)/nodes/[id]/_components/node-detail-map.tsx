@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Map, { Marker, Source, Layer, type MapRef } from "react-map-gl/maplibre";
 import circle from "@turf/circle";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
+import { BookOpen, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMiningSession } from "@/hooks/queries/use-mining-session";
@@ -12,14 +15,11 @@ import { useLocation } from "@/hooks/use-location";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
-import { MAP_STYLES } from "../../../../map/utils";
+import { getRarityInfo, MAP_STYLES } from "../../../../map/utils";
 import FloatingControls from "./floating-controls";
 import NodeInfoModal from "./node-info-modal";
 import NodeMiningSessions from "./node-mining-sessions";
 import { UserNodeMastery } from "./user-node-mastery";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Zap } from "lucide-react";
-import Link from "next/link";
 
 interface NodeDetailMapProps {
   node: Node;
@@ -118,7 +118,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
         <Marker longitude={node.longitude} latitude={node.latitude}>
           <div className="relative">
             <NodeMarker
-              nodeRarity={node.type.rarity}
+              nodeColor={getRarityInfo(node.type.rarity)}
               isActive={
                 node.openForMining && node.sessions.length < node.type.maxMiners
               }

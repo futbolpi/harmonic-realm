@@ -54,3 +54,41 @@ export type CompleteMiningRequest = z.infer<typeof CompleteMiningSchema>;
 export type CompleteMiningResponse = z.infer<
   typeof CompleteMiningResponseSchema
 >;
+
+// Define the enum for mining states
+export enum MiningState {
+  Loading = "loading",
+  Error = "error",
+  Pending = "pending",
+  Completed = "completed",
+  Cancelled = "cancelled",
+  NodeClosed = "nodeClosed",
+  NodeFull = "nodeFull",
+  NoLocation = "noLocation",
+  TooFar = "tooFar",
+  Eligible = "eligible",
+}
+
+// Interfaces for type safety
+export interface Location {
+  latitude: number;
+  longitude: number;
+}
+
+export interface UseMiningLogicProps {
+  nodeId: string;
+  nodeLocation: Location;
+  maxSessions: number;
+  completedSessions: number;
+  isOpenForMining: boolean;
+  allowedDistanceMeters?: number; // default 100
+  allowRestartAfterCancelled?: boolean; // default true
+}
+
+export interface UseMiningLogicResult {
+  miningState: MiningState;
+  distance: number | null;
+  showStartModal: boolean;
+  showMiningModal: boolean;
+  showCompletedModal: boolean;
+}

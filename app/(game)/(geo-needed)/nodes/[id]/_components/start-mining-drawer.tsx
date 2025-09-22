@@ -11,14 +11,18 @@ import { Node } from "@/lib/schema/node";
 import { useLocation } from "@/hooks/use-location";
 import { startMiningAction } from "@/actions/mining/start-mining-session";
 import { useAuth } from "@/components/shared/auth/auth-context";
-import { useMiningSession } from "@/hooks/queries/use-mining-session";
 import {
   Credenza,
   CredenzaHeader,
   CredenzaTitle,
   CredenzaContent,
 } from "@/components/credenza";
+import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
+import { MINING_RANGE_METERS } from "@/config/site";
+import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
+import { MiningState } from "@/lib/schema/mining-session";
 import { getRarityInfo } from "../../../../map/utils";
+import { getFeedbackMessage } from "../_utils/feedback-message";
 
 interface StartMiningDrawerProps {
   node: Node;
@@ -29,13 +33,20 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
 
   const userLocation = useLocation();
   const { accessToken } = useAuth();
-  const { data: sessionData, refreshSession } = useMiningSession({
-    id: node.id,
-    latitude: node.latitude,
-    longitude: node.longitude,
-    openForMining: node.openForMining,
-    maxMiners: node.type.maxMiners,
-    completedMiners: node.sessions.length,
+  const { refreshSessionAssets } = useMiningSessionAssets(node.id);
+  const { miningState, distance } = useMiningLogic({
+    completedSessions: node.sessions.length,
+    isOpenForMining: node.openForMining,
+    maxSessions: node.type.maxMiners,
+    nodeId: node.id,
+    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+    allowedDistanceMeters: MINING_RANGE_METERS,
+  });
+
+  const feedback = getFeedbackMessage({
+    miningState,
+    distanceMeters: distance,
+    allowedDistanceMeters: MINING_RANGE_METERS,
   });
 
   const onSubmit = () => {
@@ -59,7 +70,7 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
 
         if (result.success) {
           toast.success("Mining session started successfully!");
-          refreshSession();
+          refreshSessionAssets();
         } else {
           toast.error(result.error || "Failed to start mining session");
         }
@@ -73,7 +84,6 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
   const estimatedYield = (
     node.type.baseYieldPerMinute * node.type.lockInMinutes
   ).toFixed(1);
-  const canMine = sessionData?.canMine ?? false;
 
   return (
     <Credenza open={true}>
@@ -150,7 +160,7 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
             type="submit"
             className="w-full"
             onClick={onSubmit}
-            disabled={!canMine || isPending}
+            disabled={miningState !== MiningState.Eligible || isPending}
           >
             {isPending ? (
               <>
@@ -165,9 +175,9 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
             )}
           </Button>
 
-          {!canMine && sessionData?.reason && (
+          {miningState !== MiningState.Eligible && feedback && (
             <p className="text-sm text-muted-foreground text-center">
-              {sessionData.reason}
+              {feedback}
             </p>
           )}
         </div>

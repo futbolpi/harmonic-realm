@@ -12,7 +12,7 @@ import {
   CredenzaHeader,
 } from "@/components/credenza";
 import { Node } from "@/lib/schema/node";
-import { useMiningSession } from "@/hooks/queries/use-mining-session";
+import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
 
 type CompletedSessionDrawerProps = { node: Node };
 
@@ -20,16 +20,11 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
   // Mock completed session data if none provided
   const [isOpen, onOpenChange] = useState(false);
 
-  const { data: sessionData } = useMiningSession({
-    id: node.id,
-    latitude: node.latitude,
-    longitude: node.longitude,
-    openForMining: node.openForMining,
-    maxMiners: node.type.maxMiners,
-    completedMiners: node.sessions.length,
-  });
+  const { data } = useMiningSessionAssets(node.id);
 
-  if (sessionData?.session?.status !== "COMPLETED") {
+  const sessionData = data?.session;
+
+  if (sessionData?.status !== "COMPLETED") {
     return null;
   }
 
@@ -61,7 +56,7 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
           <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-4 text-center">
             <Coins className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-foreground">
-              +{sessionData.session.minerSharesEarned}
+              +{sessionData.minerSharesEarned}
             </div>
             <div className="text-sm text-muted-foreground">
               Miner Shares Earned
@@ -89,7 +84,7 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
               className="bg-green-500/10 text-green-700 border-green-500/20"
             >
               <CheckCircle className="w-3 h-3 mr-1" />
-              {sessionData.session.status}
+              {sessionData.status}
             </Badge>
           </div>
 

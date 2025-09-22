@@ -17,7 +17,6 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
-import { useMiningSession } from "@/hooks/queries/use-mining-session";
 import { completeMiningSession } from "@/actions/mining/complete-mining-session";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import {
@@ -42,19 +41,13 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
   const [isPending, startTransition] = useTransition();
   const [isApplyingTransmission, startApplyingTransmission] = useTransition();
 
-  const { data: sessionData, refreshSession } = useMiningSession({
-    id: node.id,
-    latitude: node.latitude,
-    longitude: node.longitude,
-    openForMining: node.openForMining,
-    maxMiners: node.type.maxMiners,
-    completedMiners: node.sessions.length,
-  });
-
   const { accessToken } = useAuth();
 
-  const { data, refreshSessionAssets } = useMiningSessionAssets(node.id);
-  const echoData = data?.echoInfo;
+  const { data: sessionAssets, refreshSessionAssets } = useMiningSessionAssets(
+    node.id
+  );
+  const echoData = sessionAssets?.echoInfo;
+  const sessionData = sessionAssets?.session;
 
   // Calculate time remaining based on lockInMinutes
   useEffect(() => {
@@ -69,7 +62,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
 
       if (remaining === 0 && !isPending) {
         startTransition(async () => {
-          if (!accessToken || !sessionData?.session?.id) {
+          if (!accessToken || !sessionData?.id) {
             toast.error("Unauthorized");
             return;
           }
@@ -77,13 +70,13 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
           try {
             const response = await completeMiningSession({
               accessToken,
-              sessionId: sessionData.session.id,
+              sessionId: sessionData.id,
               latitude: node.latitude,
               longitude: node.longitude,
             });
             if (response.success) {
               toast.success("Mining session completed!");
-              refreshSession();
+              refreshSessionAssets();
             } else {
               toast.error(
                 response.error || "Failed to complete mining session"
@@ -103,12 +96,12 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
     return () => clearInterval(interval);
   }, [
     node.type.lockInMinutes,
-    refreshSession,
-    sessionData?.session?.id,
+    sessionData?.id,
     accessToken,
     node.latitude,
     node.longitude,
     isPending,
+    refreshSessionAssets,
   ]);
 
   // Handle Echo Transmission activation
@@ -117,11 +110,11 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
       return;
     }
 
-    if (!sessionData?.session) {
+    if (!sessionData) {
       return;
     }
 
-    const sessionId = sessionData.session.id;
+    const sessionId = sessionData.id;
 
     startApplyingTransmission(async () => {
       try {
@@ -174,7 +167,6 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
               return Math.min(1, timeRemaining) * (1 - timeReduction / 100);
             });
           }
-          refreshSession();
           refreshSessionAssets();
         } else {
           toast.error(response.error || "Failed to apply Echo Transmission");
@@ -202,7 +194,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
     !!echoData &&
     echoData.status === "CHARGED" &&
     !echoData.usedNodeIds.includes(node.id) &&
-    !sessionData?.session?.echoTransmissionApplied &&
+    !sessionData?.echoTransmissionApplied &&
     timeRemaining > 1000;
 
   // Check if user needs to recharge
@@ -227,7 +219,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
 
         <div className="px-6 pb-6 space-y-4">
           {/* Echo Transmission Section */}
-          {!sessionData?.session?.echoTransmissionApplied && (
+          {!sessionData?.echoTransmissionApplied && (
             <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/20">
               <div className="flex items-center gap-2 mb-3">
                 <Radio className="h-5 w-5 text-purple-500" />
@@ -311,13 +303,13 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
           )}
 
           {/* Echo Transmission Applied Indicator */}
-          {sessionData?.session?.echoTransmissionApplied && (
+          {sessionData?.echoTransmissionApplied && (
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-green-700">
                   Echo Transmission Active - Time Accelerated by{" "}
-                  {sessionData.session.timeReductionPercent}%
+                  {sessionData.timeReductionPercent}%
                 </span>
               </div>
             </div>
@@ -345,7 +337,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             <div className="text-3xl font-bold text-foreground font-mono">
               {formatTime(timeRemaining)}
             </div>
-            {sessionData?.session?.echoTransmissionApplied && (
+            {sessionData?.echoTransmissionApplied && (
               <div className="text-xs text-green-600 mt-1">
                 Accelerated timeline active
               </div>
@@ -357,7 +349,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             <div className="bg-card rounded-lg p-3 text-center">
               <Coins className="h-4 w-4 text-yellow-500 mx-auto mb-1" />
               <div className="text-lg font-bold">
-                {sessionData?.session?.minerSharesEarned.toFixed(2)}
+                {sessionData?.minerSharesEarned.toFixed(2)}
               </div>
               <div className="text-xs text-muted-foreground">Shares Earned</div>
             </div>
@@ -377,7 +369,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
               className="bg-green-500/10 text-green-700 border-green-500/20"
             >
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-              {sessionData?.session?.status}
+              {sessionData?.status}
             </Badge>
           </div>
 

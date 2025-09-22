@@ -1,27 +1,27 @@
+"use client";
+
 import { Clock, Star, Users, Zap } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { cn } from "@/lib/utils";
-import { useMiningSession } from "@/hooks/queries/use-mining-session";
+import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
+import { MINING_RANGE_METERS } from "@/config/site";
 import { getRarityInfo } from "../../../../map/utils";
 
 type NodeInfoContentProps = { node: Node };
 
 export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
-  const {
-    data: sessionData,
-    distance,
-    rangeMeters,
-    isInRange,
-  } = useMiningSession({
-    id: node.id,
-    latitude: node.latitude,
-    longitude: node.longitude,
-    openForMining: node.openForMining,
-    maxMiners: node.type.maxMiners,
-    completedMiners: node.sessions.length,
+  const { distance } = useMiningLogic({
+    completedSessions: node.sessions.length,
+    isOpenForMining: node.openForMining,
+    maxSessions: node.type.maxMiners,
+    nodeId: node.id,
+    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+    allowedDistanceMeters: MINING_RANGE_METERS,
   });
+
+  const isInRange = distance !== null && distance <= MINING_RANGE_METERS;
 
   return (
     <div className="space-y-4">
@@ -74,36 +74,34 @@ export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
         </div>
       </div>
 
-      {sessionData && (
-        <div className="space-y-2 p-3 rounded-lg bg-muted/10 border">
-          <div className="flex items-center justify-between text-sm">
-            <span>Distance:</span>
-            <span className="font-medium">
-              {distance ? `${Math.round(distance)}m` : "Unknown"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span>Required:</span>
-            <span className="font-medium">{rangeMeters}m</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div
-              className={cn(
-                "w-2 h-2 rounded-full",
-                isInRange ? "bg-green-500" : "bg-red-500"
-              )}
-            />
-            <span
-              className={cn(
-                "text-xs font-medium",
-                isInRange ? "text-green-600" : "text-red-600"
-              )}
-            >
-              {isInRange ? "In Range" : "Too Far"}
-            </span>
-          </div>
+      <div className="space-y-2 p-3 rounded-lg bg-muted/10 border">
+        <div className="flex items-center justify-between text-sm">
+          <span>Distance:</span>
+          <span className="font-medium">
+            {distance ? `${Math.round(distance)}m` : "Unknown"}
+          </span>
         </div>
-      )}
+        <div className="flex items-center justify-between text-sm">
+          <span>Required:</span>
+          <span className="font-medium">{MINING_RANGE_METERS}m</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              "w-2 h-2 rounded-full",
+              isInRange ? "bg-green-500" : "bg-red-500"
+            )}
+          />
+          <span
+            className={cn(
+              "text-xs font-medium",
+              isInRange ? "text-green-600" : "text-red-600"
+            )}
+          >
+            {isInRange ? "In Range" : "Too Far"}
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
-import { useMiningSession } from "@/hooks/queries/use-mining-session";
 import { useLocation } from "@/hooks/use-location";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
+import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
+import { MINING_RANGE_METERS } from "@/config/site";
 import { getRarityInfo, MAP_STYLES } from "../../../../map/utils";
 import FloatingControls from "./floating-controls";
 import NodeInfoModal from "./node-info-modal";
@@ -30,20 +31,22 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
   const { resolvedTheme } = useTheme();
 
-  const { isInRange, rangeMeters } = useMiningSession({
-    id: node.id,
-    latitude: node.latitude,
-    longitude: node.longitude,
-    openForMining: node.openForMining,
-    maxMiners: node.type.maxMiners,
-    completedMiners: node.sessions.length,
+  const { distance } = useMiningLogic({
+    completedSessions: node.sessions.length,
+    isOpenForMining: node.openForMining,
+    maxSessions: node.type.maxMiners,
+    nodeId: node.id,
+    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+    allowedDistanceMeters: MINING_RANGE_METERS,
   });
+
+  const isInRange = distance !== null && distance <= MINING_RANGE_METERS;
 
   const userLocation = useLocation();
   const { data: userProfile } = useProfile();
 
   // Create circle for mining radius
-  const miningRadius = rangeMeters;
+  const miningRadius = MINING_RANGE_METERS;
   const radiusCircle = circle(
     [node.longitude, node.latitude],
     miningRadius / 1000,

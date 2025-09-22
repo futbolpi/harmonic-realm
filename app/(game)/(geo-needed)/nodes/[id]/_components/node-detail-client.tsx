@@ -5,11 +5,13 @@ import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Node } from "@/lib/schema/node";
-import { useMiningSession } from "@/hooks/queries/use-mining-session";
+import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
+import { MINING_RANGE_METERS } from "@/config/site";
 import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
 import { ActiveMiningDrawer } from "./active-mining-drawer";
 import { CompletedSessionDrawer } from "./completed-session-drawer";
+import { getFeedbackMessage } from "../_utils/feedback-message";
 
 interface NodeDetailClientProps {
   node: Node;
@@ -19,22 +21,22 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
   const router = useRouter();
 
   // Fetch mining session data with range validation
-  const {
-    data: sessionData,
-    isInRange,
-    distance,
-  } = useMiningSession({
-    id: node.id,
-    latitude: node.latitude,
-    longitude: node.longitude,
-    openForMining: node.openForMining,
-    maxMiners: node.type.maxMiners,
-    completedMiners: node.sessions.length,
-  });
+  const { showStartModal, showMiningModal, distance, miningState } =
+    useMiningLogic({
+      completedSessions: node.sessions.length,
+      isOpenForMining: node.openForMining,
+      maxSessions: node.type.maxMiners,
+      nodeId: node.id,
+      nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+      allowedDistanceMeters: MINING_RANGE_METERS,
+    });
 
-  const showActiveDrawer =
-    sessionData?.canMine && sessionData?.session?.status === "ACTIVE";
-  const showStartDrawer = sessionData?.canMine && !sessionData?.session;
+  const isInRange = distance !== null && distance <= MINING_RANGE_METERS;
+  const feedback = getFeedbackMessage({
+    miningState,
+    distanceMeters: distance,
+    allowedDistanceMeters: MINING_RANGE_METERS,
+  });
 
   return (
     <div className="relative bg-background">
@@ -61,9 +63,9 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
                 : "bg-red-500/90 text-white"
             }`}
           >
-            {distance > 1
-              ? `${Math.round(distance)}km`
-              : `${(distance * 1000).toFixed(1)}km`}
+            {distance < 1000
+              ? `${distance}m`
+              : `${(distance / 1000).toFixed(1)}km`}
           </div>
         </div>
       )}
@@ -72,10 +74,10 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       <NodeDetailMap node={node} />
 
       {/* Active mining session drawer - only shown when user is in range with active session */}
-      {showActiveDrawer && <ActiveMiningDrawer node={node} />}
+      {showMiningModal && <ActiveMiningDrawer node={node} />}
 
       {/* Start mining drawer - only shown when user can mine */}
-      {showStartDrawer && <StartMiningDrawer node={node} />}
+      {showStartModal && <StartMiningDrawer node={node} />}
 
       {/* Completed session drawer */}
       <CompletedSessionDrawer node={node} />
@@ -83,11 +85,10 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       {/* show sessions */}
 
       {/* can't mine info */}
-      {!sessionData?.canMine && !!sessionData?.reason && (
+      {feedback && (
         <div className="absolute bottom-20 left-4 right-4 z-10">
-          <div className="bg-amber-500/90 text-white p-3 rounded-lg shadow-lg text-center">
-            <p className="text-sm font-medium">Closed Node</p>
-            <p className="text-xs opacity-90">{sessionData.reason}</p>
+          <div className="bg-card text-card-foreground p-3 rounded-lg shadow-lg text-center">
+            <p className="text-xs opacity-90">{feedback}</p>
           </div>
         </div>
       )}

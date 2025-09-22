@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { LeaderboardClient } from "./_components/leaderboard-client";
 import { getSiteStats } from "@/lib/api-helpers/server/site";
+import { LeaderboardClient } from "./_components/leaderboard-client";
 
 export const metadata: Metadata = {
   title: "Pioneer Leaderboard | HarmonicRealm",
@@ -28,6 +28,8 @@ export const metadata: Metadata = {
     ],
   },
 };
+
+export const revalidate = 3600;
 
 export default async function LeaderboardPage() {
   const {

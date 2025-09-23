@@ -29,7 +29,7 @@ export const getFeedbackMessage = ({
           : `Move closer by ${Math.max(
               0,
               Math.round(distanceMeters - allowedDistanceMeters) / 1000
-            )} m.`;
+            )} km.`;
       break;
     case MiningState.NodeFull:
       feedbackMessage = "This node has reached its maximum capacity.";

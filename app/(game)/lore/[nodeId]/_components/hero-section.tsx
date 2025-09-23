@@ -11,7 +11,21 @@ import { NodeMarker } from "@/app/(game)/_components/node-markers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LocationLore } from "../services";
+import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+
+interface LocationLore {
+  node: {
+    name: string;
+    latitude: number;
+    longitude: number;
+    type: { rarity: NodeTypeRarity; name: string };
+  };
+  nodeId: string;
+  city: string | null;
+  totalPiStaked: number;
+  numberOfStakes: number;
+  currentLevel: number;
+}
 
 interface HeroSectionProps {
   lore: LocationLore;
@@ -61,8 +75,7 @@ export default function HeroSection({ lore }: HeroSectionProps) {
       <Card className="h-full border-none shadow-none bg-transparent">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            ECHO NODE #π-{lore.nodeId}: THE ETERNAL WHISPER OF{" "}
-            {lore.city?.toUpperCase()}
+            {lore.node.name}: THE ETERNAL WHISPER OF {lore.city?.toUpperCase()}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col md:flex-row justify-between">
@@ -93,8 +106,8 @@ export default function HeroSection({ lore }: HeroSectionProps) {
             <Badge variant="secondary">Type: {lore.node.type.name}</Badge>
             <Badge variant="secondary">Level: {lore.currentLevel}/5</Badge>
             <Badge variant="secondary">
-              Pi Staked: {lore.totalPiStaked.toDecimalPlaces(2).toString()} by{" "}
-              {lore.stakes.length}
+              Pi Staked: {lore.totalPiStaked.toFixed(2)} by{" "}
+              {lore.numberOfStakes}
             </Badge>
             <Button variant="ghost" onClick={toggleAudio}>
               <Volume2 className="mr-2" /> {isPlaying ? "Pause" : "Play"}{" "}

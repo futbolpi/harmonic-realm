@@ -101,6 +101,14 @@ export async function initiateLocationLoreStaking(
       };
     }
 
+    // create lore if it doesnt exist
+    if (!node.locationLore) {
+      await prisma.locationLore.create({
+        data: { nodeId },
+        select: { id: true },
+      });
+    }
+
     // Create stake record (pending payment)
     const stake = await prisma.locationLoreStake.create({
       data: {

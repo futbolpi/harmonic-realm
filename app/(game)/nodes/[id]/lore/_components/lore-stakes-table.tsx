@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import UserAvatar from "@/components/shared/user-avatar";
 import prisma from "@/lib/prisma";
 
-type LoreStakesTableProps = { nodeId: string };
+type LoreStakesTableProps = { nodeId: string; isUserTable?: boolean };
 
 // Mock data - replace with actual data fetching
 
@@ -24,10 +24,13 @@ const TIER_NAMES = {
   COSMIC_FOUNDER: "Cosmic Founder",
 };
 
-export async function LoreStakesTable({ nodeId }: LoreStakesTableProps) {
+export async function LoreStakesTable({
+  nodeId,
+  isUserTable = false,
+}: LoreStakesTableProps) {
   // const stakes = mockStakes;
   const stakes = await prisma.locationLoreStake.findMany({
-    where: { nodeId },
+    where: { nodeId, paymentStatus: isUserTable ? undefined : "COMPLETED" },
     select: {
       piAmount: true,
       createdAt: true,

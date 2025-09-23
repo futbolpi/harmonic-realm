@@ -255,6 +255,12 @@ export const generateLocationLore = inngest.createFunction(
           lastGeneratedAt: new Date(),
         },
         update: {
+          country: locationContext.address.country,
+          state: locationContext.address.state,
+          city: locationContext.address.city,
+          district: locationContext.address.district,
+          address: locationContext.displayName,
+          reverseGeoData: locationContext,
           [loreFieldName]: loreResult.content,
           cosmeticThemes: loreResult.cosmeticThemes,
           audioThemes: loreResult.audioThemes,

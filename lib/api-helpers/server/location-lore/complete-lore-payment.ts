@@ -97,14 +97,14 @@ export async function completeLocationLorePayment({
       await InngestEventDispatcher.startLoreGeneration(
         stake.nodeId,
         stake.targetLevel as LoreLevel,
-        stake.userId,
         result.jobId
       );
     }
 
     // Revalidate relevant paths
     revalidatePath("/nodes/[id]", "page");
-    revalidatePath("/lore");
+    revalidatePath("/nodes/[id]/lore", "page");
+    revalidatePath(`/lore-stakes/${stakeId}`);
 
     return {
       success: true,

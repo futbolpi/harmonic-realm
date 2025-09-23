@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Decimal } from "@prisma/client/runtime/library";
 
 import {
   ContributionTier,
@@ -50,16 +49,13 @@ export type StakingOpportunity = {
 };
 
 export interface LoreStakeDetails {
+  piAmount: number;
   id: string;
+  userId: string;
   nodeId: string;
-  piAmount: Decimal;
   targetLevel: number;
   paymentStatus: PaymentStatus;
   contributionTier: ContributionTier | null;
-  createdAt: Date;
-  updatedAt: Date;
-  paymentId: string | null;
-  piTransactionId: string | null;
   locationLore: {
     node: {
       id: string;

@@ -1,40 +1,19 @@
-// components/lore/StakingSection.tsx (Client for Form)
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { Decimal } from "@prisma/client/runtime/library";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { initiateLocationLoreStaking } from "@/actions/location-lore/initiate-staking";
 import { useAuth } from "@/components/shared/auth/auth-context";
 
-const stakeSchema = z.object({
-  piAmount: z
-    .number()
-    .min(0.1, "Minimum stake is 0.1 Pi")
-    .max(100, "Max stake is 100 Pi"),
-});
-
 interface StakingSectionProps {
   nodeId: string;
   currentLevel: number;
-  totalPiStaked: Decimal;
+  totalPiStaked: number;
 }
 
 export default function StakingSection({
@@ -46,20 +25,25 @@ export default function StakingSection({
   const router = useRouter();
   const { accessToken } = useAuth();
 
-  const form = useForm<z.infer<typeof stakeSchema>>({
-    resolver: zodResolver(stakeSchema),
-    defaultValues: { piAmount: 1 },
-  });
+  const progress = (currentLevel / 5) * 100;
+  const piAmount = [0.5, 1.5, 3, 5, 10][currentLevel] || 0; // Cumulative mocks
 
-  const onSubmit = (data: z.infer<typeof stakeSchema>) => {
+  const disabled = piAmount < 0.5;
+
+  const onSubmit = () => {
     if (!accessToken) {
       toast.error("Unauthourized");
       return;
     }
+    if (disabled) {
+      toast.error("Staking is not allowed for this node");
+      return;
+    }
+
     startTransition(async () => {
       const response = await initiateLocationLoreStaking({
         nodeId,
-        piAmount: data.piAmount,
+        piAmount,
         accessToken,
         targetLevel: currentLevel + 1,
       });
@@ -75,9 +59,6 @@ export default function StakingSection({
     });
   };
 
-  const progress = (currentLevel / 5) * 100;
-  const nextPiNeeded = [0.5, 1.5, 3, 5, 10][currentLevel] || 0; // Cumulative mocks
-
   return (
     <Card className="mt-8">
       <CardHeader>
@@ -86,38 +67,15 @@ export default function StakingSection({
       <CardContent>
         <Progress value={progress} className="mb-4" />
         <p className="mb-4">
-          Current Level: {currentLevel}/5 | Total Pi:{" "}
-          {totalPiStaked.toDecimalPlaces(2).toString()}
+          Current Level: {currentLevel}/5 | Total Pi: {totalPiStaked.toFixed(2)}
         </p>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="piAmount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Pi to Infuse (for next level: {nextPiNeeded} Pi)
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value))
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? "Channeling..." : "Channel Pi Energy"}
-            </Button>
-          </form>
-        </Form>
+        <Button
+          onClick={onSubmit}
+          disabled={isPending || disabled}
+          className="w-full"
+        >
+          {isPending ? "Channeling..." : `Channel Energy with ${piAmount} Pi`}
+        </Button>
         <div className="mt-6">
           <h4 className="font-semibold mb-2">Contribution Tiers</h4>
           <ul className="list-disc pl-5 space-y-1">

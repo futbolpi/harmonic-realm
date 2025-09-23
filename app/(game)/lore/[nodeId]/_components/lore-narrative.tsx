@@ -12,7 +12,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import UserAvatar from "@/components/shared/user-avatar";
 import { ContributionTier } from "@/lib/generated/prisma/enums";
-import { LocationLore } from "../services";
+
+type LocationLore = {
+  currentLevel: number;
+  basicHistory: string | null;
+  culturalSignificance: string | null;
+  mysticInterpretation: string | null;
+  epicNarrative: string | null;
+  legendaryTale: string | null;
+  stakes: {
+    user: { id: string; username: string };
+    contributionTier: ContributionTier | null;
+  }[];
+};
 
 interface LoreNarrativeProps {
   lore: LocationLore;
@@ -70,13 +82,13 @@ export default function LoreNarrative({ lore }: LoreNarrativeProps) {
         <div className="mt-8">
           <h3 className="text-lg font-semibold mb-4">Contributors Spotlight</h3>
           <div className="flex gap-4 overflow-x-auto">
-            {lore.stakes.map((contrib) => (
-              <Card key={contrib.user.id} className="min-w-[150px]">
+            {lore.stakes.map((contrib, i) => (
+              <Card key={`${contrib.user.id}-${i}`} className="min-w-[150px]">
                 <CardContent className="p-4 text-center">
                   <UserAvatar size={48} userId={contrib.user.id} />
                   <p>{contrib.user.username}</p>
                   <Badge variant="secondary">
-                    {contrib.contributionTier ||
+                    {contrib.contributionTier?.replace("_", " ") ||
                       ContributionTier.ECHO_SUPPORTER}
                   </Badge>
                 </CardContent>

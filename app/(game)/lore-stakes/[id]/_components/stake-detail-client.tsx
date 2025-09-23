@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useEffect } from "react";
+import { useTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Coins,
@@ -23,28 +23,23 @@ import {
 } from "@/components/ui/card";
 import { piPayment } from "@/lib/pi/pi-payment";
 import { Badge } from "@/components/ui/badge";
-import { useLoreStake } from "@/hooks/queries/use-lore-stake";
 import { LORE_LEVELS, LoreLevel } from "@/lib/node-lore/location-lore";
-import StakeLoading from "./stake-loading";
-import StakeError from "./stake-error";
-import StakeNotFound from "./stake-not-found";
+import { LoreStakeDetails } from "@/lib/schema/location-lore";
+import { useAuth } from "@/components/shared/auth/auth-context";
 
 interface StakeDetailProps {
-  stakeId: string;
+  stake: LoreStakeDetails;
 }
 
-export default function LoreStakeDetailClient({ stakeId }: StakeDetailProps) {
+export default function LoreStakeDetailClient({
+  stake: stakeDetails,
+}: StakeDetailProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Use the custom hook to fetch stake details
-  const {
-    data: stakeDetails,
-    isLoading,
-    isError,
-    error,
-    refreshStake,
-  } = useLoreStake(stakeId);
+  const [aiGenerating, setAIGenerating] = useState(false);
+
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     // Initialize Pi SDK
@@ -61,31 +56,38 @@ export default function LoreStakeDetailClient({ stakeId }: StakeDetailProps) {
   }, []);
 
   const handlePayment = () => {
-    if (!stakeDetails) return;
-
     startTransition(async () => {
       try {
+        setAIGenerating(true);
         await piPayment.createLocationLorePayment(
-          stakeDetails.nodeId,
+          stakeDetails.id,
           stakeDetails.targetLevel,
-          stakeDetails.piAmount.toNumber()
+          stakeDetails.piAmount
         );
 
         // The payment flow is handled by Pi SDK callbacks
         // Refresh the stake details after a short delay to check for updates
         setTimeout(() => {
-          refreshStake();
+          router.refresh();
         }, 60000);
       } catch (error) {
         console.error("Payment failed:", error);
+        if (error instanceof Error) {
+          // Inside this block, err is known to be a Error
+          console.error({ error });
+          if (error.name === "PiPaymentError") {
+            toast.error("Session expired, please sign in again.");
+            logout();
+          }
+        }
         toast.error("Payment failed. Please try again.");
+      } finally {
+        setAIGenerating(false);
       }
     });
   };
 
   const getStatusDisplay = () => {
-    if (!stakeDetails) return null;
-
     switch (stakeDetails.paymentStatus) {
       case "COMPLETED":
         return (
@@ -115,18 +117,6 @@ export default function LoreStakeDetailClient({ stakeId }: StakeDetailProps) {
   const getLevelName = (level: number) => {
     return LORE_LEVELS[level as LoreLevel]?.name || `Level ${level}`;
   };
-
-  if (isLoading) {
-    return <StakeLoading />;
-  }
-
-  if (isError) {
-    return <StakeError errorMessage={error.message} />;
-  }
-
-  if (!stakeDetails) {
-    return <StakeNotFound />;
-  }
 
   return (
     <div className="container max-w-md mx-auto p-4">
@@ -169,14 +159,14 @@ export default function LoreStakeDetailClient({ stakeId }: StakeDetailProps) {
               <div className="flex items-center gap-1">
                 <Coins className="h-4 w-4 text-amber-500" />
                 <span className="font-medium">
-                  {stakeDetails.piAmount.toString()} Pi
+                  {stakeDetails.piAmount.toFixed(2)} Pi
                 </span>
               </div>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Recognition:</span>
-              <Badge variant="secondary" className="text-purple-500">
+              <Badge variant="secondary">
                 {stakeDetails.contributionTier?.replace("_", " ") ||
                   "Echo Supporter"}
               </Badge>
@@ -189,39 +179,45 @@ export default function LoreStakeDetailClient({ stakeId }: StakeDetailProps) {
           </div>
         </CardContent>
 
-        <CardFooter>
-          {stakeDetails.paymentStatus === "PENDING" ? (
-            <Button
-              onClick={handlePayment}
-              disabled={isPending}
-              className="w-full game-button"
-            >
-              {isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
+        {stakeDetails.userId === user?.piId && (
+          <CardFooter>
+            {stakeDetails.paymentStatus === "PENDING" ? (
+              <Button
+                onClick={handlePayment}
+                disabled={isPending || aiGenerating}
+                className="w-full game-button"
+              >
+                {isPending || aiGenerating ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Coins className="h-4 w-4 mr-2" />
+                )}
+                {isPending || aiGenerating
+                  ? "Processing..."
+                  : `Pay ${stakeDetails.piAmount.toFixed(2)} Pi`}
+              </Button>
+            ) : stakeDetails.paymentStatus === "COMPLETED" ? (
+              <Button
+                onClick={() =>
+                  router.push(`/nodes/${stakeDetails.nodeId}/lore`)
+                }
+                className="w-full game-button"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Return to Node Lore
+              </Button>
+            ) : (
+              <Button
+                onClick={handlePayment}
+                disabled={isPending}
+                className="w-full game-button"
+              >
                 <Coins className="h-4 w-4 mr-2" />
-              )}
-              {isPending ? "Processing..." : `Pay ${stakeDetails.piAmount} Pi`}
-            </Button>
-          ) : stakeDetails.paymentStatus === "COMPLETED" ? (
-            <Button
-              onClick={() => router.push(`/nodes/${stakeDetails.nodeId}/lore`)}
-              className="w-full game-button"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Return to Node Lore
-            </Button>
-          ) : (
-            <Button
-              onClick={handlePayment}
-              disabled={isPending}
-              className="w-full game-button"
-            >
-              <Coins className="h-4 w-4 mr-2" />
-              Try Again
-            </Button>
-          )}
-        </CardFooter>
+                Try Again
+              </Button>
+            )}
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

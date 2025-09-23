@@ -21,9 +21,14 @@ export const getFeedbackMessage = ({
       feedbackMessage =
         distanceMeters === null
           ? "You are not close to this node."
-          : `Move closer by ${Math.max(
+          : distanceMeters < 1000
+          ? `Move closer by ${Math.max(
               0,
               Math.round(distanceMeters - allowedDistanceMeters)
+            )} m.`
+          : `Move closer by ${Math.max(
+              0,
+              Math.round(distanceMeters - allowedDistanceMeters) / 1000
             )} m.`;
       break;
     case MiningState.NodeFull:

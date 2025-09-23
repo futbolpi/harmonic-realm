@@ -14,7 +14,6 @@ export class InngestEventDispatcher {
   static async startLoreGeneration(
     nodeId: string,
     targetLevel: LoreLevel,
-    userId: string,
     jobId: string
   ) {
     return await inngest.send({
@@ -22,7 +21,6 @@ export class InngestEventDispatcher {
       data: {
         nodeId,
         targetLevel,
-        userId,
         jobId,
       },
     });

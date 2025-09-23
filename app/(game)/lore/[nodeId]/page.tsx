@@ -58,8 +58,6 @@ export async function generateMetadata({
     primaryColor
   )}&rarity=${encodeURIComponent(rarity)}`;
 
-  console.log({ url });
-
   return {
     title,
     description,
@@ -111,7 +109,16 @@ export default async function LorePage({ params }: LorePageProps) {
             <Suspense
               fallback={<div className="animate-pulse h-64 bg-[--muted]" />}
             >
-              <HeroSection lore={lore} />
+              <HeroSection
+                lore={{
+                  city: lore.city,
+                  currentLevel: lore.currentLevel,
+                  node: lore.node,
+                  nodeId: lore.nodeId,
+                  numberOfStakes: lore.stakes.length,
+                  totalPiStaked: lore.totalPiStaked.toNumber(),
+                }}
+              />
             </Suspense>
           </TabsContent>
 
@@ -119,7 +126,20 @@ export default async function LorePage({ params }: LorePageProps) {
             <Suspense
               fallback={<div className="animate-pulse h-96 bg-[--muted]" />}
             >
-              <LoreNarrative lore={lore} />
+              <LoreNarrative
+                lore={{
+                  basicHistory: lore.basicHistory,
+                  culturalSignificance: lore.culturalSignificance,
+                  currentLevel: lore.currentLevel,
+                  epicNarrative: lore.epicNarrative,
+                  legendaryTale: lore.legendaryTale,
+                  mysticInterpretation: lore.mysticInterpretation,
+                  stakes: lore.stakes.map((stake) => ({
+                    contributionTier: stake.contributionTier,
+                    user: stake.user,
+                  })),
+                }}
+              />
             </Suspense>
           </TabsContent>
 
@@ -130,13 +150,13 @@ export default async function LorePage({ params }: LorePageProps) {
               <StakingSection
                 nodeId={nodeId}
                 currentLevel={lore.currentLevel}
-                totalPiStaked={lore.totalPiStaked}
+                totalPiStaked={lore.totalPiStaked.toNumber()}
               />
             </Suspense>
           </TabsContent>
 
           <TabsContent value="share">
-            <SharingSection loreTitle={lore.epicNarrative || "Mystic Node"} />
+            <SharingSection loreTitle={"View this Mystic Node on Pi"} />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,7 +1,14 @@
 import { MapPin, Sparkles, Users, Coins, BookOpen, Zap } from "lucide-react";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +29,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
   if (!node) {
     notFound();
   }
+
   const currentLevel = node.locationLore?.currentLevel || 0;
   const totalStaked = node.locationLore?.totalPiStaked.toNumber() || 0;
   const nextLevel = currentLevel + 1;
@@ -94,6 +102,9 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                 <Sparkles className="h-5 w-5 text-primary" />
                 Lore Awakening Progress
               </CardTitle>
+              <CardDescription className="underline text-primary">
+                <Link href={`/lore/${nodeId}`}>Alternate Lore.</Link>
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {Object.values(LORE_LEVELS).map((level, i) => {
@@ -156,6 +167,12 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                             ? node.locationLore?.basicHistory
                             : i + 1 === 2
                             ? node.locationLore?.culturalSignificance
+                            : i + 1 === 3
+                            ? node.locationLore?.mysticInterpretation
+                            : i + 1 === 4
+                            ? node.locationLore?.epicNarrative
+                            : i + 1 === 5
+                            ? node.locationLore?.legendaryTale
                             : ""}
                         </p>
                       </div>

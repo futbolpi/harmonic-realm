@@ -42,18 +42,15 @@ export class PiPaymentService {
    * Create payment for Location Lore staking
    */
   async createLocationLorePayment(
-    nodeId: string,
+    stakeId: string,
     targetLevel: number,
     piAmount: number
   ): Promise<void> {
     const paymentData: PiPaymentData = {
       amount: piAmount,
-      memo: `HarmonicRealm: Level ${targetLevel} Lore for Node ${nodeId.slice(
-        0,
-        8
-      )}...`,
+      memo: `HarmonicRealm: Payment for Level ${targetLevel} Lore for Node`,
       metadata: {
-        modelId: nodeId,
+        modelId: stakeId,
         type: "LOCATION_LORE",
         level: targetLevel,
       },

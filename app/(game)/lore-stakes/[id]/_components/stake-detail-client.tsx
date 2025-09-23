@@ -57,6 +57,11 @@ export default function LoreStakeDetailClient({
 
   const handlePayment = () => {
     startTransition(async () => {
+      // Refresh the stake details after a short delay to check for updates
+      setTimeout(() => {
+        setAIGenerating(false);
+        router.refresh();
+      }, 60000);
       try {
         setAIGenerating(true);
         await piPayment.createLocationLorePayment(
@@ -66,10 +71,6 @@ export default function LoreStakeDetailClient({
         );
 
         // The payment flow is handled by Pi SDK callbacks
-        // Refresh the stake details after a short delay to check for updates
-        setTimeout(() => {
-          router.refresh();
-        }, 60000);
       } catch (error) {
         console.error("Payment failed:", error);
         if (error instanceof Error) {
@@ -78,11 +79,10 @@ export default function LoreStakeDetailClient({
           if (error.name === "PiPaymentError") {
             toast.error("Session expired, please sign in again.");
             logout();
+            return;
           }
         }
         toast.error("Payment failed. Please try again.");
-      } finally {
-        setAIGenerating(false);
       }
     });
   };

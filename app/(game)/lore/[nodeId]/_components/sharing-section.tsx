@@ -14,23 +14,13 @@ interface SharingSectionProps {
 export default function SharingSection({ loreTitle }: SharingSectionProps) {
   const pathname = usePathname();
   const shareUrl = `${env.NEXT_PUBLIC_PINET_URL}${pathname}`;
-  const shareText = `Unveiled cosmic lore at ${loreTitle}! Join the resonance in HarmonicRealm: `;
+  const shareText = `Unveiled cosmic lore at ${loreTitle}! Join the resonance in HarmonicRealm: \n ${shareUrl}`;
 
   const handleShare = async () => {
     const piSdk = getPiSDK();
 
-    if (
-      navigator.canShare({ title: loreTitle, text: shareText, url: shareUrl })
-    ) {
-      await navigator.share({
-        title: loreTitle,
-        text: shareText,
-        url: shareUrl,
-      });
-    } else {
-      piSdk.openShareDialog(loreTitle, shareText.concat("\n", shareUrl));
-      // Toast: Link copied
-    }
+    piSdk.openShareDialog(loreTitle, shareText);
+    // Toast: Link copied
   };
 
   return (

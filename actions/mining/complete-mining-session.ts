@@ -25,7 +25,7 @@ export const completeMiningSession = async (
       return { success: false, error: "Invalid Request" };
     }
 
-    const { accessToken, sessionId, latitude, longitude } = data;
+    const { accessToken, sessionId } = data;
 
     const { id: userId } = await verifyTokenAndGetUser(accessToken);
 
@@ -47,6 +47,8 @@ export const completeMiningSession = async (
           select: {
             openForMining: true,
             typeId: true,
+            latitude: true,
+            longitude: true,
             type: {
               select: {
                 baseYieldPerMinute: true,
@@ -134,7 +136,10 @@ export const completeMiningSession = async (
       miniTaskMultiplier,
     });
 
-    const { latitudeBin, longitudeBin } = binLatLon(latitude, longitude);
+    const { latitudeBin, longitudeBin } = binLatLon(
+      session.node.latitude,
+      session.node.longitude
+    );
 
     // 5. Persist all changes atomically
     await prisma.$transaction([

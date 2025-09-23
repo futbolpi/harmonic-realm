@@ -241,10 +241,15 @@ async function updateMasteryProgression(
   prisma: PrismaClient
 ): Promise<UserMasteryProgression> {
   // First, get the current mastery state or prepare to create new one
-  const existingMastery = await prisma.userNodeMastery.findUnique({
+  const existingMastery = await prisma.userNodeMastery.upsert({
     where: {
       user_node_mastery_unique: { userId, nodeTypeId },
     },
+    create: {
+      userId,
+      nodeTypeId,
+    },
+    update: {},
     include: {
       nodeType: {
         select: { rarity: true },
@@ -253,8 +258,8 @@ async function updateMasteryProgression(
   });
 
   // Calculate current state
-  const previousLevel = existingMastery?.level || 0;
-  const previousSessions = existingMastery?.sessionsCompleted || 0;
+  const previousLevel = existingMastery.level;
+  const previousSessions = existingMastery.sessionsCompleted;
   const newTotalSessions = previousSessions + completedSessions;
 
   // Calculate new progression state
@@ -262,11 +267,7 @@ async function updateMasteryProgression(
   const leveledUp = newLevel > previousLevel;
 
   // Get node type information for bonus calculation
-  const nodeType = existingMastery?.nodeType;
-
-  if (!nodeType) {
-    throw new Error(`NodeType with id ${nodeTypeId} not found`);
-  }
+  const nodeType = existingMastery.nodeType;
 
   // Calculate new bonus percentage
   const newBonusPercent = calculateMasteryBonus(newLevel, nodeType.rarity);

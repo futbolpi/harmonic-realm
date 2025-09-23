@@ -1,22 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import {
-  Timer,
-  Zap,
-  Coins,
-  MapPin,
-  Loader2,
-  Radio,
-  Sparkles,
-  Clock,
-} from "lucide-react";
+import { Timer, Zap, Coins, MapPin, Loader2 } from "lucide-react";
 
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Node } from "@/lib/schema/node";
 import { completeMiningSession } from "@/actions/mining/complete-mining-session";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import {
@@ -26,295 +16,158 @@ import {
   CredenzaTitle,
 } from "@/components/credenza";
 import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
-import { getPiSDK } from "@/components/shared/pi/pi-sdk";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { applyEchoTransmission } from "@/actions/echo/apply-echo-transmission";
-import { displayInterstitialAd, showRewardedAd } from "../_utils/pi-ads";
+import { MiningState } from "@/lib/schema/mining-session";
+import { MINING_RANGE_METERS } from "@/config/site";
 
 interface ActiveMiningDrawerProps {
-  node: Node;
+  node: {
+    id: string;
+    name: string;
+    lockInMinutes: number;
+  };
+  distanceMeters: number | null;
+  miningState: MiningState;
+  allowedDistanceMeters?: number;
 }
 
-export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
-  const [timeRemaining, setTimeRemaining] = useState<number>(0);
-  const [isPending, startTransition] = useTransition();
-  const [isApplyingTransmission, startApplyingTransmission] = useTransition();
+export function ActiveMiningDrawer({
+  node,
+  distanceMeters,
+  miningState,
+  allowedDistanceMeters = MINING_RANGE_METERS,
+}: ActiveMiningDrawerProps) {
+  // remaining time in milliseconds
+  const [remainingMs, setRemainingMs] = useState<number>(
+    node.lockInMinutes * 60 * 1000
+  );
+  const remainingRef = useRef<number>(remainingMs);
+  useEffect(() => {
+    remainingRef.current = remainingMs;
+  }, [remainingMs]);
 
+  // state for the server action
+  const [isCompleting, startTransition] = useTransition();
   const { accessToken } = useAuth();
 
+  // helpers to manage concurrency and avoid double-calls
+  const completedCalledRef = useRef(false);
+  const tickIntervalRef = useRef<number | null>(null);
+
+  // session data for action and ui
   const { data: sessionAssets, refreshSessionAssets } = useMiningSessionAssets(
     node.id
   );
-  const echoData = sessionAssets?.echoInfo;
   const sessionData = sessionAssets?.session;
 
-  // Calculate time remaining based on lockInMinutes
+  // Are we inside the allowed radius and allowed to run the timer?
+  const withinRange =
+    typeof distanceMeters === "number" &&
+    distanceMeters <= allowedDistanceMeters &&
+    miningState === MiningState.Pending;
+
+  // finalize function that calls the server action exactly once
+  const finalizeNow = useCallback(async () => {
+    if (completedCalledRef.current) return;
+    completedCalledRef.current = true;
+
+    if (!accessToken || !sessionData?.id) {
+      toast.error("Unauthorized");
+      return;
+    }
+
+    try {
+      const response = await completeMiningSession({
+        accessToken,
+        sessionId: sessionData.id,
+      });
+      if (response.success) {
+        toast.success("Mining session completed!");
+        refreshSessionAssets();
+      } else {
+        toast.error(response.error || "Failed to complete mining session");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to complete mining session");
+    }
+  }, [accessToken, refreshSessionAssets, sessionData?.id]);
+
+  // Reset timer whenever a new pending mining session starts for this node
   useEffect(() => {
-    const lockInDurationMs = node.type.lockInMinutes * 60 * 1000;
-    const startTime = Date.now();
-    const endTime = startTime + lockInDurationMs;
+    if (miningState === MiningState.Pending) {
+      setRemainingMs(node.lockInMinutes * 60 * 1000);
+      completedCalledRef.current = false;
+    }
+  }, [node.id, miningState, node.lockInMinutes]);
 
-    const updateTimer = () => {
-      const now = Date.now();
-      const remaining = Math.max(0, endTime - now);
-      setTimeRemaining(remaining);
+  // Timer logic: runs only while withinRange and not already completing
+  useEffect(() => {
+    // if not in-range or we're completing or the timer is already finished -> pause
+    if (!withinRange || isCompleting || remainingRef.current <= 0) {
+      if (tickIntervalRef.current) {
+        window.clearInterval(tickIntervalRef.current);
+        tickIntervalRef.current = null;
+      }
+      return;
+    }
 
-      if (remaining === 0 && !isPending) {
-        startTransition(async () => {
-          if (!accessToken || !sessionData?.id) {
-            toast.error("Unauthorized");
-            return;
-          }
+    // start a small-interval timer for snappy UI (250ms)
+    tickIntervalRef.current = window.setInterval(() => {
+      setRemainingMs((prev) => Math.max(prev - 250, 0));
+    }, 250);
 
-          try {
-            const response = await completeMiningSession({
-              accessToken,
-              sessionId: sessionData.id,
-              latitude: node.latitude,
-              longitude: node.longitude,
-            });
-            if (response.success) {
-              toast.success("Mining session completed!");
-              refreshSessionAssets();
-            } else {
-              toast.error(
-                response.error || "Failed to complete mining session"
-              );
-            }
-          } catch (error) {
-            console.log(error);
-            toast.error("Failed to complete mining session");
-          }
-        });
+    return () => {
+      if (tickIntervalRef.current) {
+        window.clearInterval(tickIntervalRef.current);
+        tickIntervalRef.current = null;
       }
     };
+  }, [withinRange, isCompleting]);
 
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-
-    return () => clearInterval(interval);
-  }, [
-    node.type.lockInMinutes,
-    sessionData?.id,
-    accessToken,
-    node.latitude,
-    node.longitude,
-    isPending,
-    refreshSessionAssets,
-  ]);
-
-  // Handle Echo Transmission activation
-  const handleEchoTransmission = (needsRecharge: boolean) => {
-    if (!echoData || !accessToken) {
-      return;
+  // When timer reaches zero, call finalize
+  useEffect(() => {
+    if (
+      remainingMs <= 0 &&
+      !completedCalledRef.current &&
+      miningState === MiningState.Pending
+    ) {
+      startTransition(() => {
+        finalizeNow();
+      });
     }
+  }, [remainingMs, finalizeNow, miningState]);
 
-    if (!sessionData) {
-      return;
-    }
-
-    const sessionId = sessionData.id;
-
-    startApplyingTransmission(async () => {
-      try {
-        // Check if Pi Ads SDK is available
-        let adId: string | undefined;
-        if (needsRecharge) {
-          const piSdk = getPiSDK();
-          const nativeFeaturesList = await piSdk.nativeFeaturesList();
-          const adNetworkSupported = nativeFeaturesList.includes("ad_network");
-          if (!adNetworkSupported) {
-            toast.error(
-              "Please update your Pi Browser to get echo transmissions"
-            );
-            return;
-          }
-          const isRewardedAdReady = await piSdk.Ads.isAdReady("rewarded");
-          if (isRewardedAdReady.ready === false) {
-            const adResponse = await displayInterstitialAd(piSdk);
-            if (adResponse?.result === "AD_CLOSED") {
-              adId = "interstitial";
-            } else {
-              toast.error("Failed to apply Echo Transmission");
-              return;
-            }
-          } else {
-            const adResponse = await showRewardedAd(piSdk);
-            if (!!adResponse) {
-              adId = adResponse;
-            } else {
-              toast.error("Failed to apply Echo Transmission");
-              return;
-            }
-          }
-        }
-
-        const response = await applyEchoTransmission({
-          accessToken: accessToken,
-          sessionId,
-          nodeId: node.id,
-          adId,
-        });
-
-        if (response.success) {
-          toast.success(
-            response.error || "Echo Transmission channeled! Time accelerated."
-          );
-          if (!!response.data?.timeReduction) {
-            const timeReduction = response.data.timeReduction;
-            setTimeRemaining((timeRemaining) => {
-              return Math.min(1, timeRemaining) * (1 - timeReduction / 100);
-            });
-          }
-          refreshSessionAssets();
-        } else {
-          toast.error(response.error || "Failed to apply Echo Transmission");
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to load Echo Transmission");
-      }
-    });
-  };
-
+  // UI helpers
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const progressPercentage =
-    ((node.type.lockInMinutes * 60 * 1000 - timeRemaining) /
-      (node.type.lockInMinutes * 60 * 1000)) *
-    100;
-
-  // Check if Echo Transmission is available
-  const canUseEchoTransmission =
-    !!echoData &&
-    echoData.status === "CHARGED" &&
-    !echoData.usedNodeIds.includes(node.id) &&
-    !sessionData?.echoTransmissionApplied &&
-    timeRemaining > 1000;
-
-  // Check if user needs to recharge
-  const needsRecharge =
-    !echoData ||
-    echoData.status === "EXPIRED" ||
-    echoData.status === "DEPLETED";
+  const totalMs = Math.max(1, node.lockInMinutes * 60 * 1000);
+  const progress = 1 - remainingMs / totalMs;
+  const progressPercentage = Math.max(
+    0,
+    Math.min(100, Math.floor(progress * 100))
+  );
 
   return (
     <Credenza open={true}>
       <CredenzaContent className="border-t-0">
         <CredenzaHeader className="text-center pb-2">
           <CredenzaTitle className="flex items-center justify-center gap-2 text-lg">
-            {isPending ? (
+            {isCompleting ? (
               <Loader2 className="h-5 w-5 text-primary animate-spin" />
             ) : (
               <Zap className="h-5 w-5 text-yellow-500" />
             )}
-            {isPending ? "Completing Mining Session" : "Active Mining Session"}
+            {isCompleting
+              ? "Completing Mining Session"
+              : "Active Mining Session"}
           </CredenzaTitle>
         </CredenzaHeader>
 
         <div className="px-6 pb-6 space-y-4">
-          {/* Echo Transmission Section */}
-          {!sessionData?.echoTransmissionApplied && (
-            <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/20">
-              <div className="flex items-center gap-2 mb-3">
-                <Radio className="h-5 w-5 text-purple-500" />
-                <span className="font-medium text-purple-700">
-                  Echo Resonator
-                </span>
-                <Badge
-                  variant={
-                    echoData?.status === "CHARGED" ? "default" : "secondary"
-                  }
-                  className={
-                    echoData?.status === "CHARGED"
-                      ? "bg-green-500/10 text-green-700 border-green-500/20"
-                      : "bg-gray-500/10 text-gray-700"
-                  }
-                >
-                  {echoData?.status || "EXPIRED"}
-                </Badge>
-              </div>
-
-              {canUseEchoTransmission ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Channel temporal frequencies to reduce mining time by{" "}
-                    {echoData.maxTimeReduction}%
-                  </p>
-                  <Button
-                    onClick={() => handleEchoTransmission(false)}
-                    disabled={isApplyingTransmission}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                  >
-                    {isApplyingTransmission ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Channeling Transmission...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Channel Echo Transmission
-                      </>
-                    )}
-                  </Button>
-                </div>
-              ) : needsRecharge ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Your Echo Resonator needs recalibration through cosmic
-                    transmissions
-                  </p>
-                  <Button
-                    onClick={() => handleEchoTransmission(true)}
-                    disabled={isApplyingTransmission}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    {isApplyingTransmission ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Recharging Resonator...
-                      </>
-                    ) : (
-                      <>
-                        <Radio className="h-4 w-4 mr-2" />
-                        Recharge Echo Resonator
-                      </>
-                    )}
-                  </Button>
-                </div>
-              ) : (
-                <Alert>
-                  <Clock className="h-4 w-4" />
-                  <AlertDescription className="text-sm">
-                    {echoData?.usedNodeIds.includes(node.id)
-                      ? "This Node's temporal signature has been locked by your previous transmission."
-                      : "Echo Transmission already applied to this session."}
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
-          )}
-
-          {/* Echo Transmission Applied Indicator */}
-          {sessionData?.echoTransmissionApplied && (
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700">
-                  Echo Transmission Active - Time Accelerated by{" "}
-                  {sessionData.timeReductionPercent}%
-                </span>
-              </div>
-            </div>
-          )}
-
           {/* Mining Progress */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -335,7 +188,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
               </span>
             </div>
             <div className="text-3xl font-bold text-foreground font-mono">
-              {formatTime(timeRemaining)}
+              {formatTime(remainingMs)}
             </div>
             {sessionData?.echoTransmissionApplied && (
               <div className="text-xs text-green-600 mt-1">
@@ -355,7 +208,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             </div>
             <div className="bg-card rounded-lg p-3 text-center">
               <MapPin className="h-4 w-4 text-green-500 mx-auto mb-1" />
-              <div className="text-lg font-bold">{node.type.name}</div>
+              <div className="text-lg font-bold">{node.name}</div>
               <div className="text-xs text-muted-foreground">
                 Mining Location
               </div>

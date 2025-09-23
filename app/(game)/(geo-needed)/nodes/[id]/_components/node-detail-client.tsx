@@ -74,7 +74,18 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       <NodeDetailMap node={node} />
 
       {/* Active mining session drawer - only shown when user is in range with active session */}
-      {showMiningModal && <ActiveMiningDrawer node={node} />}
+      {showMiningModal && (
+        <ActiveMiningDrawer
+          distanceMeters={distance}
+          miningState={miningState}
+          node={{
+            id: node.id,
+            lockInMinutes: node.type.lockInMinutes,
+            name: node.name,
+          }}
+          allowedDistanceMeters={MINING_RANGE_METERS}
+        />
+      )}
 
       {/* Start mining drawer - only shown when user can mine */}
       {showStartModal && <StartMiningDrawer node={node} />}

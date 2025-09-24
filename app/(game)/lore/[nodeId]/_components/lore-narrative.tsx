@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import UserAvatar from "@/components/shared/user-avatar";
 import { ContributionTier } from "@/lib/generated/prisma/enums";
+import { Response } from "@/components/ai-elements/response";
 
 type LocationLore = {
   currentLevel: number;
@@ -62,13 +63,13 @@ export default function LoreNarrative({ lore }: LoreNarrativeProps) {
                 </AccordionTrigger>
                 <AccordionContent>
                   {isUnlocked && content ? (
-                    <motion.p
+                    <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="text-[--muted-foreground] italic"
                     >
-                      {content}
-                    </motion.p>
+                      <Response>{content}</Response>
+                    </motion.div>
                   ) : (
                     <p className="text-[--muted-foreground] blur-sm">
                       Whispers of cosmic binding await... Stake Pi to unveil.

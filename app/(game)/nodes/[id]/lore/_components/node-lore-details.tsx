@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { LORE_LEVELS } from "@/lib/node-lore/location-lore";
 import { cn } from "@/lib/utils";
+import { Response } from "@/components/ai-elements/response";
 import { getNodeLore } from "../services";
 import { LoreStakingDialog } from "./lore-staking-dialog";
 import { LoreStakesTable } from "./lore-stakes-table";
@@ -162,7 +163,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
 
                     {isUnlocked && i + 1 <= 2 && (
                       <div className="mt-3 p-4 bg-muted/50 rounded-lg">
-                        <p className="text-sm leading-relaxed">
+                        <Response className="text-sm leading-relaxed">
                           {i + 1 === 1
                             ? node.locationLore?.basicHistory
                             : i + 1 === 2
@@ -174,7 +175,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                             : i + 1 === 5
                             ? node.locationLore?.legendaryTale
                             : ""}
-                        </p>
+                        </Response>
                       </div>
                     )}
                   </div>

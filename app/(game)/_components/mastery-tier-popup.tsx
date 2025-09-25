@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Confetti from "react-confetti";
 import { Trophy, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useWindowSize } from "@/hooks/use-window-size";
+// import { useWindowSize } from "@/hooks/use-window-size";
 
 interface MasteryTierPopupProps {
   isOpen: boolean;
@@ -27,22 +26,22 @@ export function MasteryTierPopup({
   onClose,
   tier,
 }: MasteryTierPopupProps) {
-  const [showConfetti, setShowConfetti] = useState(false);
-  const { width, height } = useWindowSize();
+  // const [showConfetti, setShowConfetti] = useState(false);
+  // const { width, height } = useWindowSize();
 
-  useEffect(() => {
-    if (isOpen) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     setShowConfetti(true);
+  //     const timer = setTimeout(() => setShowConfetti(false), 5000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <>
-      {showConfetti && (
+      {/* {showConfetti && (
         <Confetti
           width={width}
           height={height}
@@ -50,7 +49,7 @@ export function MasteryTierPopup({
           numberOfPieces={200}
           colors={["#3b82f6", "#8b5cf6", "#06d6a0", "#f72585", "#ffbe0b"]}
         />
-      )}
+      )} */}
 
       <AnimatePresence>
         <motion.div

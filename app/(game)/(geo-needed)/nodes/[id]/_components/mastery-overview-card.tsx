@@ -2,7 +2,7 @@ import { Crown } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { TierName } from "@/lib/schema/mastery";
+import type { TierName } from "@/lib/schema/mastery";
 
 type MasteryOverviewCardProps = {
   mastery: { level: number; bonusPercent: number; sessionsCompleted: number };
@@ -14,41 +14,41 @@ const MasteryOverviewCard = ({
   tierName = "Unknown",
 }: MasteryOverviewCardProps) => {
   return (
-    <Card className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 border-primary/20">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-foreground">
-          <Crown className="h-5 w-5 text-accent" />
-          Current Resonance State
+    <Card className="game-card">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <Crown className="h-4 w-4 text-primary" />
+          Resonance State
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-primary">
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <div className="text-xl font-bold text-primary">
               {mastery.level}
             </div>
-            <div className="text-xs text-muted-foreground">Mastery Level</div>
+            <div className="text-xs text-muted-foreground">Level</div>
           </div>
-          <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-secondary">
+          <div>
+            <div className="text-xl font-bold text-chart-2">
               {mastery.bonusPercent}%
             </div>
-            <div className="text-xs text-muted-foreground">Yield Bonus</div>
+            <div className="text-xs text-muted-foreground">Bonus</div>
           </div>
-          <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-chart-2">
+          <div>
+            <div className="text-xl font-bold text-chart-4">
               {mastery.sessionsCompleted}
             </div>
             <div className="text-xs text-muted-foreground">Sessions</div>
           </div>
         </div>
-
-        {/* Tier Badge */}
-        <div className="flex justify-center">
-          <Badge className="px-4 py-2 bg-gradient-to-r from-primary to-secondary">
-            {tierName} Tier
-          </Badge>
-        </div>
+        {tierName && (
+          <div className="flex justify-center mt-3">
+            <Badge className="px-3 py-1 bg-primary/20 text-primary border-primary/30">
+              {tierName} Tier
+            </Badge>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

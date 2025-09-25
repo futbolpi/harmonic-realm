@@ -1,12 +1,11 @@
+import { getRarityInfo } from "@/app/(game)/map/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 
 type NodeTypeDetailsProps = {
   nodeType: {
-    name: string;
     baseYieldPerMinute: number;
-    lockInMinutes: number;
     rarity: NodeTypeRarity;
   };
   masteryBonusPercent: number;
@@ -16,45 +15,30 @@ const NodeTypeDetails = ({
   nodeType,
   masteryBonusPercent,
 }: NodeTypeDetailsProps) => {
+  const rarityColors = getRarityInfo(nodeType.rarity);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm">Node Frequency Analysis</CardTitle>
+    <Card className="game-card">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Node Analysis</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            Rarity Classification:
-          </span>
+      <CardContent className="pt-0 space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-muted-foreground">Rarity:</span>
           <Badge
-            className={
-              nodeType.rarity === "Legendary"
-                ? "bg-accent/20 text-accent-foreground"
-                : nodeType.rarity === "Epic"
-                ? "bg-secondary/20 text-secondary-foreground"
-                : nodeType.rarity === "Rare"
-                ? "bg-primary/20 text-primary-foreground"
-                : nodeType.rarity === "Uncommon"
-                ? "bg-chart-2/20 text-foreground"
-                : "bg-muted/20 text-muted-foreground"
-            }
+            className={`${rarityColors.textColor} bg-transparent border-current`}
           >
             {nodeType.rarity}
           </Badge>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            Base Yield Rate:
-          </span>
-          <span className="text-sm font-medium">
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-muted-foreground">Base Rate:</span>
+          <span className="text-xs font-medium">
             {nodeType.baseYieldPerMinute.toFixed(1)}/min
           </span>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            Your Enhanced Rate:
-          </span>
-          <span className="text-sm font-medium text-chart-2">
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-muted-foreground">Enhanced:</span>
+          <span className="text-xs font-medium text-chart-2">
             {Math.floor(
               nodeType.baseYieldPerMinute * (1 + masteryBonusPercent / 100)
             )}

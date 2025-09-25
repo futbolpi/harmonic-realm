@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState } from "react";
 import { Zap, Target, Crown } from "lucide-react";
 
@@ -10,15 +12,16 @@ import {
   CredenzaHeader,
   CredenzaTitle,
   CredenzaTrigger,
+  CredenzaBody,
 } from "@/components/credenza";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
-import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { UserNodeMasteryLoading } from "./user-node-mastery-loading";
 import MasteryOverviewCard from "./mastery-overview-card";
-import MasteryProgressInfo from "./mastery-progress-info";
 import NodeTypeDetails from "./node-type-details";
+import MasteryProgressInfo from "./mastery-progress-info";
 
 interface UserNodeMasteryProps {
   nodeId: string;
@@ -40,7 +43,7 @@ export function UserNodeMastery({
   const { data, isLoading: loading } = useMiningSessionAssets(nodeId);
 
   const defaultTrigger = (
-    <Button variant="outline" size="sm" className="gap-2">
+    <Button variant="outline" size="sm" className="gap-2 bg-transparent">
       <Zap className="h-4 w-4" />
       View Mastery
     </Button>
@@ -61,8 +64,8 @@ export function UserNodeMastery({
   return (
     <Credenza open={isOpen} onOpenChange={setIsOpen}>
       <CredenzaTrigger asChild>{trigger || defaultTrigger}</CredenzaTrigger>
-      <CredenzaContent className="max-w-2xl max-h-[90vh]">
-        <CredenzaHeader>
+      <CredenzaContent>
+        <CredenzaHeader className="pb-4">
           <CredenzaTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
             {nodeType.name} Harmonic Resonance
@@ -72,75 +75,81 @@ export function UserNodeMastery({
           </CredenzaDescription>
         </CredenzaHeader>
 
-        {loading && <UserNodeMasteryLoading />}
+        <CredenzaBody className="p-4 max-w-3xl max-h-96 overflow-y-auto">
+          {loading && <UserNodeMasteryLoading />}
 
-        {!loading && !!masteryData?.mastery && (
-          <div className="space-y-6 animate-in fade-in-50 duration-500">
-            {/* Current Mastery Overview */}
-            <MasteryOverviewCard
-              mastery={masteryData.mastery}
-              tierName={threshold?.tierName}
-            />
+          {!loading && !!masteryData?.mastery && (
+            <div className="space-y-4 animate-in fade-in-50 duration-500">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Current Mastery Stats */}
+                <MasteryOverviewCard
+                  mastery={{
+                    bonusPercent: masteryData.mastery.bonusPercent,
+                    level: masteryData.mastery.level,
+                    sessionsCompleted: masteryData.mastery.sessionsCompleted,
+                  }}
+                  tierName={threshold?.tierName}
+                />
 
-            {/* Progress to Next Level */}
-            {!isMaxLevel && masteryData.progressInfo.sessionsNeeded && (
-              <MasteryProgressInfo progressInfo={masteryData.progressInfo} />
-            )}
+                {/* Node Details */}
+                <NodeTypeDetails
+                  masteryBonusPercent={masteryData.mastery.bonusPercent}
+                  nodeType={{
+                    baseYieldPerMinute: nodeType.baseYieldPerMinute,
+                    rarity: nodeType.rarity,
+                  }}
+                />
+              </div>
 
-            {/* Max Level Achievement */}
-            {isMaxLevel && (
-              <Card className="bg-gradient-to-r from-accent/20 to-chart-4/20 border-accent/30">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-2">
-                    <Crown className="h-12 w-12 text-accent mx-auto animate-pulse" />
-                    <h3 className="text-lg font-bold text-foreground">
+              {!isMaxLevel && masteryData.progressInfo.sessionsNeeded && (
+                <MasteryProgressInfo progressInfo={masteryData.progressInfo} />
+              )}
+
+              {/* Max Level Achievement */}
+              {isMaxLevel && (
+                <Card className="game-card border-primary/30">
+                  <CardContent className="pt-4 text-center">
+                    <Crown className="h-8 w-8 text-primary mx-auto mb-2 animate-pulse" />
+                    <h3 className="font-bold text-primary mb-1">
                       Perfect Harmonic Resonance
                     </h3>
-                    <p className="text-sm text-muted-foreground">
-                      You have achieved complete synchronization with this Node
-                      frequency
+                    <p className="text-xs text-muted-foreground">
+                      Complete synchronization achieved with this Node frequency
                     </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              )}
 
-            {/* Lore Narrative */}
-            {threshold?.loreNarrative && (
-              <Card className="bg-gradient-to-br from-chart-1/10 to-secondary/10 border-chart-1/20">
-                <CardHeader>
-                  <CardTitle className="text-sm text-foreground">
-                    Lattice Whispers
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <blockquote className="text-sm text-muted-foreground italic leading-relaxed border-l-2 border-primary/50 pl-4">
-                    &quot;{threshold.loreNarrative}&quot;
-                  </blockquote>
-                </CardContent>
-              </Card>
-            )}
+              {threshold?.loreNarrative && (
+                <Card className="game-card border-chart-1/20">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm text-chart-1">
+                      Lattice Whispers
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <blockquote className="text-xs text-muted-foreground italic leading-relaxed border-l-2 border-primary/50 pl-3">
+                      &quot;{threshold.loreNarrative}&quot;
+                    </blockquote>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
-            {/* Node Type Details */}
-            <NodeTypeDetails
-              masteryBonusPercent={masteryData.mastery.bonusPercent}
-              nodeType={nodeType}
-            />
-          </div>
-        )}
-
-        {!loading && !masteryData?.mastery && (
-          <div className="text-center py-8">
-            <Zap className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No Resonance Established
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Begin mining at this Node to develop harmonic resonance and unlock
-              mastery progression.
-            </p>
-          </div>
-        )}
+          {!loading && !masteryData?.mastery && (
+            <div className="text-center py-8">
+              <Zap className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+              <h3 className="text-lg font-semibold mb-2">
+                No Resonance Established
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Begin mining at this Node to develop harmonic resonance and
+                unlock mastery progression.
+              </p>
+            </div>
+          )}
+        </CredenzaBody>
       </CredenzaContent>
     </Credenza>
   );

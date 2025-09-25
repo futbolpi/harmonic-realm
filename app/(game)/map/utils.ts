@@ -12,19 +12,6 @@ export const MAP_STYLES = {
   dark: `https://api.maptiler.com/maps/streets-dark/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
 } as const;
 
-// Get node icon based on type
-export function getNodeIcon(node: Node): string {
-  const iconMap: Record<string, string> = {
-    "Urban Hub": "🏢",
-    "Community Center": "🏛️",
-    Landmark: "🗽",
-    "Rare Node": "💎",
-    Local: "📍",
-  };
-
-  return iconMap[node.type.name] || "⚡";
-}
-
 // Get rarity info
 export function getRarityInfo(rarity: NodeTypeRarity) {
   const rarityMap = {

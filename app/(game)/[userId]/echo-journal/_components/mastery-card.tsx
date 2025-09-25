@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { UserNodeMastery } from "@/lib/generated/prisma/client";
+import { getRarityInfo } from "@/app/(game)/map/utils";
 import DetailedViewDrawer from "./detailed-view-drawer";
 
 interface MasteryProgressInfo {
@@ -36,29 +37,6 @@ interface MasteryCardProps {
   animationDelay: number;
 }
 
-const rarityConfig: Record<NodeTypeRarity, { color: string; glow: string }> = {
-  Common: {
-    color: "bg-gray-500/20 text-gray-100 border-gray-400/30",
-    glow: "shadow-gray-400/20",
-  },
-  Uncommon: {
-    color: "bg-green-500/20 text-green-100 border-green-400/30",
-    glow: "shadow-green-400/30",
-  },
-  Rare: {
-    color: "bg-blue-500/20 text-blue-100 border-blue-400/30",
-    glow: "shadow-blue-400/40",
-  },
-  Epic: {
-    color: "bg-purple-500/20 text-purple-100 border-purple-400/30",
-    glow: "shadow-purple-400/50",
-  },
-  Legendary: {
-    color: "bg-yellow-500/20 text-yellow-100 border-yellow-400/30",
-    glow: "shadow-yellow-400/60 shadow-lg",
-  },
-};
-
 const tierConfig = {
   Initiate: { color: "text-blue-300", icon: Circle },
   Apprentice: { color: "text-yellow-300", icon: Sparkles },
@@ -69,14 +47,14 @@ const tierConfig = {
 export function MasteryCard({ masteryInfo, animationDelay }: MasteryCardProps) {
   const { mastery, progressInfo, tierName, isMaxLevel, loreNarrative } =
     masteryInfo;
-  const rarity = rarityConfig[mastery.nodeType.rarity];
+  const rarity = getRarityInfo(mastery.nodeType.rarity);
   const tier =
     tierConfig[tierName as keyof typeof tierConfig] || tierConfig.Initiate;
   const TierIcon = tier.icon;
 
   return (
     <Card
-      className={`${rarity.color} ${rarity.glow} transition-all duration-300 hover:scale-105 animate-in slide-in-from-bottom-4`}
+      className={`${rarity.shadowColor} ${rarity.borderColor} ${rarity.textColor} transition-all duration-300 hover:scale-105 animate-in slide-in-from-bottom-4`}
       style={{ animationDelay: `${animationDelay}ms` }}
     >
       <CardHeader className="pb-3">

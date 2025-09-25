@@ -310,7 +310,9 @@ export function MiningPathMap({ sessions }: MiningPathMapProps) {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{session.nodeId}</span>
+                    <span className="font-medium">
+                      {session.nodeId.substring(0, 7)}...
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       {format(new Date(session.startTime), "MMM d, HH:mm")}
                     </span>

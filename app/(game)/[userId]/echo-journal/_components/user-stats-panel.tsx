@@ -1,22 +1,24 @@
-"use client";
-
 import { TrendingUp, Zap, Trophy, Star } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { UserProfile } from "@/lib/schema/user";
 import { xpForLevel } from "@/lib/utils/xp";
 
 interface UserStatsPanelProps {
-  user: UserProfile;
+  user: {
+    level: number;
+    xp: number;
+    username: string;
+    sharePoints: number;
+    totalEarned: number;
+  };
 }
 
 export function UserStatsPanel({ user }: UserStatsPanelProps) {
   // Calculate level progress
-  const currentLevelXP = xpForLevel(user.level); // Mock calculation
+
   const nextLevelXP = xpForLevel(user.level + 1);
-  const progressPercent =
-    ((user.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+  const progressPercent = (user.xp / nextLevelXP) * 100;
 
   const stats = [
     {

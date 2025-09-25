@@ -22,7 +22,7 @@ export function getRarityInfo(rarity: NodeTypeRarity) {
       fromColor: "from-blue-500/80",
       toColor: "to-blue-500/60",
       borderColor: "border-blue-500/90",
-      shadowColor: "shadow-blue-500",
+      shadowColor: "shadow-blue-500/20",
     },
     Uncommon: {
       rating: 2,
@@ -31,7 +31,7 @@ export function getRarityInfo(rarity: NodeTypeRarity) {
       fromColor: "from-green-500/80",
       toColor: "to-green-500/60",
       borderColor: "border-green-500/90",
-      shadowColor: "shadow-green-500",
+      shadowColor: "shadow-green-500/30",
     },
     Rare: {
       rating: 3,
@@ -40,7 +40,7 @@ export function getRarityInfo(rarity: NodeTypeRarity) {
       fromColor: "from-purple-500/80",
       toColor: "to-purple-500/60",
       borderColor: "border-purple-500/90",
-      shadowColor: "shadow-purple-500",
+      shadowColor: "shadow-purple-500/40",
     },
     Epic: {
       rating: 4,
@@ -49,7 +49,7 @@ export function getRarityInfo(rarity: NodeTypeRarity) {
       fromColor: "from-amber-500/80",
       toColor: "to-amber-500/60",
       borderColor: "border-amber-500/90",
-      shadowColor: "shadow-amber-500",
+      shadowColor: "shadow-amber-500/50",
     },
     Legendary: {
       rating: 5,
@@ -58,7 +58,7 @@ export function getRarityInfo(rarity: NodeTypeRarity) {
       fromColor: "from-pink-500/80",
       toColor: "to-pink-500/60",
       borderColor: "border-pink-500/90",
-      shadowColor: "shadow-pink-500",
+      shadowColor: "shadow-pink-500/60 shadow-lg",
     },
   };
   return rarityMap[rarity] || rarityMap.Common;

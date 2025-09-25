@@ -7,9 +7,11 @@ import {
   CredenzaContent,
   CredenzaDescription,
   CredenzaTrigger,
+  CredenzaBody,
 } from "@/components/credenza";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Response } from "@/components/ai-elements/response";
 
 type DetailedViewDrawerProps = {
   tierColor: string;
@@ -40,7 +42,7 @@ const DetailedViewDrawer = ({
           View Harmonic Details
         </Button>
       </CredenzaTrigger>
-      <CredenzaContent className="max-h-[80vh]">
+      <CredenzaContent>
         <CredenzaHeader>
           <CredenzaTitle className="flex items-center gap-2">
             <TimerIcon className={`h-5 w-5 ${tierColor}`} />
@@ -51,7 +53,7 @@ const DetailedViewDrawer = ({
             Resonance Bonus
           </CredenzaDescription>
         </CredenzaHeader>
-        <div className="px-4 pb-4 space-y-6">
+        <CredenzaBody className="px-4 pb-4 space-y-6 max-h-[80vh] overflow-y-auto">
           {/* Lore Narrative */}
           {loreNarrative && (
             <Card className="bg-gradient-to-br from-violet-500/10 to-blue-500/10">
@@ -61,9 +63,9 @@ const DetailedViewDrawer = ({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground italic leading-relaxed">
-                  &quot;{loreNarrative}&quot;
-                </p>
+                <Response className="text-sm text-muted-foreground italic leading-relaxed">
+                  {loreNarrative}
+                </Response>
               </CardContent>
             </Card>
           )}
@@ -75,9 +77,9 @@ const DetailedViewDrawer = ({
                 <CardTitle className="text-sm">Node Type Secrets</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <Response className="text-sm text-muted-foreground leading-relaxed">
                   {mastery.nodeType.extendedLore}
-                </p>
+                </Response>
               </CardContent>
             </Card>
           )}
@@ -115,7 +117,7 @@ const DetailedViewDrawer = ({
               </CardContent>
             </Card>
           </div>
-        </div>
+        </CredenzaBody>
       </CredenzaContent>
     </Credenza>
   );

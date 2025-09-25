@@ -43,7 +43,15 @@ export function EchoJournalClient({ userProfile }: EchoJournalClientProps) {
 
       {/* Stats Panel */}
       <div className="container mx-auto px-4 py-6">
-        <UserStatsPanel user={userProfile} />
+        <UserStatsPanel
+          user={{
+            level: userProfile.level,
+            sharePoints: userProfile.sharePoints,
+            totalEarned: userProfile.totalEarned,
+            username: userProfile.username,
+            xp: userProfile.xp,
+          }}
+        />
       </div>
 
       {/* Main Content */}

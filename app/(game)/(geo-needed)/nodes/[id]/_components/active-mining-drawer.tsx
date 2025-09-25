@@ -28,6 +28,7 @@ interface ActiveMiningDrawerProps {
   distanceMeters: number | null;
   miningState: MiningState;
   allowedDistanceMeters?: number;
+  onComplete?: () => void;
 }
 
 export function ActiveMiningDrawer({
@@ -35,6 +36,7 @@ export function ActiveMiningDrawer({
   distanceMeters,
   miningState,
   allowedDistanceMeters = MINING_RANGE_METERS,
+  onComplete,
 }: ActiveMiningDrawerProps) {
   // remaining time in milliseconds
   const [remainingMs, setRemainingMs] = useState<number>(
@@ -83,6 +85,7 @@ export function ActiveMiningDrawer({
       if (response.success) {
         toast.success("Mining session completed!");
         refreshSessionAssets();
+        onComplete?.();
       } else {
         toast.error(response.error || "Failed to complete mining session");
       }
@@ -90,7 +93,7 @@ export function ActiveMiningDrawer({
       console.log(error);
       toast.error("Failed to complete mining session");
     }
-  }, [accessToken, refreshSessionAssets, sessionData?.id]);
+  }, [accessToken, refreshSessionAssets, sessionData?.id, onComplete]);
 
   // Reset timer whenever a new pending mining session starts for this node
   useEffect(() => {

@@ -1,5 +1,3 @@
-"use client";
-
 import { env } from "@/env";
 import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { Node } from "@/lib/schema/node";
@@ -12,15 +10,6 @@ export const MAP_STYLES = {
   outdoor: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
   outdoorDark: `https://api.maptiler.com/maps/outdoor-v2-dark/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
   dark: `https://api.maptiler.com/maps/streets-dark/style.json?key=${env.NEXT_PUBLIC_MAPTILER_TOKEN}`,
-} as const;
-
-// Node marker colors based on rarity
-export const NODE_COLORS: Record<NodeTypeRarity, string> = {
-  Common: "#10b981", // green - common
-  Uncommon: "#3b82f6", // blue - uncommon
-  Rare: "#8b5cf6", // purple - rare
-  Epic: "#f59e0b", // orange - epic
-  Legendary: "#ef4444", // red - legendary
 } as const;
 
 // Get node icon based on type

@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import confetti from "canvas-confetti";
 import { ArrowLeft } from "lucide-react";
+import { useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Node } from "@/lib/schema/node";
@@ -37,6 +39,38 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
     distanceMeters: distance,
     allowedDistanceMeters: MINING_RANGE_METERS,
   });
+
+  const onComplete = useCallback(() => {
+    const end = Date.now() + 3 * 1000; // 3 seconds
+    const scalar = 2;
+    const pineapple = confetti.shapeFromText({
+      text: "⚡",
+      scalar,
+    });
+    const frame = () => {
+      if (Date.now() > end) return;
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 55,
+        scalar,
+        shapes: [pineapple],
+        startVelocity: 60,
+        origin: { x: 0, y: 0.5 },
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 55,
+        scalar,
+        shapes: [pineapple],
+        startVelocity: 60,
+        origin: { x: 1, y: 0.5 },
+      });
+      requestAnimationFrame(frame);
+    };
+    frame();
+  }, []);
 
   return (
     <div className="relative bg-background">
@@ -84,6 +118,7 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
             name: node.name,
           }}
           allowedDistanceMeters={MINING_RANGE_METERS}
+          onComplete={onComplete}
         />
       )}
 

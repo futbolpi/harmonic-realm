@@ -26,7 +26,7 @@ export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-semibold">{node.type.name}</h3>
+        <h3 className="text-lg font-semibold">{node.name}</h3>
         <Badge
           className={cn("text-white", getRarityInfo(node.type.rarity).color)}
         >

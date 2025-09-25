@@ -54,7 +54,7 @@ export function NodesList({
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-medium text-sm">{node.type.name}</h3>
+                  <h3 className="font-medium text-sm">{node.name}</h3>
                   <Badge
                     className={cn(
                       "text-white text-xs",

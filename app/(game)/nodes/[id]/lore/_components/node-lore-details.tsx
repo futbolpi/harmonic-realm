@@ -19,6 +19,7 @@ import { Response } from "@/components/ai-elements/response";
 import { getNodeLore } from "../services";
 import { LoreStakingDialog } from "./lore-staking-dialog";
 import { LoreStakesTable } from "./lore-stakes-table";
+import { getRarityInfo } from "@/app/(game)/map/utils";
 
 interface NodeLoreDetailsProps {
   nodeId: string;
@@ -35,16 +36,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
   const totalStaked = node.locationLore?.totalPiStaked.toNumber() || 0;
   const nextLevel = currentLevel + 1;
 
-  const getRarityGlow = (rarity: string) => {
-    const rarityMap = {
-      Common: "mastery-glow-common",
-      Uncommon: "mastery-glow-uncommon",
-      Rare: "mastery-glow-rare",
-      Epic: "mastery-glow-epic",
-      Legendary: "mastery-glow-legendary",
-    };
-    return rarityMap[rarity as keyof typeof rarityMap] || "";
-  };
+  const rarityColors = getRarityInfo(node.type.rarity);
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -66,10 +58,11 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
             variant="outline"
             className={cn(
               "text-sm font-medium",
-              getRarityGlow(node.type.rarity)
+              rarityColors.borderColor,
+              rarityColors.textColor
             )}
           >
-            {node.type.rarity} {node.type.name}
+            {node.type.name}
           </Badge>
         </div>
 
@@ -103,9 +96,11 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                 <Sparkles className="h-5 w-5 text-primary" />
                 Lore Awakening Progress
               </CardTitle>
-              <CardDescription className="underline text-primary">
-                <Link href={`/lore/${nodeId}`}>Alternate Lore.</Link>
-              </CardDescription>
+              {node.locationLore && (
+                <CardDescription className="underline text-primary">
+                  <Link href={`/lore/${nodeId}`}>Alternate Lore.</Link>
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               {Object.values(LORE_LEVELS).map((level, i) => {

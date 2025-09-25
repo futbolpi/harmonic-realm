@@ -128,7 +128,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
             />
             <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
               <Badge variant="secondary" className="text-xs">
-                {node.type.name}
+                {node.name}
               </Badge>
             </div>
           </div>

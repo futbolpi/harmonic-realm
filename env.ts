@@ -37,7 +37,7 @@ export const env = createEnv({
 
     //PINETWORK
     NEXT_PUBLIC_PINET_URL: z.url(),
-    NEXT_PUBLIC_WALLET_ADDRESS: z.string().min(1),
+    NEXT_PUBLIC_WALLET_ADDRESS: z.string().optional(),
     NEXT_PUBLIC_PI_EXPLORER_LINK: z.url(),
 
     // MAPTILER

@@ -7,7 +7,7 @@ export const getTotalMainnetKYCPioneers = () => {
     return 100000;
   }
   // should call api
-  return 16000000;
+  return 20000000;
 };
 
 export const getNumberOfPhaseNodes = (gamePhase: number) => {

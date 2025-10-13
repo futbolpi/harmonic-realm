@@ -9,10 +9,10 @@ import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
-import NodesMap from "./nodes-map";
 import { MapControlModal } from "./map-control-modal";
 import { NodesListModal } from "./nodes-list-modal";
 import MapHelp from "./map-help";
+import NodesMap from "./nodes-map";
 
 interface MobileMapViewProps {
   nodes: Node[];

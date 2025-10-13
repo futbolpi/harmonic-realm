@@ -49,13 +49,32 @@ export async function POST(request: NextRequest) {
     //  then call the initiate genesis workflow
 
     const newUser = await prisma.$transaction(async (tx) => {
-      // create new user
+      // check if referral is valid
+      let referrer: string | null = null;
 
+      if (!!auth.referral && auth.referral !== auth.user.username) {
+        const validRef = await tx.user.findUnique({
+          where: { username: auth.referral },
+          select: { id: true },
+        });
+        // if valid referral update referrer no of referrals and referrer
+        if (validRef) {
+          await tx.user.update({
+            where: { id: validRef.id },
+            data: { noOfReferrals: { increment: 1 } },
+            select: { noOfReferrals: true },
+          });
+          referrer = auth.referral;
+        }
+      }
+
+      // create new user
       const createdUser = await tx.user.create({
         data: {
           accessToken: auth.accessToken,
           piId: auth.user.uid,
           username: auth.user.username,
+          referrer,
         },
         select: { username: true, piId: true },
       });

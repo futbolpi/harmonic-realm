@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 
 import { getNodes } from "@/lib/api-helpers/server/nodes";
+import { getSiteStats } from "@/lib/api-helpers/server/site";
+import { GENESIS_THRESHOLD } from "@/config/site";
 import { MobileMapView } from "./_components/mobile-map-view";
+import { GenesisCountdown } from "./_components/genesis-countdown";
 
 export const metadata = {
   title: "Cosmic Lattice Map - Discover Echo Guardian Nodes",
@@ -35,14 +38,25 @@ export const metadata = {
 export const revalidate = 3600;
 
 export default async function MapPage() {
-  const nodes = await getNodes();
+  const [nodes, siteStats] = await Promise.all([getNodes(), getSiteStats()])
+
+  const isPreGenesis = nodes.length === 0
+  const currentHarmonizers = siteStats.pioneersAggregate._count.id 
+  const requiredHarmonizers = GENESIS_THRESHOLD 
 
   return (
     <div className="h-[calc(100vh-8rem)] w-full relative">
       <Suspense
         fallback={<div className="h-full w-full bg-muted animate-pulse" />}
       >
-        <MobileMapView nodes={nodes} />
+        {isPreGenesis ? (
+          <GenesisCountdown
+            currentHarmonizers={currentHarmonizers}
+            requiredHarmonizers={requiredHarmonizers}
+          />
+        ) : (
+          <MobileMapView nodes={nodes} />
+        )}
       </Suspense>
     </div>
   );

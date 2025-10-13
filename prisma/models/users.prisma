@@ -9,6 +9,11 @@ model User {
     level       Int   @default(1)
     xp          Int   @default(0)
 
+    /// username of user's referrer
+    referrer      String?
+    /// no of users referred
+    noOfReferrals Int     @default(0)
+
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
     archivedAt DateTime?

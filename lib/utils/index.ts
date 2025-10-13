@@ -73,3 +73,13 @@ export function halvingFormula(phase: number, baseValue: number): number {
 
   return baseValue / Math.pow(2, phase - 1);
 }
+
+export function truncateText(str: string, maxLength: number, ending = "...") {
+  if (str.length > maxLength) {
+    // Subtract the length of the ending from maxLength to ensure total length
+    // including the ending does not exceed maxLength.
+    return str.slice(0, maxLength - ending.length) + ending;
+  } else {
+    return str;
+  }
+}

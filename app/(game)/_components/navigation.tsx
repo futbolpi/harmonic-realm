@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Map, Trophy, Settings, LogOut, Zap } from "lucide-react";
+import { Home, Map, Trophy, Settings, LogOut, Compass } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,7 +38,7 @@ export function GameNavigation() {
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
-              <Zap className="h-4 w-4 text-primary" />
+              <Compass className="h-4 w-4 text-primary" />
             </div>
             <span className="font-bold text-lg neon-text hidden sm:block">
               {siteConfig.name}
@@ -63,6 +63,12 @@ export function GameNavigation() {
                 <Link href="/settings" className="cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/referrals" className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Referrals
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

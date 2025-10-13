@@ -40,6 +40,7 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
       id: true,
       level: true,
       sharePoints: true,
+      noOfReferrals: true,
       totalEarned: true,
       username: true,
       achievements: {
@@ -101,3 +102,10 @@ export async function awardXp(userId: string, xpGained: number) {
 
   return { xp: user.xp, level: newLevel, leveledUp };
 }
+
+export const getReferrer = async (username: string) => {
+  return prisma.user.findFirst({
+    where: { username },
+    select: { username: true },
+  });
+};

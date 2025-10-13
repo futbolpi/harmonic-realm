@@ -39,7 +39,7 @@ export const siteConfig: SiteConfig = {
   },
 };
 
-export const SiteId = `${siteConfig.name}-${siteConfig.network}`;
+export const SiteId = siteConfig.name;
 
 // Mining constants
 export const MINING_RANGE_METERS = 100; // Distance in meters user must be within to mine

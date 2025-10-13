@@ -18,6 +18,7 @@ import { env } from "@/env";
 export type SiteConfig = {
   id: string;
   name: string;
+  description: string;
   network: "testnet" | "mainnet";
   links: {
     twitter: string;
@@ -28,6 +29,8 @@ export type SiteConfig = {
 
 export const siteConfig: SiteConfig = {
   name: "HarmonicRealm",
+  description:
+    "Turn real-world exploration into a Shares mining adventure. Discover nodes, mine Shares, and earn rewards in this location-based game.",
   id: "harmonic-realm",
   network: env.NEXT_PUBLIC_PI_EXPLORER_LINK.includes("testnet")
     ? "testnet"

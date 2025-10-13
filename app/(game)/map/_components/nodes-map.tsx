@@ -100,22 +100,26 @@ MemoizedNodeMarker.displayName = "MemoizedNodeMarker";
  */
 const MemoizedClusterMarker = memo(
   ({
-    point_count,
+    pointCount,
     longitude,
     latitude,
     onClusterClick,
   }: {
-    point_count: number;
+    pointCount: number;
     longitude: number;
     latitude: number;
     onClusterClick: () => void;
-  }) => (
+  }) => {
+    // Dynamically size the cluster based on point count for visual distinction
+    const size = 30 + Math.min(pointCount / 10, 30);
+
+    return(
     <Marker longitude={longitude} latitude={latitude} onClick={onClusterClick}>
-      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm cursor-pointer border-2 border-primary-foreground shadow-lg transition-transform hover:scale-110">
-        {point_count}
+      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm cursor-pointer border-2 border-primary-foreground shadow-lg transition-transform hover:scale-110" style={{ width: `${size}px`, height: `${size}px` }}>
+        {pointCount}
       </div>
     </Marker>
-  )
+  )}
 );
 MemoizedClusterMarker.displayName = "MemoizedClusterMarker";
 
@@ -286,14 +290,14 @@ const NodesMap = ({
         {clusters.map((cluster) => {
           
           const [longitude, latitude] = cluster.geometry.coordinates;
-          const { cluster: isCluster, point_count } =
+          const { cluster: isCluster, point_count:pointCount } =
             cluster.properties as ClusterProperties;
 
           if (isCluster) {
             return (
               <MemoizedClusterMarker
                 key={`cluster-${cluster.id}`}
-                point_count={point_count}
+                pointCount={pointCount}
                 longitude={longitude}
                 latitude={latitude}
                 onClusterClick={() => handleClusterClick(cluster.id as number, longitude, latitude)}

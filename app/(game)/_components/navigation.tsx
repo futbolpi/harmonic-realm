@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Map, Trophy, Settings, LogOut, Compass } from "lucide-react";
+import { Home, Map, Trophy, Settings, LogOut, Compass, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +49,7 @@ export function GameNavigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"outline"}>
-                <UserAvatar size={32} userId={user.piId} /> {user.username}
+                <UserAvatar size={32} userId={user.username} /> {user.username} 
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 game-card" align="end">
@@ -67,8 +67,8 @@ export function GameNavigation() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/referrals" className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Referrals
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Invite
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

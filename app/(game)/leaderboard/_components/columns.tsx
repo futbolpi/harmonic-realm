@@ -55,7 +55,7 @@ export const columns: ColumnDef<Pioneer>[] = [
           className="flex items-center justify-center space-x-3 hover:text-primary transition-colors group"
           prefetch={false}
         >
-          <UserAvatar size={32} userId={pioneer.id} />
+          <UserAvatar size={32} userId={pioneer.username} />
           <div className="min-w-0">
             <div className="font-medium truncate group-hover:text-primary">
               @

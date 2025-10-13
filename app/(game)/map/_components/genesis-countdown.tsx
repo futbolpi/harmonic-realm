@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Users, Sparkles, Share2, Zap } from "lucide-react"
+import { Users, Share2, Zap, Compass } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -13,6 +14,7 @@ interface GenesisCountdownProps {
 }
 
 export function GenesisCountdown({ currentHarmonizers, requiredHarmonizers }: GenesisCountdownProps) {
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const progress = (currentHarmonizers / requiredHarmonizers) * 100
 
@@ -23,7 +25,7 @@ export function GenesisCountdown({ currentHarmonizers, requiredHarmonizers }: Ge
   if (!mounted) return null
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-8 bg-gradient-to-b from-background via-background to-muted overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-8 bg-gradient-to-b from-background via-background to-muted overflow-hidden my-4">
       {/* Animated background particles */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(20)].map((_, i) => (
@@ -74,7 +76,7 @@ export function GenesisCountdown({ currentHarmonizers, requiredHarmonizers }: Ge
               background: "radial-gradient(circle, hsl(var(--primary) / 0.3), transparent 70%)",
             }}
           />
-          <Sparkles
+          <Compass
             className="w-20 h-20 text-primary z-10"
             style={{ filter: "drop-shadow(0 0 20px hsl(var(--primary)))" }}
           />
@@ -170,8 +172,7 @@ export function GenesisCountdown({ currentHarmonizers, requiredHarmonizers }: Ge
           </p>
           <Button
             onClick={() => {
-              // Handle invite action - could open share dialog, copy referral link, etc.
-              console.log("[v0] Invite button clicked")
+              router.push("/referrals")
             }}
             size="lg"
             className="bg-gradient-to-r from-primary to-chart-3 hover:from-primary/90 hover:to-chart-3/90 text-primary-foreground font-semibold border-none transition-all"

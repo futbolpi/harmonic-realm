@@ -21,9 +21,10 @@ import type { Node } from "@/lib/schema/node";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
-import { cn } from "@/lib/utils";
+import { cn, debounce } from "@/lib/utils";
 import { getRarityInfo, MAP_STYLES } from "../utils";
 import { NodePopup } from "./node-popup";
+
 
 // ============================================================================
 // Types
@@ -191,7 +192,7 @@ const NodesMap = ({
    * @state
    */
   const [zoom, setZoom] = useState(initialViewState.zoom);
-  
+
   /**
    * The current geographical bounds of the map's viewport.
    * Format: [west, south, east, north]
@@ -227,16 +228,39 @@ const NodesMap = ({
 
 
   /**
-   * A callback to update map bounds and zoom state when the map moves.
-   * This is crucial for `useSupercluster` to recalculate clusters.
+   * The **core logic** to update map state (zoom and bounds).
+   * This function is now **instant** and stable across renders.
    */
-  const handleMapMove = useCallback((e: ViewStateChangeEvent) => {
+  const updateMapStateInstant = useCallback((e: ViewStateChangeEvent) => {
+    // 1. Update Zoom state instantly, as it's needed for the clustering hook's dependency (Math.floor(zoom)).
     setZoom(e.viewState.zoom);
+    
+    // 2. Update Bounds state. This is the expensive part and what we want to delay.
     if (mapRef.current) {
+      // Use the map instance from the ref to get the current bounds
       setBounds(mapRef.current.getMap().getBounds().toArray().flat() as BBox);
     }
-  }, [mapRef]);
-  
+  }, [mapRef]); // Dependency: mapRef is a stable ref object.
+
+  /**
+   * The **debounced map move handler**.
+   * It is memoized to only be created once (or when the instant function changes, which it won't).
+   * This function is passed to the `onMove` prop of the Map component.
+   */
+  const handleMapMoveDebounced = useMemo(
+    () => debounce(updateMapStateInstant, 300), // Debounce for 300 milliseconds
+    [updateMapStateInstant]
+  );
+
+  /**
+   * Cleanup effect to cancel any pending debounced calls when the component unmounts.
+   */
+  useEffect(() => {
+    return () => {
+      handleMapMoveDebounced.cancel();
+    };
+  }, [handleMapMoveDebounced]);
+
   /**
    * Zooms into a cluster when it's clicked.
    */
@@ -284,7 +308,8 @@ const NodesMap = ({
             }
           }
         }}
-        onMove={handleMapMove}
+        // Use the debounced handler here
+        onMove={handleMapMoveDebounced}
       >
         {/* Render Clusters and Markers */}
         {clusters.map((cluster) => {
@@ -305,7 +330,7 @@ const NodesMap = ({
             );
           }
           
-          const { node, nodeColor } = cluster.properties;
+          const { node, nodeColor } = (cluster.properties as Supercluster.PointFeature<PointProperties>['properties']);
           return (
             <MemoizedNodeMarker
               key={`node-${node.id}`}

@@ -195,32 +195,6 @@ const NodesMap = ({
    */
   const [bounds, setBounds] = useState<BBox | undefined>(undefined);
 
-  // Update bounds and zoom on map events
-  useEffect(() => {
-    const map = mapRef.current?.getMap();
-    if (!map) return;
-
-    const update = () => {
-      const newBounds = map.getBounds();
-      if (newBounds) {
-        setBounds([
-          newBounds.getWest(),
-          newBounds.getSouth(),
-          newBounds.getEast(),
-          newBounds.getNorth(),
-        ]);
-        setZoom(map.getZoom());
-      }
-    };
-
-    map.on("moveend", update);
-    update(); // Initial update
-
-    return () => {
-      map.off("moveend", update);
-    };
-  }, [mapRef]);
-
   /**
    * The core clustering hook.
    * It takes the points, zoom, and bounds and returns clusters.

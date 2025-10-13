@@ -1,3 +1,5 @@
+import { revalidatePath } from "next/cache";
+
 import { inngest } from "@/inngest/client";
 import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { generateNodeTypes } from "@/lib/node-spawn/generate-node-type";
@@ -150,6 +152,9 @@ export const generateNextPhase = inngest.createFunction(
           where: { phaseNumber },
         })
     );
+
+    // revalidate path or tag
+    revalidatePath("/");
 
     // Step 8: Notify ecosystem of phase completion
     await inngest.send({

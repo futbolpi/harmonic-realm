@@ -99,7 +99,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                 >
                   <Icons.twitter className="w-4 h-4 mr-2" />
-                  Follow @HarmonicRealm
+                  Follow @HarmonicRealmPi
                 </a>
               </Button>
             </CardContent>

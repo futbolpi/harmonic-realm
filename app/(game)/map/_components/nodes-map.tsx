@@ -9,6 +9,7 @@ import {
   useState,
   memo,
   useCallback,
+  useRef,
 } from "react";
 import Map, { MapRef, Marker, Popup, ViewStateChangeEvent } from "react-map-gl/maplibre";
 import { useTheme } from "next-themes";
@@ -21,7 +22,7 @@ import type { Node } from "@/lib/schema/node";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
-import { cn, debounce } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { getRarityInfo, MAP_STYLES } from "../utils";
 import { NodePopup } from "./node-popup";
 
@@ -226,40 +227,34 @@ const NodesMap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialViewState.latitude, initialViewState.longitude, mapRef]);
 
+  // Ref to manage the debounce timeout
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
-   * The **core logic** to update map state (zoom and bounds).
-   * This function is now **instant** and stable across renders.
+   * A callback to update map bounds and zoom state when the map moves.
+   * This is crucial for `useSupercluster` to recalculate clusters.
+   * Debounced to prevent excessive updates during rapid movements.
    */
-  const updateMapStateInstant = useCallback((e: ViewStateChangeEvent) => {
-    // 1. Update Zoom state instantly, as it's needed for the clustering hook's dependency (Math.floor(zoom)).
-    setZoom(e.viewState.zoom);
-    
-    // 2. Update Bounds state. This is the expensive part and what we want to delay.
-    if (mapRef.current) {
-      // Use the map instance from the ref to get the current bounds
-      setBounds(mapRef.current.getMap().getBounds().toArray().flat() as BBox);
+  const handleMapMove = useCallback((e: ViewStateChangeEvent) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-  }, [mapRef]); // Dependency: mapRef is a stable ref object.
+    timeoutRef.current = setTimeout(() => {
+      setZoom(e.viewState.zoom);
+      if (mapRef.current) {
+        setBounds(mapRef.current.getMap().getBounds().toArray().flat() as BBox);
+      }
+    }, 200); // 200ms debounce delay
+  }, [mapRef]);
 
-  /**
-   * The **debounced map move handler**.
-   * It is memoized to only be created once (or when the instant function changes, which it won't).
-   * This function is passed to the `onMove` prop of the Map component.
-   */
-  const handleMapMoveDebounced = useMemo(
-    () => debounce(updateMapStateInstant, 300), // Debounce for 300 milliseconds
-    [updateMapStateInstant]
-  );
-
-  /**
-   * Cleanup effect to cancel any pending debounced calls when the component unmounts.
-   */
+  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      handleMapMoveDebounced.cancel();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [handleMapMoveDebounced]);
+  }, []);
 
   /**
    * Zooms into a cluster when it's clicked.
@@ -309,7 +304,7 @@ const NodesMap = ({
           }
         }}
         // Use the debounced handler here
-        onMove={handleMapMoveDebounced}
+        onMove={handleMapMove}
       >
         {/* Render Clusters and Markers */}
         {clusters.map((cluster) => {

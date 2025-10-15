@@ -12,7 +12,6 @@ import { MINING_RANGE_METERS } from "@/config/site";
 import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
 import { ActiveMiningDrawer } from "./active-mining-drawer";
-import { CompletedSessionDrawer } from "./completed-session-drawer";
 import { getFeedbackMessage } from "../_utils/feedback-message";
 
 interface NodeDetailClientProps {
@@ -123,12 +122,7 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       )}
 
       {/* Start mining drawer - only shown when user can mine */}
-      {showStartModal && <StartMiningDrawer node={node} />}
-
-      {/* Completed session drawer */}
-      <CompletedSessionDrawer node={node} />
-
-      {/* show sessions */}
+      {showStartModal && <StartMiningDrawer node={node} />} 
 
       {/* can't mine info */}
       {feedback && (

@@ -1,7 +1,7 @@
 "use client";
 
-import { CheckCircle, Coins, Clock, Star } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle, Coins, Clock, Star, HandCoins } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ import {
   CredenzaContent,
   CredenzaTitle,
   CredenzaHeader,
+  CredenzaTrigger,
+  CredenzaClose,
+  CredenzaBody,
 } from "@/components/credenza";
 import { Node } from "@/lib/schema/node";
 import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
@@ -17,11 +20,10 @@ import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-asset
 type CompletedSessionDrawerProps = { node: Node };
 
 export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
-  // Mock completed session data if none provided
-  const [isOpen, onOpenChange] = useState(false);
 
   const { data } = useMiningSessionAssets(node.id);
 
+  
   const sessionData = data?.session;
 
   if (sessionData?.status !== "COMPLETED") {
@@ -29,7 +31,12 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
   }
 
   return (
-    <Credenza open={isOpen} onOpenChange={onOpenChange}>
+    <Credenza>
+      <CredenzaTrigger asChild>
+        <Button size="icon" className="shadow-lg rounded-full">
+          <HandCoins className="h-4 w-4" />
+        </Button>
+      </CredenzaTrigger>
       <CredenzaContent className="border-t-0">
         <CredenzaHeader className="text-center pb-2">
           <CredenzaTitle className="flex items-center justify-center gap-2 text-lg">
@@ -38,7 +45,7 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
           </CredenzaTitle>
         </CredenzaHeader>
 
-        <div className="px-6 pb-6 space-y-4">
+        <CredenzaBody className="space-y-4 p-4 max-w-3xl max-h-96 overflow-y-auto">
           {/* Success Animation Area */}
           <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg p-6 text-center">
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -90,21 +97,21 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
 
           {/* Actions */}
           <div className="space-y-2">
-            <Button
-              onClick={() => onOpenChange(false)}
+              <CredenzaClose asChild>
+             <Button
               className="w-full"
               variant="default"
             >
               Continue Exploring
             </Button>
+            </CredenzaClose>
+           
             <Button
-              onClick={() => {
-                /* Navigate to profile/stats */
-              }}
+             asChild
               className="w-full"
               variant="outline"
             >
-              View Stats
+              <Link href="/dashboard">View Stats</Link>     
             </Button>
           </div>
 
@@ -115,7 +122,7 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
               skills!
             </p>
           </div>
-        </div>
+        </CredenzaBody>
       </CredenzaContent>
     </Credenza>
   );

@@ -15,8 +15,8 @@ model MiningSession {
     timeReductionPercent    Int     @default(0) // 0-40%
 
     //bins
-    latitudeBin  Int? // Binned lat (e.g., floor(lat / 10) * 10)
-    longitudeBin Int? // Binned lon
+    latitudeBin  Float? // Binned lat (e.g., floor(lat / 10) * 10)
+    longitudeBin Float? // Binned lon
 
     // Rewards
     minerSharesEarned Float @default(0)

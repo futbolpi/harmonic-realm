@@ -26,6 +26,7 @@ enum PaymentType {
     LOCATION_LORE
     AWAKENING
     SHARE_REDEMPTION
+    LATTICE_CALIBRATION
 }
 
 enum PaymentStatus {

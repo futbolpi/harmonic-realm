@@ -23,9 +23,6 @@ export async function approveLocationLorePayment({
         paymentStatus: "PENDING",
         piAmount: { lte: amount },
       },
-      include: {
-        locationLore: true,
-      },
     });
 
     if (!stake) {

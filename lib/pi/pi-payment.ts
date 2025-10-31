@@ -81,6 +81,28 @@ export class PiPaymentService {
   }
 
   /**
+   * Create payment for Lattice Calibration contribution
+   */
+  async createCalibrationPayment(
+    contributionId: string,
+    piAmount: number,
+    phaseNumber: number
+  ): Promise<void> {
+    const tier = this.calculateContributionTier(piAmount).replace("_", " ");
+
+    const paymentData: PiPaymentData = {
+      amount: piAmount,
+      memo: `HarmonicRealm: Phase ${phaseNumber} Lattice Calibration Contribution (${tier})`,
+      metadata: {
+        modelId: contributionId,
+        type: "LATTICE_CALIBRATION",
+      },
+    };
+
+    return this.processPayment(paymentData);
+  }
+
+  /**
    * Core payment processing logic
    */
   private async processPayment(paymentData: PiPaymentData): Promise<void> {

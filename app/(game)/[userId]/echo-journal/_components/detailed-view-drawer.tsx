@@ -58,7 +58,7 @@ const DetailedViewDrawer = ({
           {loreNarrative && (
             <Card className="bg-gradient-to-br from-violet-500/10 to-blue-500/10">
               <CardHeader>
-                <CardTitle className="text-sm text-violet-100">
+                <CardTitle className="text-sm text-card-foreground">
                   Lattice Whispers
                 </CardTitle>
               </CardHeader>

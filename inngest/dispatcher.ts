@@ -94,6 +94,16 @@ export class InngestEventDispatcher {
   }
 
   /**
+   * Start Lattice Calibration Event
+   */
+  static async startLatticeCalibration(gamePhaseId: number) {
+    return await inngest.send({
+      name: "calibration/triggered",
+      data: { gamePhaseId },
+    });
+  }
+
+  /**
    * Batch send multiple events
    */
   static async sendBatch(events: Array<Events>) {

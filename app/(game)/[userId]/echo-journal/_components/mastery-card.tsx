@@ -81,13 +81,13 @@ export function MasteryCard({ masteryInfo, animationDelay }: MasteryCardProps) {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Resonance Progress</span>
-              <span className="text-white">
+              <span className="text-foreground">
                 {progressInfo.progressPercent}%
               </span>
             </div>
             <Progress
               value={progressInfo.progressPercent}
-              className="h-2 bg-black/20"
+              className="h-2 bg-foreground/20"
             />
             <p className="text-xs text-muted-foreground">
               {progressInfo.sessionsNeeded} sessions until Level{" "}
@@ -107,12 +107,12 @@ export function MasteryCard({ masteryInfo, animationDelay }: MasteryCardProps) {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="text-center p-2 rounded bg-black/20">
-            <div className="font-bold text-white">{mastery.bonusPercent}%</div>
+          <div className="text-center p-2 rounded bg-foreground/20">
+            <div className="font-bold text-foreground">{mastery.bonusPercent}%</div>
             <div className="text-xs text-muted-foreground">Yield Bonus</div>
           </div>
-          <div className="text-center p-2 rounded bg-black/20">
-            <div className="font-bold text-white">
+          <div className="text-center p-2 rounded bg-foreground/20">
+            <div className="font-bold text-foreground">
               {mastery.sessionsCompleted}
             </div>
             <div className="text-xs text-muted-foreground">Sessions</div>

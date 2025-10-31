@@ -199,7 +199,7 @@ export async function generateNodes({
   ];
   const probs = [0.5, 0.25, 0.15, 0.09, 0.01];
   const nodes: NodeCreateManyInput[] = [];
-  let offset = (phaseId - 1) * 100000 + batch * 5000;
+  let offset = (phaseId - 1) * 150000 + batch * 5000;
   let maxActivity = 0;
   const adaptiveFraction = 0.7; // 70% adaptive, 30% uniform
   const numAdaptive = Math.floor(currentBatchSize * adaptiveFraction);

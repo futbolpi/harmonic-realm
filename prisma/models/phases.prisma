@@ -8,8 +8,15 @@ model GamePhase {
     loreNarrative String // AI-generated phase story
     halvingFactor Float // node halving factor
 
+    currentProgress   Decimal @default(0) @db.Decimal(20, 10) // Current progress toward threshold
+    piDigitsIndex     Int     @default(1) // Index for Pi digit precision (e.g., 1 for 3.14)
+    requiredPiFunding Decimal @default(3.14) @db.Decimal(20, 10) // Required Pi funding for calibration
+
     startTime DateTime  @default(now())
     endTime   DateTime?
+
+    // Relations
+    contributions AwakeningContribution[]
 
     @@map("game_phases")
 }

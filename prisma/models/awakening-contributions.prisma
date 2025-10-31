@@ -1,0 +1,29 @@
+// Community contribution tracking for calibration events
+model AwakeningContribution {
+  id               String           @id @default(cuid())
+  userId           String
+  gamePhaseId      Int
+  contributionTier ContributionTier
+
+  // Binned location (0.01 degree precision for privacy and aggregation)
+  latitudeBin  Float
+  longitudeBin Float
+
+  // Pi Payment Data
+  piContributed   Decimal       @db.Decimal(20, 10) // Amount of Pi staked
+  paymentId       String? // Pi Network payment ID
+  piTransactionId String?
+  paymentStatus   PaymentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  gamePhase GamePhase @relation(fields: [gamePhaseId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [piId])
+
+  @@index([gamePhaseId])
+  @@index([userId])
+  @@index([latitudeBin, longitudeBin])
+  @@map("awakening_contributions")
+}

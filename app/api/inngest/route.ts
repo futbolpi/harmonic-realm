@@ -9,6 +9,7 @@ import { generateNextPhase } from "@/inngest/workflows/phases/threshold-phase-wo
 import { generateLocationLore } from "@/inngest/workflows/location-lores/generate-location-lore";
 import { appToUserPayment } from "@/inngest/workflows/payments/app-to-user";
 import { loreGenerationHealthCheck } from "@/inngest/workflows/location-lores/lore-generation-health-check";
+import { calibrationTriggeredWorkflow } from "@/inngest/workflows/phases/calibration-triggered-workflow";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -23,5 +24,6 @@ export const { GET, POST, PUT } = serve({
     generateLocationLore,
     appToUserPayment,
     loreGenerationHealthCheck,
+    calibrationTriggeredWorkflow,
   ],
 });

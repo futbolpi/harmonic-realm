@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
-import prisma from "@/lib/prisma";
 import platformAPIClient from "@/lib/pi/platform-api-client";
+import { PaymentDTO } from "@/types/pi";
+import { cancelPayment } from "./utils";
 
 export async function POST(req: Request) {
   try {
@@ -11,6 +12,10 @@ export async function POST(req: Request) {
       paymentId: string;
     } = await req.json();
 
+    const currentPayment = await platformAPIClient.get<PaymentDTO>(
+      `/payments/${paymentId}`
+    );
+
     /* 
       DEVELOPER NOTE:
       implement logic here 
@@ -18,15 +23,11 @@ export async function POST(req: Request) {
 
     */
 
-    const tx = await prisma.locationLoreStake.findFirst({
-      where: { paymentId },
-    });
-    if (tx) {
-      await prisma.locationLoreStake.update({
-        where: { id: tx.id },
-        data: { paymentStatus: "CANCELLED" },
-      });
-    }
+    const {
+      metadata: { modelId, type },
+    } = currentPayment.data;
+
+    await cancelPayment({ modelId, type });
 
     // let Pi Servers know that payment was cancelled
     await platformAPIClient.post(`/payments/${paymentId}/cancel`);

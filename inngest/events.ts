@@ -203,6 +203,13 @@ export interface AppToUserPaymentEvent {
   };
 }
 
+export interface CalibrationTriggeredEvent {
+  name: "calibration/triggered";
+  data: {
+    gamePhaseId: number;
+  };
+}
+
 export type Events =
   | UserCreated
   | PhaseCompletedEvent
@@ -222,4 +229,5 @@ export type Events =
   | PiPaymentCompletedEvent
   | PiPaymentFailedEvent
   | PiPaymentProcessedEvent
-  | AppToUserPaymentEvent;
+  | AppToUserPaymentEvent
+  | CalibrationTriggeredEvent;

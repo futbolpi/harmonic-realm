@@ -3,6 +3,7 @@ import axios from "axios";
 import { PaymentType } from "@/lib/generated/prisma/enums";
 import { ApiResponse } from "@/lib/schema/api";
 import { completeLocationLorePayment } from "@/lib/api-helpers/server/location-lore/complete-lore-payment";
+import { completeCalibrationPayment } from "@/lib/api-helpers/server/calibration/complete-calibration-payment";
 
 type VerifyPaymentParams = {
   txURL: string;
@@ -66,6 +67,15 @@ export const completePayment = async ({
         txid,
       });
       return response;
+
+    case "LATTICE_CALIBRATION":
+      const calibrationResponse = await completeCalibrationPayment({
+        amount,
+        paymentId,
+        contributionId: modelId,
+        txid,
+      });
+      return calibrationResponse;
 
     default:
       return { success: true };

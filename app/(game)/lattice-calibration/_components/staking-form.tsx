@@ -31,6 +31,7 @@ import {
 } from "@/lib/schema/calibration";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import { initiateCalibrationStaking } from "@/actions/calibration/initiate-staking";
+import { getUserLocation } from "@/lib/utils/location";
 import { LocationMap } from "./location-map";
 
 interface StakingFormProps {
@@ -38,11 +39,15 @@ interface StakingFormProps {
 }
 
 export function StakingForm({ phase }: StakingFormProps) {
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, startTransition] = useTransition();
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
     lon: number;
   } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+
+  const isPending = isLoading || isLocating;
+
   const router = useRouter();
 
   const { accessToken } = useAuth();
@@ -57,32 +62,29 @@ export function StakingForm({ phase }: StakingFormProps) {
     },
   });
 
-  const handleGetCurrentLocation = () => {
-    if ("geolocation" in navigator) {
-      startTransition(async () => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            form.setValue("currentLat", latitude);
-            form.setValue("currentLon", longitude);
-            setSelectedLocation({ lat: latitude, lon: longitude });
-            toast.success("Location detected", {
-              description: `Using coordinates: ${latitude.toFixed(
-                4
-              )}, ${longitude.toFixed(4)}`,
-            });
-          },
-          (error) => {
-            toast.error("Location error", {
-              description: error.message,
-            });
-          }
-        );
+  // Get user location
+  const handleGetLocation = async () => {
+    setIsLocating(true);
+
+    try {
+      const position = await getUserLocation();
+      const { latitude, longitude } = position.coords;
+      form.setValue("currentLat", latitude);
+      form.setValue("currentLon", longitude);
+      setSelectedLocation({ lat: latitude, lon: longitude });
+      toast.success("Location detected", {
+        description: `Using coordinates: ${latitude.toFixed(
+          4
+        )}, ${longitude.toFixed(4)}`,
       });
-    } else {
-      toast.error("Geolocation not supported", {
-        description: "Please enter coordinates manually",
-      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to get location, please refresh browser";
+      toast.error(errorMessage);
+    } finally {
+      setIsLocating(false);
     }
   };
 
@@ -137,7 +139,7 @@ export function StakingForm({ phase }: StakingFormProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleGetCurrentLocation}
+                  onClick={handleGetLocation}
                   disabled={isPending}
                   className="w-full bg-transparent"
                 >

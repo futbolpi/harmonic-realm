@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const InitiateCalibrationSchema = z.object({
-  piContributed: z.number().positive("Pi amount must be greater than 0"),
+  piContributed: z.number().min(0.1, "Pi amount must be greater than 0.1"),
   currentLat: z
     .number()
     .min(-90, "Latitude must be between -90 and 90")

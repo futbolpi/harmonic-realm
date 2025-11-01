@@ -33,6 +33,7 @@ import { useAuth } from "@/components/shared/auth/auth-context";
 import { initiateCalibrationStaking } from "@/actions/calibration/initiate-staking";
 import { getUserLocation } from "@/lib/utils/location";
 import { LocationMap } from "./location-map";
+import { isValidCoordinates } from "@/lib/node-spawn/region-metrics";
 
 interface StakingFormProps {
   phase: { requiredPiFunding: string };
@@ -109,6 +110,10 @@ export function StakingForm({ phase }: StakingFormProps) {
     });
   };
 
+  const showMap =
+    selectedLocation &&
+    isValidCoordinates(selectedLocation.lat, selectedLocation.lon);
+
   return (
     <Card>
       <CardHeader>
@@ -173,11 +178,15 @@ export function StakingForm({ phase }: StakingFormProps) {
                             step="0.0001"
                             disabled={isPending}
                             {...field}
+                            value={field.value ?? ""}
                             onChange={(e) => {
-                              field.onChange(e.target.valueAsNumber);
+                              const lat = isNaN(e.target.valueAsNumber)
+                                ? undefined
+                                : e.target.valueAsNumber;
+                              field.onChange(lat);
                               setSelectedLocation({
-                                lat: e.target.valueAsNumber,
-                                lon: form.getValues("currentLon"),
+                                lat: lat ?? 0,
+                                lon: form.getValues("currentLon") ?? 0,
                               });
                             }}
                           />
@@ -199,11 +208,15 @@ export function StakingForm({ phase }: StakingFormProps) {
                             step="0.0001"
                             disabled={isPending}
                             {...field}
+                            value={field.value ?? ""}
                             onChange={(e) => {
-                              field.onChange(e.target.valueAsNumber);
+                              const lon = isNaN(e.target.valueAsNumber)
+                                ? undefined
+                                : e.target.valueAsNumber;
+                              field.onChange(lon);
                               setSelectedLocation({
-                                lat: form.getValues("currentLat"),
-                                lon: e.target.valueAsNumber,
+                                lat: form.getValues("currentLat") ?? 0,
+                                lon: lon ?? 0,
                               });
                             }}
                           />
@@ -217,7 +230,7 @@ export function StakingForm({ phase }: StakingFormProps) {
             </Tabs>
 
             {/* Map Preview */}
-            {selectedLocation && (
+            {showMap && (
               <div className="space-y-2">
                 <FormLabel>Node Spawn Location Preview</FormLabel>
                 <LocationMap location={selectedLocation} />
@@ -236,10 +249,13 @@ export function StakingForm({ phase }: StakingFormProps) {
                       type="number"
                       placeholder="3.14"
                       step="0.01"
-                      min="0.01"
+                      min="0.1"
                       disabled={isPending}
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      value={field.value ?? 0.1}
+                      onChange={(e) => {
+                        field.onChange(e.target.valueAsNumber);
+                      }}
                     />
                   </FormControl>
                   <FormDescription>

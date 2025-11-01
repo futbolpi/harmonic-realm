@@ -16,7 +16,7 @@ export function LocationMap({ location }: LocationMapProps) {
   const [viewState, setViewState] = useState({
     longitude: location.lon,
     latitude: location.lat,
-    zoom: 12,
+    zoom: 10,
   });
   const { resolvedTheme } = useTheme();
 

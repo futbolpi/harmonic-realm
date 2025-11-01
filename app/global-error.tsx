@@ -3,7 +3,7 @@
 import NextError from "next/error";
 import { useEffect } from "react";
 
-import { reportError } from "@/actions/site/errors";
+// import { reportError } from "@/actions/site/errors";
 
 export default function GlobalError({
   error,
@@ -11,7 +11,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
 }) {
   useEffect(() => {
-    reportError(error);
+    console.warn(error);
   }, [error]);
 
   return (

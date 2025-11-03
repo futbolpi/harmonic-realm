@@ -31,14 +31,27 @@ export const cancelPayment = async ({
         select: { id: true },
       });
       if (contribution) {
-        await prisma.locationLoreStake.update({
+        await prisma.awakeningContribution.update({
           where: { id: contribution.id },
           data: { paymentStatus: "CANCELLED" },
         });
       }
       return { success: true };
 
-    default:
+    case "RESONANCE_ANCHOR":
+      const anchor = await prisma.resonantAnchor.findFirst({
+        where: { id: modelId },
+        select: { id: true },
+      });
+      if (anchor) {
+        await prisma.resonantAnchor.update({
+          where: { id: anchor.id },
+          data: { paymentStatus: "CANCELLED" },
+        });
+      }
       return { success: true };
+
+    default:
+      return { success: false };
   }
 };

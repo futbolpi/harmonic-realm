@@ -1,38 +1,31 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Zap } from "lucide-react";
+import { toast } from "sonner";
 import type { MapRef } from "react-map-gl/maplibre";
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  InitiateCalibrationSchema,
-  InitiateCalibrationParams,
-} from "@/lib/schema/calibration";
-import { useAuth } from "@/components/shared/auth/auth-context";
-import { initiateCalibrationStaking } from "@/actions/calibration/initiate-staking";
 import { getUserLocation } from "@/lib/utils/location";
-import { LocationMap } from "./location-map";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import {
+  InitiateNodeAnchoringParams,
+  InitiateNodeAnchoringSchema,
+} from "@/lib/schema/anchor";
+import { useAuth } from "@/components/shared/auth/auth-context";
+import { initiateAnchorStaking } from "@/actions/anchor/initiate-staking";
+import LocationMap from "./location-map";
 
-interface StakingFormProps {
-  phase: { requiredPiFunding: string };
-}
+type AnchoringFormProps = { anchorCost: string };
 
-export function StakingForm({ phase }: StakingFormProps) {
+/**
+ * Anchoring Form Component - Map-centric location selection
+ * Users select location by clicking map or using geolocation button
+ */
+export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
   const [isLoading, startTransition] = useTransition();
   const [selectedLat, setSelectedLat] = useState<number | null>(null);
   const [selectedLon, setSelectedLon] = useState<number | null>(null);
@@ -46,12 +39,11 @@ export function StakingForm({ phase }: StakingFormProps) {
 
   const isPending = isLoading || isLocating;
 
-  const form = useForm({
-    resolver: zodResolver(InitiateCalibrationSchema),
+  const form = useForm<InitiateNodeAnchoringParams>({
+    resolver: zodResolver(InitiateNodeAnchoringSchema),
     defaultValues: {
-      piContributed: 3.14,
-      currentLat: 0,
-      currentLon: 0,
+      latitude: 0,
+      longitude: 0,
       accessToken: accessToken ?? "",
     },
   });
@@ -59,14 +51,15 @@ export function StakingForm({ phase }: StakingFormProps) {
   const handleMapLocationSelect = (lat: number, lon: number) => {
     setSelectedLat(lat);
     setSelectedLon(lon);
-    form.setValue("currentLat", lat);
-    form.setValue("currentLon", lon);
+    form.setValue("latitude", lat);
+    form.setValue("longitude", lon);
     if (mapRef.current) {
       mapRef.current.flyTo({
         center: [lon, lat],
         zoom: 15.5,
         bearing: 27,
         pitch: 45,
+        // duration: 1000,
         speed: 0.5,
       });
     }
@@ -75,36 +68,34 @@ export function StakingForm({ phase }: StakingFormProps) {
   // Get user location
   const handleUseCurrentLocation = async () => {
     setIsLocating(true);
-
     try {
       const position = await getUserLocation();
       const { latitude, longitude } = position.coords;
       handleMapLocationSelect(latitude, longitude);
       toast.success("Location detected", {
-        description: `Using coordinates: ${latitude.toFixed(
-          4
-        )}, ${longitude.toFixed(4)}`,
+        description: "Your harmonic signature resonates here",
       });
     } catch (error) {
-      const errorMessage =
+      const description =
         error instanceof Error
           ? error.message
-          : "Failed to get location, please refresh browser";
-      toast.error(errorMessage);
+          : "Unable to access your location";
+      toast.error("Error", { description });
     } finally {
       setIsLocating(false);
     }
   };
 
-  const onSubmit = async (data: InitiateCalibrationParams) => {
+  // Handle form submission
+  const onSubmit = (data: InitiateNodeAnchoringParams) => {
     startTransition(async () => {
       try {
-        const result = await initiateCalibrationStaking(data);
+        const result = await initiateAnchorStaking(data);
         if (result.success && result.data) {
-          toast.success("Staking initiated successfully, proceed to payment");
-          router.push(`/awakening-contributions/${result.data.id}`);
+          toast.success("Initated successfully, proceed to payment");
+          router.push(`/resonant-anchors/${result.data.id}`);
         } else {
-          toast.error("Staking failed", {
+          toast.error("Error", {
             description: result.error,
           });
         }
@@ -137,20 +128,20 @@ export function StakingForm({ phase }: StakingFormProps) {
       </div>
 
       <div className="space-y-3 border-t border-border bg-card/50 px-4 py-4 backdrop-blur-sm md:space-y-4 md:border-t-0 md:bg-card md:p-6">
-        {/* Location Info & Pi Amount Card */}
+        {/* Cost Card */}
         {selectedLat !== null && selectedLon !== null && (
           <div className="rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4">
-            <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
                   <Zap className="h-4 w-4 text-primary" />
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <p className="text-xs font-medium text-muted-foreground">
-                    Required Funding
+                    Anchor Cost
                   </p>
                   <p className="text-sm font-semibold text-foreground">
-                    {phase.requiredPiFunding} π
+                    {anchorCost} π
                   </p>
                 </div>
               </div>
@@ -161,59 +152,28 @@ export function StakingForm({ phase }: StakingFormProps) {
                 </p>
               </div>
             </div>
-
-            {/* Pi Amount Input */}
-            <Form {...form}>
-              <FormField
-                control={form.control}
-                name="piContributed"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Your Contribution Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="3.14"
-                        step="0.01"
-                        min="0.1"
-                        disabled={isPending}
-                        {...field}
-                        value={field.value ?? 0.1}
-                        onChange={(e) => {
-                          field.onChange(e.target.valueAsNumber);
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      Contribute any amount towards the calibration goal
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Form>
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Submission Button */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Button
               type="submit"
-              className="w-full game-button"
               disabled={
                 isPending || selectedLat === null || selectedLon === null
               }
+              className="w-full game-button"
             >
               {isPending ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  Processing...
+                  Anchoring...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Zap className="h-4 w-4" />
-                  Initiate Staking
+                  Initiate Resonant Anchor
                 </span>
               )}
             </Button>

@@ -11,6 +11,7 @@ import {
   InitiateCalibrationSchema,
 } from "@/lib/schema/calibration";
 import { binLatLon } from "@/lib/node-spawn/region-metrics";
+import { isOnLand, loadLandGeoJson } from "@/lib/node-spawn/node-generator";
 
 /**
  * ACTION: Initiate Lattice Calibration Staking (creates payment intent)
@@ -27,10 +28,18 @@ export async function initiateCalibrationStaking(
 
     const { accessToken, currentLat, currentLon, piContributed } = data;
 
-    const piDecimal = new Decimal(piContributed);
-
     // Verify user authentication
     const user = await verifyTokenAndGetUser(accessToken);
+
+    // validate location is on land
+    const geojson = await loadLandGeoJson();
+    const onLand = isOnLand(currentLon, currentLat, geojson);
+
+    if (!onLand) {
+      return { success: false, error: "Location is not on land" };
+    }
+
+    const piDecimal = new Decimal(piContributed);
 
     // find current phase
     const phase = await prisma.gamePhase.findFirst({

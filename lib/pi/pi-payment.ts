@@ -60,20 +60,19 @@ export class PiPaymentService {
   }
 
   /**
-   * Create payment for Awakening contribution
+   * Create payment for Resonance Anchor
    */
-  async createAwakeningPayment(
+  async createAnchorPayment(
+    anchorId: string,
     phaseNumber: number,
     piAmount: number
   ): Promise<void> {
-    const tier = this.calculateContributionTier(piAmount);
-
     const paymentData: PiPaymentData = {
       amount: piAmount,
-      memo: `HarmonicRealm: Phase ${phaseNumber} Awakening Contribution (${tier})`,
+      memo: `HarmonicRealm: Phase ${phaseNumber} Resonance Anchor Payment`,
       metadata: {
-        modelId: phaseNumber.toString(),
-        type: "AWAKENING",
+        modelId: anchorId,
+        type: "RESONANCE_ANCHOR",
       },
     };
 

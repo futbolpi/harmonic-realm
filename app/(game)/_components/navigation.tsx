@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Map, Trophy, Settings, LogOut, Compass, UserPlus } from "lucide-react";
+import {
+  Home,
+  Map,
+  Trophy,
+  Settings,
+  LogOut,
+  Compass,
+  UserPlus,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +57,7 @@ export function GameNavigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"outline"}>
-                <UserAvatar size={32} userId={user.username} /> {user.username} 
+                <UserAvatar size={32} userId={user.username} /> {user.username}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 game-card" align="end">

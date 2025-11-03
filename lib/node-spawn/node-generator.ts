@@ -120,7 +120,7 @@ export function piSeededPoint(
 }
 
 // Cached loadLandGeoJson
-async function loadLandGeoJson(): Promise<
+export async function loadLandGeoJson(): Promise<
   FeatureCollection<MultiPolygon | Polygon>
 > {
   const cacheKey = "land_geojson";
@@ -163,7 +163,10 @@ export function isOnLand(
 }
 
 // Generate dynamic node name (similar to type, but instance-specific)
-function generateNodeName(rarity: NodeTypeRarity, offset: number): string {
+export function generateNodeName(
+  rarity: NodeTypeRarity,
+  offset: number
+): string {
   const { adjectives, nouns } = getRarityElements(rarity);
   const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
   const noun = nouns[Math.floor(Math.random() * nouns.length)];
@@ -172,7 +175,7 @@ function generateNodeName(rarity: NodeTypeRarity, offset: number): string {
 }
 
 // Weighted choice
-function chooseWeighted<T>(items: T[], weights: number[]): T {
+export function chooseWeighted<T>(items: T[], weights: number[]): T {
   const cumWeights = weights.reduce(
     (acc, w, i) => [...acc, (acc[i - 1] || 0) + w],
     [] as number[]

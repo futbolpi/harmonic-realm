@@ -1,0 +1,25 @@
+model ResonantAnchor {
+    id          String @id @default(cuid())
+    phaseId     Int
+    userId      String
+    locationLat Float
+    locationLon Float
+
+    nodeId String?
+
+    piCost          Decimal       @db.Decimal(20, 10)
+    paymentStatus   PaymentStatus @default(PENDING)
+    paymentId       String? // Pi Network payment ID
+    piTransactionId String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    phase GamePhase @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+    user  User      @relation(fields: [userId], references: [piId])
+
+    @@index([phaseId])
+    @@index([userId])
+    @@index([paymentStatus])
+    @@map("resonant_anchors")
+}

@@ -24,7 +24,7 @@ model ShareRedemption {
 
 enum PaymentType {
     LOCATION_LORE
-    AWAKENING
+    RESONANCE_ANCHOR
     SHARE_REDEMPTION
     LATTICE_CALIBRATION
 }

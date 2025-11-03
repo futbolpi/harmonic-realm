@@ -27,6 +27,7 @@ model User {
     echoTransmission       EchoTransmission? // One-to-one relationship
     loreContributions      LocationLoreStake[] // Pi staking for lore
     awakeningContributions AwakeningContribution[] // Pi contribution for lattice calibration
+    resonantAnchors        ResonantAnchor[] // Pi contribution for resonant anchors
 
     @@map("users")
 }

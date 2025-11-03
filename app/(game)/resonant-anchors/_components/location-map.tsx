@@ -2,18 +2,15 @@
 
 import { type RefObject, useState } from "react";
 import Map, {
+  NavigationControl,
   Marker,
-  Source,
-  Layer,
   type MapRef,
   type MapLayerMouseEvent,
-  NavigationControl,
 } from "react-map-gl/maplibre";
-import { useTheme } from "next-themes";
 import { Crosshair } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
-import { binLatLon, getBinBounds } from "@/lib/node-spawn/region-metrics";
 import { MAP_STYLES } from "../../map/utils";
 import { UserMarker } from "../../_components/user-markers";
 
@@ -27,24 +24,23 @@ interface LocationMapProps {
   mapRef: RefObject<MapRef | null>;
 }
 
-export function LocationMap({
-  mapRef,
-  onGeolocationClick,
+/**
+ * Interactive map for selecting anchor location
+ * Optimized for mobile with overlay geolocation button
+ */
+export default function LocationMap({
   onLocationSelect,
+  onGeolocationClick,
   selectedLocation,
+  mapRef,
 }: LocationMapProps) {
   const [viewState, setViewState] = useState({
     longitude: 0,
     latitude: 20,
     zoom: 3,
   });
-  const { resolvedTheme } = useTheme();
 
-  const { latitudeBin, longitudeBin } = binLatLon(
-    selectedLocation?.lat || viewState.latitude,
-    selectedLocation?.lon || viewState.longitude
-  );
-  const bounds = getBinBounds(latitudeBin, longitudeBin);
+  const { resolvedTheme } = useTheme();
 
   // Handle map clicks
   const handleMapClick = (event: MapLayerMouseEvent) => {
@@ -52,24 +48,6 @@ export function LocationMap({
     if (lngLat) {
       onLocationSelect(lngLat.lat, lngLat.lng);
     }
-  };
-
-  // Create GeoJSON polygon for binned area
-  const binAreaGeoJSON = {
-    type: "Feature" as const,
-    geometry: {
-      type: "Polygon" as const,
-      coordinates: [
-        [
-          [bounds.west, bounds.south],
-          [bounds.east, bounds.south],
-          [bounds.east, bounds.north],
-          [bounds.west, bounds.north],
-          [bounds.west, bounds.south],
-        ],
-      ],
-    },
-    properties: {},
   };
 
   return (
@@ -88,28 +66,6 @@ export function LocationMap({
         attributionControl={false}
       >
         <NavigationControl position="top-right" />
-        {/* Binned area layer */}
-
-        {selectedLocation && (
-          <Source id="bin-area" type="geojson" data={binAreaGeoJSON}>
-            <Layer
-              id="bin-area-fill"
-              type="fill"
-              paint={{
-                "fill-color": "#22c55e",
-                "fill-opacity": 0.15,
-              }}
-            />
-            <Layer
-              id="bin-area-border"
-              type="line"
-              paint={{
-                "line-color": "#22c55e",
-                "line-width": 2,
-              }}
-            />
-          </Source>
-        )}
 
         <div className="absolute bottom-4 left-4 z-10 md:bottom-6 md:left-6">
           <Button
@@ -123,7 +79,7 @@ export function LocationMap({
           </Button>
         </div>
 
-        {/* Current location marker */}
+        {/* Selected Location Marker */}
         {selectedLocation && (
           <Marker
             longitude={selectedLocation.lon}
@@ -138,7 +94,7 @@ export function LocationMap({
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
           <div className="text-center">
             <p className="text-sm font-medium text-foreground/60 backdrop-blur-sm rounded-lg px-3 py-2 bg-background/50">
-              Click on map / crosshair to contribute
+              Click on map / crosshair to anchor
             </p>
           </div>
         </div>

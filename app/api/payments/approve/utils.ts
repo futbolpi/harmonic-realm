@@ -1,3 +1,4 @@
+import { approveAnchorPayment } from "@/lib/api-helpers/server/anchors/approve-anchor-payment";
 import { approveCalibrationPayment } from "@/lib/api-helpers/server/calibration/approve-calibration-payment";
 import { approveLocationLorePayment } from "@/lib/api-helpers/server/location-lore/approve-lore-payment";
 import { PaymentType } from "@/lib/generated/prisma/enums";
@@ -33,7 +34,15 @@ export const verifyPaymentApproval = async ({
       });
       return calibrationResponse;
 
+    case "RESONANCE_ANCHOR":
+      const anchorResponse = await approveAnchorPayment({
+        amount,
+        paymentId,
+        anchorId: modelId,
+      });
+      return anchorResponse;
+
     default:
-      return { success: true };
+      return { success: false };
   }
 };

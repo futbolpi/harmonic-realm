@@ -3,12 +3,11 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { MapRef } from "react-map-gl/maplibre";
 import { useRouter } from "next/navigation";
-import { PlusCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
-import { Button } from "@/components/ui/button";
+import { AwakeningPathwaysModal } from "@/components/shared/awakening-pathways-modal";
 import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
 import { MapControlModal } from "./map-control-modal";
@@ -110,15 +109,8 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
           {/* Map Tour Button */}
           <MapHelp />
 
-          {/* Calibration Page */}
-
-          <Button
-            onClick={() => router.push("/lattice-calibration")}
-            size="sm"
-            className="game-button cursor-pointer shadow-lg"
-          >
-            <PlusCircle className="h-4 w-4" />
-          </Button>
+          {/* Awakening Modal */}
+          <AwakeningPathwaysModal />
         </div>
 
         {/* Node Count Badge */}

@@ -16,7 +16,8 @@ model GamePhase {
     endTime   DateTime?
 
     // Relations
-    contributions AwakeningContribution[]
+    contributions   AwakeningContribution[]
+    resonantAnchors ResonantAnchor[]
 
     @@map("game_phases")
 }

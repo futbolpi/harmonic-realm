@@ -4,6 +4,7 @@ import { PaymentType } from "@/lib/generated/prisma/enums";
 import { ApiResponse } from "@/lib/schema/api";
 import { completeLocationLorePayment } from "@/lib/api-helpers/server/location-lore/complete-lore-payment";
 import { completeCalibrationPayment } from "@/lib/api-helpers/server/calibration/complete-calibration-payment";
+import { completeAnchorPayment } from "@/lib/api-helpers/server/anchors/complete-anchor-payment";
 
 type VerifyPaymentParams = {
   txURL: string;
@@ -77,7 +78,16 @@ export const completePayment = async ({
       });
       return calibrationResponse;
 
+    case "RESONANCE_ANCHOR":
+      const anchorResponse = await completeAnchorPayment({
+        amount,
+        paymentId,
+        anchorId: modelId,
+        txid,
+      });
+      return anchorResponse;
+
     default:
-      return { success: true };
+      return { success: false };
   }
 };

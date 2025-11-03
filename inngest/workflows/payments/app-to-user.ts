@@ -2,8 +2,13 @@ import PiNetwork from "pi-backend";
 
 import { env } from "@/env";
 import { inngest } from "@/inngest/client";
-import prisma from "@/lib/prisma";
 import { PiPaymentData, PaymentDTO } from "@/types/pi";
+import {
+  updateIncomplete,
+  updatePaymentId,
+  updateTxId,
+  upsertIncomplete,
+} from "./utils";
 
 export const appToUserPayment = inngest.createFunction(
   { id: "app-to-user-payment", retries: 1 },
@@ -48,21 +53,13 @@ export const appToUserPayment = inngest.createFunction(
         incompletePayments.incomplete_server_payments[0];
 
       await step.run("upsert-db-incomplete-payments", () => {
-        return prisma.shareRedemption.upsert({
-          where: {
-            id: incompletePayment.metadata.modelId,
-          },
-          create: {
-            piPaymentId: incompletePayment.identifier,
-            piReceived: incompletePayment.amount,
-            redemptionRate:
-              (incompletePayment.metadata.level || 0) /
-              incompletePayment.amount,
-            sharesRedeemed: incompletePayment.metadata.level || 0,
-            userId: incompletePayment.user_uid,
-          },
-          update: {},
-          select: { status: true },
+        return upsertIncomplete({
+          modelId: incompletePayment.metadata.modelId,
+          amount: incompletePayment.amount,
+          piPaymentId: incompletePayment.identifier,
+          type,
+          userPiId: incompletePayment.user_uid,
+          extraData: incompletePayment.metadata.level,
         });
       });
       // submit and complete transaction if no transaction
@@ -81,10 +78,10 @@ export const appToUserPayment = inngest.createFunction(
 
         if (txId) {
           await step.run("update-db-incomplete-payment", async () => {
-            return prisma.shareRedemption.update({
-              where: { id: incompletePayment.metadata.modelId },
-              data: { piTxId: txId, status: "COMPLETED" },
-              select: { piPaymentId: true },
+            return updateTxId({
+              modelId: incompletePayment.metadata.modelId,
+              piTxId: txId,
+              type,
             });
           });
 
@@ -96,17 +93,10 @@ export const appToUserPayment = inngest.createFunction(
         // just complete transaction
       } else {
         await step.run("update-db-incomplete-payment", async () => {
-          return prisma.shareRedemption.update({
-            where: {
-              id: incompletePayment.metadata.modelId,
-            },
-            data: {
-              piTxId: incompletePayment.transaction?.txid,
-              status: incompletePayment.transaction?.txid
-                ? "COMPLETED"
-                : "FAILED",
-            },
-            select: { piPaymentId: true },
+          return updateIncomplete({
+            modelId: incompletePayment.metadata.modelId,
+            type,
+            piTxId: incompletePayment.transaction?.txid,
           });
         });
 
@@ -126,15 +116,8 @@ export const appToUserPayment = inngest.createFunction(
       return pi.createPayment(paymentData);
     });
 
-    await step.run("update-shares-record-payment", async () => {
-      return prisma.shareRedemption.update({
-        data: {
-          piPaymentId,
-          status: "PROCESSING",
-        },
-        select: { piPaymentId: true },
-        where: { id: modelId, status: "PENDING" },
-      });
+    await step.run("update-db-payment-models-payment-id", async () => {
+      return updatePaymentId({ modelId, type, piPaymentId });
     });
 
     // It is strongly recommended that you store the txId along with the paymentId you stored earlier for your reference.
@@ -142,12 +125,8 @@ export const appToUserPayment = inngest.createFunction(
       return pi.submitPayment(piPaymentId);
     });
 
-    await step.run("update-db-payment", async () => {
-      return prisma.shareRedemption.update({
-        where: { piPaymentId, status: "PROCESSING", id: modelId },
-        data: { piTxId, status: "COMPLETED" },
-        select: { piPaymentId: true },
-      });
+    await step.run("update-db-payment-models-tx-id", async () => {
+      return updateTxId({ modelId, piTxId, type });
     });
 
     const { transaction } = await step.run("complete-payment", async () => {

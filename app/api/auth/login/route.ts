@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma";
 import { authResultSchema, defaultSession } from "@/lib/schema/auth";
 import { GENESIS_THRESHOLD, siteConfig } from "@/config/site";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
+import { sendMockPayment } from "@/lib/api-helpers/server/mock-payments";
 
 // login
 export async function POST(request: NextRequest) {
@@ -28,14 +29,20 @@ export async function POST(request: NextRequest) {
 
   try {
     // create or update user then send user created event if created
-    const existingUser = await prisma.user.findUnique({
-      where: { piId: auth.user.uid },
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ piId: auth.user.uid }, { username: auth.user.username }],
+      },
     });
     if (existingUser) {
       // update accessToken and return session
       const updatedUser = await prisma.user.update({
-        where: { piId: auth.user.uid },
-        data: { accessToken: auth.accessToken, username: auth.user.username },
+        where: { id: existingUser.id },
+        data: {
+          accessToken: auth.accessToken,
+          username: auth.user.username,
+          piId: auth.user.uid,
+        },
         select: { username: true, piId: true },
       });
 
@@ -92,6 +99,8 @@ export async function POST(request: NextRequest) {
 
       return createdUser;
     });
+
+    await sendMockPayment(newUser.piId);
 
     // send tg message of new user
     const content = `<b>New ${siteConfig.name} User Alert!</b>

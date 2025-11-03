@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
 import prisma from "@/lib/prisma";
 import { ApiResponse } from "@/lib/schema/api";
+import { sendMockPayment } from "../mock-payments";
 
 type Params = {
   paymentId: string;
@@ -33,6 +34,7 @@ export async function completeCalibrationPayment({
         gamePhaseId: true,
         piContributed: true,
         gamePhase: { select: { currentProgress: true } },
+        userId: true,
       },
     });
 
@@ -83,6 +85,8 @@ export async function completeCalibrationPayment({
         contribution.gamePhaseId
       );
     }
+
+    await sendMockPayment(contribution.userId);
 
     // Revalidate relevant paths
     revalidatePath(`/awakening-contributions/${updatedContribution.id}`);

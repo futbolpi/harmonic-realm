@@ -9,6 +9,7 @@ import {
   generateNodeName,
 } from "@/lib/node-spawn/node-generator";
 import { generateLore } from "@/lib/node-spawn/generate-lore";
+import { sendMockPayment } from "../mock-payments";
 
 type Params = {
   paymentId: string;
@@ -42,6 +43,7 @@ export async function completeAnchorPayment({
         locationLat: true,
         locationLon: true,
         phase: { select: { phaseNumber: true } },
+        userId: true,
       },
     });
 
@@ -129,6 +131,8 @@ export async function completeAnchorPayment({
         select: { totalNodes: true },
       });
     });
+
+    await sendMockPayment(anchor.userId);
 
     // Revalidate relevant paths
     revalidatePath(`/resonant-anchors/${anchorId}`);

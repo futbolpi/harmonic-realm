@@ -63,7 +63,7 @@ export class InngestEventDispatcher {
   }
 
   /**
-   * Start Genesis Phase Node Generation
+   * Send Payment from app to user
    */
   static async sendAppToUserPayment({
     amount,

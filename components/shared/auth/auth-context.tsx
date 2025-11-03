@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: async () => {
       const piSDK = getPiSDK();
       const { accessToken, user } = await piSDK.authenticate(
-        ["username", "payments"],
+        ["username", "payments", "wallet_address"],
         onIncompletePaymentFound
       );
 

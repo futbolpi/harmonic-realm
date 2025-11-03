@@ -27,6 +27,7 @@ enum PaymentType {
     RESONANCE_ANCHOR
     SHARE_REDEMPTION
     LATTICE_CALIBRATION
+    MOCK_PAYMENT
 }
 
 enum PaymentStatus {

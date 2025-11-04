@@ -12,8 +12,8 @@ import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
 import { MapControlModal } from "./map-control-modal";
 import { NodesListModal } from "./nodes-list-modal";
-import MapHelp from "./map-help";
 import NodesMap from "./nodes-map";
+import { MapHelpModal } from "./map-help-modal";
 
 interface MobileMapViewProps {
   nodes: Node[];
@@ -107,7 +107,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
           <LocationButton />
 
           {/* Map Tour Button */}
-          <MapHelp />
+          <MapHelpModal />
 
           {/* Awakening Modal */}
           <AwakeningPathwaysModal />

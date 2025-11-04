@@ -1,0 +1,57 @@
+import {
+  Navigation,
+  Filter,
+  List,
+  Zap,
+  MapPin,
+  CircleHelp,
+} from "lucide-react";
+
+<div className="space-y-4">
+
+Welcome, Pioneer. The map is your guide to the Lattice. Here’s how to find and
+mine Nodes. The map is interactve so you can zoom in/out and move.
+
+<h4 className="font-semibold pt-2">Map Controls</h4>
+<ul className="list-none space-y-3 pl-0">
+  <li className="flex items-start gap-3">
+    <Navigation className="h-5 w-5 text-primary-foreground flex-shrink-0 mt-1" />
+    <div>
+      <strong>Find Yourself:</strong> Reveals your current position. Your
+      physical location determines which Nodes you can mine. Click it to sort
+      nearby Nodes.
+    </div>
+  </li>
+  <li className="flex items-start gap-3">
+    <Filter className="h-5 w-5 text-primary-foreground flex-shrink-0 mt-1" />
+    <div>
+      <strong>Attune Your View:</strong> Filter Nodes by rarity, type,
+      availability, or sponsorship to find your perfect match.
+    </div>
+  </li>
+  <li className="flex items-start gap-3">
+    <List className="h-5 w-5 text-primary-foreground flex-shrink-0 mt-1" />
+    <div>
+      <strong>See Nearby Nodes:</strong> Opens a list of all detected Nodes,
+      showing yield, miner capacity, and rarity to help you plan.
+    </div>
+  </li>
+</ul>
+
+<h4 className="font-semibold pt-2">Finding & Mining a Node</h4>
+<div className="flex items-start gap-3">
+  <Zap className="h-5 w-5 text-primary-foreground flex-shrink-0 mt-1" />
+  <div>
+    <strong>Node Markers:</strong> Each <Zap className="h-4 w-4 inline-block" />{" "}
+    on the map is a Node. Its color matches its rarity. Click any Node to open a
+    popup with its basic stats and link to its detail page.
+  </div>
+</div>
+
+<InfoAlert>
+    **Proximity is Key!**
+    You must be physically close to a Node to mine it. When you're in
+    range, the **'Mine Node'** button will activate on its
+    detail page. Get out there and explore!
+</InfoAlert>
+</div>

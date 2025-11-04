@@ -2,25 +2,21 @@ import {
   MapPin,
   Zap,
   Users,
-  Trophy,
-  Shield,
-  Smartphone,
-  Globe,
-  TrendingUp,
   Compass,
-  Eye,
+  TrendingUp,
+  Award,
+  BookOpen,
 } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 
 export const metadata = {
   title: "About HarmonicRealm - The Cosmic Lattice Awaits",
   description:
-    "Discover HarmonicRealm, where Pioneers resonate with the cosmic Lattice to discover Echo Guardians and collect Lore Fragments through harmonic exploration.",
+    "Discover HarmonicRealm, a geolocation adventure bound to the infinite digits of Pi. Explore your world, discover Nodes, and shape the Lattice.",
   openGraph: {
     title: "About HarmonicRealm - The Cosmic Lattice Awaits",
     description:
-      "Discover HarmonicRealm, where Pioneers resonate with the cosmic Lattice to discover Echo Guardians and collect Lore Fragments through harmonic exploration.",
+      "Discover HarmonicRealm, a geolocation adventure bound to the infinite digits of Pi. Explore your world, discover Nodes, and shape the Lattice.",
     images: [
       {
         url: "/api/og?title=About HarmonicRealm&description=Where Pioneers resonate with the cosmic Lattice&type=default",
@@ -35,7 +31,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "About HarmonicRealm - The Cosmic Lattice Awaits",
     description:
-      "Discover HarmonicRealm, where Pioneers resonate with the cosmic Lattice to discover Echo Guardians and collect Lore Fragments through harmonic exploration.",
+      "Discover HarmonicRealm, a geolocation adventure bound to the infinite digits of Pi. Explore your world, discover Nodes, and shape the Lattice.",
     images: [
       "/api/og?title=About HarmonicRealm&description=Where Pioneers resonate with the cosmic Lattice&type=default",
     ],
@@ -50,87 +46,103 @@ export const metadata = {
 
 # The Cosmic Lattice Awaits
 
-We're pioneering a new realm where the infinite digits of Pi create a cosmic frequency grid, allowing Pioneers to resonate with geo-anchored Nodes and discover the mysteries guarded by ancient Echo Guardians.
+We're pioneering a new realm where the **infinite digits of Pi** create a cosmic frequency grid called the Lattice. As a Pioneer, you explore your physical world to discover and resonate with geo-anchored **Nodes**—mystical points that offer mining rewards, rare lore fragments, and cosmetic treasures.
 
 ## Our Mission
 
-To bridge the digital and physical realms through harmonic resonance, creating an immersive experience where Pioneers explore the world while uncovering the secrets of the cosmic Lattice.
-
-HarmonicRealm transforms traditional concepts by encouraging real-world exploration through mystical resonance, creating a sustainable and community-driven ecosystem within the Pi Network's infinite mathematical foundation.
+To bridge the digital and physical realms through harmonic resonance. HarmonicRealm transforms your world into a living mathematical canvas, creating a sustainable and community-driven ecosystem built on the foundation of Pi.
 
 <div className="grid md:grid-cols-2 gap-8 my-12">
   <FeatureCard
     icon={Compass}
-    title="Resonate"
-    description="Discover Nodes worldwide through harmonic exploration and cosmic resonance"
+    title="Explore & Discover"
+    description="Use your physical location to find procedural, community-funded, and player-created Nodes hidden in the world."
     color="text-primary"
   />
   <FeatureCard
     icon={Zap}
-    title="Harmonize"
-    description="Earn Shares through engaging resonance sessions with Echo Guardians"
+    title="Mine & Earn"
+    description="Resonate with Nodes to earn mining rewards. Rarer Nodes, like Legendary and Epic, offer unique mechanics and yields."
     color="text-neon-green"
   />
   <FeatureCard
     icon={Users}
-    title="Unite"
-    description="Join a thriving community of Pioneers exploring the cosmic Lattice"
+    title="Collaborate & Fund"
+    description="Join Lattice Calibration Events. Pool Pi with other Pioneers to spawn new, rare Nodes in high-activity areas."
     color="text-neon-purple"
   />
   <FeatureCard
-    icon={Eye}
-    title="Discover"
-    description="Collect Lore Fragments and unlock the mysteries of HarmonicRealm"
+    icon={MapPin}
+    title="Shape the World"
+    description="Use Resonant Anchoring to create your own permanent Nodes at locations that matter to you, earning sponsor bonuses."
     color="text-neon-orange"
   />
 </div>
 
-## The Lore of HarmonicRealm
+## The Core of HarmonicRealm
 
-The cosmic Lattice pulses with the infinite rhythm of Pi, creating resonance points across our world where reality grows thin and Echo Guardians emerge to test worthy Pioneers.
+The world evolves through three powerful, interconnected systems.
 
-### The Infinite Foundation
+### The Three Pillars of Exploration
 
-Long ago, mathematicians discovered that Pi's infinite, non-repeating digits weren't random—they were a cosmic frequency, a universal heartbeat that connects all things. This discovery led to the creation of the Lattice, a mystical grid overlaying our world.
+The game world is shaped by all Pioneers, from long-term collective progression to immediate, individual action.
 
-### Echo Guardians
+<CosmicTable>
+  <CosmicTableHeader>
+    <CosmicTableRow>
+      <CosmicTableCell header>System</CosmicTableCell>
+      <CosmicTableCell header>What It Is</CosmicTableCell>
+    </CosmicTableRow>
+  </CosmicTableHeader>
+  <CosmicTableBody>
+    <CosmicTableRow>
+      <CosmicTableCell>Harmonic Awakenings</CosmicTableCell>
+      <CosmicTableCell>
+        **Main Progression:** The main story spine. Reaching milestones advances
+        the phase, halves yields (creating scarcity), and unlocks new Node
+        tiers.
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Lattice Calibration</CosmicTableCell>
+      <CosmicTableCell>
+        **Community-Funded:** Pioneers collectively stake Pi to trigger events
+        that spawn new rare Nodes, rewarding collaboration between main
+        Awakenings.
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Resonant Anchoring</CosmicTableCell>
+      <CosmicTableCell>
+        **Individual Agency:** Stake Pi to permanently create your own sponsored
+        Node at a chosen location, complete with yield bonuses and bragging
+        rights.
+      </CosmicTableCell>
+    </CosmicTableRow>
+  </CosmicTableBody>
+</CosmicTable>
 
-At specific coordinates determined by Pi's digits, Echo Guardians manifest—ethereal beings that test Pioneers through harmonic challenges. Each Guardian holds unique Lore Fragments, pieces of ancient knowledge that reveal the deeper mysteries of existence.
+### Location-Based Lore
 
-### The Pioneer's Journey
-
-As a Pioneer, you possess the rare ability to resonate with the Lattice frequency. Through this resonance, you can:
-
-- **Detect Nodes** where Echo Guardians dwell
-- **Harmonize** with their frequencies to earn Shares
-- **Collect Lore Fragments** that unlock cosmic secrets
-- **Advance through Phases** as the universe evolves
-
-## Our Values
-
-The principles that guide our cosmic exploration:
-
-### Harmony
-
-Creating balance between the digital and physical realms through respectful exploration. Every interaction with the Lattice strengthens the connection between Pioneers and the cosmic frequency.
-
-### Discovery
-
-Encouraging curiosity and exploration while respecting the ancient wisdom of Echo Guardians. Each Lore Fragment collected adds to humanity's understanding of the universe.
-
-### Community
-
-Building a network of Pioneers who support each other's journey through the Lattice. Together, we unlock mysteries that no single Explorer could discover alone.
-
-### Resonance
-
-Maintaining authentic connection with the cosmic frequency through genuine exploration and harmonic interaction with Echo Guardians.
+<div className="grid md:grid-cols-2 gap-8 my-12">
+  <FeatureCard
+    icon={BookOpen}
+    title="Collaborative Storytelling"
+    description="Every Node is a canvas. Stake Pi on any Node to progressively unlock its story, from geographical facts to deep, AI-powered cosmic mythology."
+  />
+  <FeatureCard
+    icon={Award}
+    title="Become a Lore Patron"
+    description="Contributors who help unlock a Node's lore are permanently recognized as 'Lore Patrons' in its description and chronicle."
+  />
+</div>
 
 ## How We're Different
 
 <InfoAlert>
-  HarmonicRealm is the first mystical exploration game built on Pi's infinite
-  mathematical foundation, combining real-world adventure with cosmic discovery.
+  HarmonicRealm is the first geolocation adventure built on Pi's infinite
+  mathematical foundation, where progression is driven by community
+  collaboration and individual world-shaping.
 </InfoAlert>
 
 ### Traditional Gaming vs. HarmonicRealm
@@ -145,83 +157,56 @@ Maintaining authentic connection with the cosmic frequency through genuine explo
   <CosmicTableBody>
     <CosmicTableRow>
       <CosmicTableCell>Fictional worlds</CosmicTableCell>
-      <CosmicTableCell>Mystical overlay on reality</CosmicTableCell>
+      <CosmicTableCell>A mystical overlay on your reality</CosmicTableCell>
     </CosmicTableRow>
     <CosmicTableRow>
-      <CosmicTableCell>Repetitive mechanics</CosmicTableCell>
-      <CosmicTableCell>Infinite Pi-based variations</CosmicTableCell>
+      <CosmicTableCell>Static, developer-placed content</CosmicTableCell>
+      <CosmicTableCell>
+        Player-created and community-funded Nodes
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Fixed progression paths</CosmicTableCell>
+      <CosmicTableCell>
+        Emergent scarcity and dynamic, player-driven costs
+      </CosmicTableCell>
     </CosmicTableRow>
     <CosmicTableRow>
       <CosmicTableCell>Solo achievements</CosmicTableCell>
-      <CosmicTableCell>Collective cosmic discovery</CosmicTableCell>
-    </CosmicTableRow>
-    <CosmicTableRow>
-      <CosmicTableCell>Virtual rewards</CosmicTableCell>
-      <CosmicTableCell>Real Pi through harmonic resonance</CosmicTableCell>
-    </CosmicTableRow>
-    <CosmicTableRow>
-      <CosmicTableCell>Limited exploration</CosmicTableCell>
-      <CosmicTableCell>Endless Lattice mysteries</CosmicTableCell>
+      <CosmicTableCell>
+        Real rewards for both individual and collective action
+      </CosmicTableCell>
     </CosmicTableRow>
   </CosmicTableBody>
 </CosmicTable>
 
-## The Technology Behind the Realm
-
-Our platform channels cutting-edge technology to manifest the cosmic Lattice:
-
-- **Pi Lattice Integration**: Secure resonance through Pi Network's infinite foundation
-- **Harmonic Verification**: Real-time location resonance to ensure authentic exploration
-- **Echo Integration**: Transparent Share distribution through cosmic algorithms
-- **Lattice Updates**: Live session tracking and community resonance features
-- **Mobile Harmonization**: Native mobile experience with offline Lattice access
-
 ## The Harmonic Phases
 
-The universe evolves through distinct phases, each bringing new mysteries:
+The universe evolves through major narrative events called Harmonic Awakenings. Each phase introduces new challenges, greater scarcity, and deeper lore.
 
-### Phase 1: Awakening ✨
+### Genesis Phase
 
-- Core resonance mechanics established
-- Pioneer authentication through Pi Lattice
-- Basic Node discovery and Echo Guardian encounters
-- Share earning system implementation
+- **Trigger**: 100+ Pioneers join
+- **New Nodes**: Genesis Nodes with the highest yield
+- **Lore**: _The Lattice awakens to first resonance._
 
-### Phase 2: Resonance 🌊
+### Next Phase Awakening
 
-- Social features and collective harmonization
-- Leaderboards and cosmic competitions
-- Achievement system expansion through Lore Fragments
-- Community challenges and group discoveries
-
-### Phase 3: Expansion 🌌
-
-- Global Lattice network enhancement
-- Advanced harmonic mechanics and Echo Guardian varieties
-- Lore Fragment integration and cosmic storytelling
-- Cross-dimensional compatibility
-
-### Phase 4: Transcendence 🔮
-
-- Developer API for third-party Lattice integrations
-- Marketplace for harmonic equipment and Lore Fragments
-- Advanced analytics and cosmic insights
-- Governance through Pioneer consensus
+- **Trigger**: Collective resonance threshold met
+- **New Nodes**: 70% of new nodes spawned in region with high mining activity + yields halved
+- **Lore**: _The frequency deepens; echoes multiply._
 
 ## Join the Cosmic Journey
 
 <SuccessAlert>
-  Over 10,000 Pioneers have already begun their journey through HarmonicRealm,
-  earning real Pi rewards through harmonic exploration and Echo Guardian
-  encounters.
+  Thousands of Pioneers have already begun their journey, anchoring nodes and
+  contributing to the first Lattice Calibrations.
 </SuccessAlert>
 
-HarmonicRealm represents more than just a game—it's a gateway to understanding the cosmic connections that bind our universe. By combining the mystery of exploration with the power of Pi's infinite foundation, we're creating a new paradigm for how humanity interacts with both digital currency and the mystical forces that surround us.
-
-Whether you're a seasoned Pi Network Pioneer or new to cosmic exploration, HarmonicRealm offers an immersive way to earn real Pi rewards while discovering the hidden mysteries of our world.
-
-**Ready to begin your cosmic journey?** [Join thousands of Pioneers](/login) who are already exploring, resonating, and discovering through HarmonicRealm.
+HarmonicRealm is more than a game—it's a living world shaped by mathematics, community, and your own exploration.
+**Ready to begin your cosmic journey?** [Join thousands of Pioneers](/login) who are already exploring, mining, and shaping the Lattice.
 
 ---
 
-_HarmonicRealm is an independent mystical exploration platform built for the Pi Network community. We are not officially affiliated with Pi Network but are proud guardians of the Pi ecosystem._
+_HarmonicRealm is an independent platform built for the Pi Network community.
+We are not officially affiliated with Pi Network but are proud supporters of the Pi ecosystem._

@@ -53,7 +53,7 @@ export default function LoginPageClient() {
               <Link href={"/"}>{siteConfig.name}</Link>
             </h1>
             <p className="text-muted-foreground text-lg">
-              Resonate. Discover. Transcend.
+              Discover. Resonate. Awaken.
             </p>
             <p className="text-xs text-primary/70 mt-1">
               The Cosmic Lattice Awaits

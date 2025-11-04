@@ -39,7 +39,10 @@ export default function HeroSection({ lore }: HeroSectionProps) {
   const initialViewState = {
     latitude: lore.node.latitude,
     longitude: lore.node.longitude,
-    zoom: 16,
+    zoom: 12,
+    bearing: 27,
+    pitch: 45,
+    speed: 0.5,
   };
 
   useEffect(() => {
@@ -75,11 +78,11 @@ export default function HeroSection({ lore }: HeroSectionProps) {
       <Card className="h-full border-none shadow-none bg-transparent">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            {lore.node.name}: THE ETERNAL WHISPER OF {lore.city?.toUpperCase()}
+            {lore.node.name}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col md:flex-row justify-between">
-          <div className="w-full md:w-1/2 h-40">
+          <div className="w-full md:w-1/2 h-[calc(100vh-28rem)]">
             <Map
               initialViewState={initialViewState}
               style={{ width: "100%", height: "100%" }}
@@ -105,6 +108,7 @@ export default function HeroSection({ lore }: HeroSectionProps) {
             <Badge variant="secondary">Rarity: {lore.node.type.rarity}</Badge>
             <Badge variant="secondary">Type: {lore.node.type.name}</Badge>
             <Badge variant="secondary">Level: {lore.currentLevel}/5</Badge>
+            <Badge variant="secondary">City: {lore?.city || "N/A"}</Badge>
             <Badge variant="secondary">
               Pi Staked: {lore.totalPiStaked.toFixed(2)} by{" "}
               {lore.numberOfStakes}

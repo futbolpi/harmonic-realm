@@ -133,6 +133,7 @@ export function StakingForm({ phase }: StakingFormProps) {
           onGeolocationClick={handleUseCurrentLocation}
           selectedLocation={selectedLocation}
           mapRef={mapRef}
+          isLocating={isLocating}
         />
       </div>
 
@@ -180,7 +181,11 @@ export function StakingForm({ phase }: StakingFormProps) {
                         {...field}
                         value={field.value ?? 0.1}
                         onChange={(e) => {
-                          field.onChange(e.target.valueAsNumber);
+                          field.onChange(
+                            isNaN(e.target.valueAsNumber)
+                              ? ""
+                              : e.target.valueAsNumber
+                          );
                         }}
                       />
                     </FormControl>

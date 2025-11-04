@@ -10,7 +10,7 @@ import Map, {
   NavigationControl,
 } from "react-map-gl/maplibre";
 import { useTheme } from "next-themes";
-import { Crosshair } from "lucide-react";
+import { Crosshair, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { binLatLon, getBinBounds } from "@/lib/node-spawn/region-metrics";
@@ -25,6 +25,7 @@ interface LocationMapProps {
     lon: number;
   } | null;
   mapRef: RefObject<MapRef | null>;
+  isLocating: boolean;
 }
 
 export function LocationMap({
@@ -32,6 +33,7 @@ export function LocationMap({
   onGeolocationClick,
   onLocationSelect,
   selectedLocation,
+  isLocating,
 }: LocationMapProps) {
   const [viewState, setViewState] = useState({
     longitude: 0,
@@ -115,11 +117,16 @@ export function LocationMap({
           <Button
             type="button"
             onClick={onGeolocationClick}
+            disabled={isLocating}
             size="icon"
             className="h-10 w-10 rounded-full bg-primary shadow-lg hover:bg-primary/90 md:h-11 md:w-11"
             title="Use current location"
           >
-            <Crosshair className="h-5 w-5" />
+            {isLocating ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Crosshair className="h-5 w-5" />
+            )}
           </Button>
         </div>
 

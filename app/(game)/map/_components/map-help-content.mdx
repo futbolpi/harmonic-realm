@@ -1,4 +1,4 @@
-import { Navigation, Filter, List, Zap } from "lucide-react";
+import { Navigation, Filter, List, Zap, MapPlus } from "lucide-react";
 
 <div className="space-y-4">
 
@@ -13,6 +13,16 @@ mine Nodes. The map is interactve so you can zoom in/out and move.
       <strong>Find Yourself:</strong> Reveals your current position. Your
       physical location determines which Nodes you can mine. Click it to sort
       nearby Nodes.
+    </div>
+  </li>
+  <li className="flex items-start gap-3">
+    <MapPlus className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
+    <div>
+      <strong>Shape the Lattice:</strong> Ready to leave your mark? This is your
+      gateway to creation. Select this to **Anchor a permanent Node** at a
+      location you choose (Resonant Anchoring) or **contribute Pi** to spawn new
+      community Nodes (Lattice Calibration). Stake your claim and reshape the
+      cosmic map.
     </div>
   </li>
   <li className="flex items-start gap-3">

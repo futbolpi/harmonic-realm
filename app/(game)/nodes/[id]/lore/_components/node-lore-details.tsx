@@ -16,10 +16,10 @@ import { Progress } from "@/components/ui/progress";
 import { LORE_LEVELS } from "@/lib/node-lore/location-lore";
 import { cn } from "@/lib/utils";
 import { Response } from "@/components/ai-elements/response";
+import { getRarityInfo } from "@/app/(game)/map/utils";
 import { getNodeLore } from "../services";
 import { LoreStakingDialog } from "./lore-staking-dialog";
 import { LoreStakesTable } from "./lore-stakes-table";
-import { getRarityInfo } from "@/app/(game)/map/utils";
 
 interface NodeLoreDetailsProps {
   nodeId: string;

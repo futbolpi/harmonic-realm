@@ -106,11 +106,11 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
           {/* Location Button */}
           <LocationButton />
 
-          {/* Map Tour Button */}
-          <MapHelpModal />
-
           {/* Awakening Modal */}
           <AwakeningPathwaysModal />
+
+          {/* Map Tour Button */}
+          <MapHelpModal />
         </div>
 
         {/* Node Count Badge */}

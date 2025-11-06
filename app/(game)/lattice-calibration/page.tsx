@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { PhaseOverview } from "./_components/phase-overview";
 import { ContributionsTable } from "./_components/contributions-table";
 import { StakingForm } from "./_components/staking-form";
+import { CalibrationHelpModal } from "./_components/calibration-help-modal";
 
 /**
  * Lattice Calibration Page
@@ -43,7 +44,10 @@ export default async function CalibrationPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            Lattice Calibration
+            Lattice Calibration{" "}
+            <span>
+              <CalibrationHelpModal />
+            </span>
           </h1>
           <p className="text-muted-foreground">
             Contribute Pi to shape the harmonic lattice and earn rewards

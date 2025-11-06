@@ -4,6 +4,7 @@ import { calculateGlobalAnchorIndex } from "@/lib/api-helpers/server/anchors/uti
 import { calculateAnchorCost } from "@/lib/anchors/utils";
 import AnchoringForm from "./_components/anchoring-form";
 import CostBreakdown from "./_components/cost-breakdown";
+import { AnchorHelpModal } from "./_components/anchor-help-modal";
 
 export default async function ResonantAnchorsPage() {
   // Fetch current active game phase
@@ -41,7 +42,10 @@ export default async function ResonantAnchorsPage() {
         {/* Header */}
         <div className="mb-8 space-y-2">
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">
-            Resonant Anchoring
+            Resonant Anchoring{" "}
+            <span>
+              <AnchorHelpModal />
+            </span>
           </h1>
           <p className="text-sm text-muted-foreground md:text-base">
             Awaken individual nodes at your chosen coordinates. Watch the cost

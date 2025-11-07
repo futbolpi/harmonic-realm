@@ -52,16 +52,19 @@ export const columns: ColumnDef<Pioneer>[] = [
       return (
         <Link
           href={`/${pioneer.id}/echo-journal`}
-          className="flex items-center justify-center space-x-3 hover:text-primary transition-colors group"
+          className="w-full flex items-center justify-start space-x-3 hover:text-primary transition-colors group"
           prefetch={false}
         >
-          <UserAvatar size={32} userId={pioneer.username} />
-          <div className="min-w-0">
-            <div className="font-medium truncate group-hover:text-primary">
-              @
-              {pioneer.username.length < 10
-                ? pioneer.username
-                : `${pioneer.username.slice(0, 10)}..`}
+          <div className="flex-shrink-0">
+            <UserAvatar size={32} userId={pioneer.username} />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div
+              className="font-medium truncate group-hover:text-primary text-left"
+              title={pioneer.username}
+            >
+              {pioneer.username}
             </div>
           </div>
         </Link>

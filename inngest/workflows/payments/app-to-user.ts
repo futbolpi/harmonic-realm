@@ -92,7 +92,7 @@ export const appToUserPayment = inngest.createFunction(
 
         // just complete transaction
       } else {
-        await step.run("update-db-incomplete-payment", async () => {
+        await step.run("update-db-incomplete-to-complete", async () => {
           return updateIncomplete({
             modelId: incompletePayment.metadata.modelId,
             type,

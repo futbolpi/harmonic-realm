@@ -70,7 +70,7 @@ export const updateTxId = async ({
   switch (type) {
     case "SHARE_REDEMPTION":
       await prisma.shareRedemption.update({
-        where: { status: "PROCESSING", id: modelId },
+        where: { status: { in: ["PENDING", "PROCESSING"] }, id: modelId },
         data: { piTxId, status: "COMPLETED" },
         select: { piTxId: true },
       });
@@ -83,7 +83,7 @@ export const updateTxId = async ({
           status: "COMPLETED",
         },
         select: { piTxId: true },
-        where: { id: modelId, status: "PROCESSING" },
+        where: { id: modelId, status: { in: ["PENDING", "PROCESSING"] } },
       });
       return true;
 

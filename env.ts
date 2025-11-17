@@ -31,6 +31,10 @@ export const env = createEnv({
 
     // LOCATIONIQ
     LOCATIONIQ_API_KEY: z.string().min(1),
+
+    // TOKENS
+    DISTRIBUTOR_WALLET_SECRET: z.string().optional(),
+    ISSUING_WALLET_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.url(),
@@ -42,6 +46,10 @@ export const env = createEnv({
 
     // MAPTILER
     NEXT_PUBLIC_MAPTILER_TOKEN: z.string().min(1),
+
+    // TOKENS
+    NEXT_PUBLIC_DISTRIBUTOR_WALLET_ADDRESS: z.string().optional(),
+    NEXT_PUBLIC_ISSUING_WALLET_ADDRESS: z.string().optional(),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -74,5 +82,13 @@ export const env = createEnv({
 
     // LOCATIONIQ
     LOCATIONIQ_API_KEY: process.env.LOCATIONIQ_API_KEY,
+
+    // TOKENS
+    NEXT_PUBLIC_DISTRIBUTOR_WALLET_ADDRESS:
+      process.env.NEXT_PUBLIC_DISTRIBUTOR_WALLET_ADDRESS,
+    DISTRIBUTOR_WALLET_SECRET: process.env.DISTRIBUTOR_WALLET_SECRET,
+    NEXT_PUBLIC_ISSUING_WALLET_ADDRESS:
+      process.env.NEXT_PUBLIC_ISSUING_WALLET_ADDRESS,
+    ISSUING_WALLET_SECRET: process.env.ISSUING_WALLET_SECRET,
   },
 });

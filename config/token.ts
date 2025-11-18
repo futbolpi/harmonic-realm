@@ -1,6 +1,6 @@
 export const TOKEN_NAME = "Harmonic Resonance";
 
-export const TOKEN_TICKER = "HRS";
+export const TOKEN_TICKER = "RESONANCE";
 
 export const TOKEN_TOTAL_SUPPLY = 314159265;
 

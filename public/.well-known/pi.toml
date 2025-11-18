@@ -1,9 +1,9 @@
 [[CURRENCIES]]
-code="HRS"
+code="RESONANCE"
 issuer="GAZBOHQQE4JHWCMHL5GI6QI6LE3MUITBGE5WORNB7FH2B54JBAFF52LY"
-display_decimals=2
+display_decimals=8
 name="Harmonic Resonance"
-desc="HRS is the primary reward and utility token for engagement and progression. Pioneers earn HRS by resonating with geo-anchored Nodes. HRS is spent on enhancing personal experience, status, and influence."
-conditions="The total supply is fixed at 314,159,265 HRS, tied thematically to the digits of Pi, reinforcing the core lore of the game. HRS emission is subject to programmatic scarcity via the Harmonic Awakening halving schedule."
-image="https://www.harmonicrealm.app/hrs_icon.png"
+desc="Harmonic Resonance (RESONANCE) is the primary reward and utility token for engagement and progression. Pioneers earn RESONANCE by resonating with geo-anchored Nodes. RESONANCE is spent on enhancing personal experience, status, and influence."
+conditions="The total supply is fixed at 314,159,265 RESONANCE, tied thematically to the digits of Pi, reinforcing the core lore of the game. RESONANCE emission is subject to programmatic scarcity via the Harmonic Awakening halving schedule."
+image="https://www.harmonicrealm.app/resonance_icon.png"
 fixed_number=314159265

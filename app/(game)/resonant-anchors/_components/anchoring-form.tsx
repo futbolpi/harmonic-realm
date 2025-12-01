@@ -141,7 +141,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
     selectedDiscountLevels > 0 && finalCost.lessThan(FLOOR_PRICE);
 
   return (
-    <div className="flex h-[calc(100vh-120px)] w-full flex-col gap-0 md:flex-row md:gap-4 md:h-screen bg-background">
+    <div className="flex h-[calc(100vh-16rem)] w-full flex-col gap-0 md:flex-row md:gap-4 md:h-screen bg-background">
       {/* Map Section - Full screen on mobile, 60% on desktop */}
       <div className="relative flex-1 md:rounded-lg md:border md:border-border md:overflow-hidden">
         <LocationMap
@@ -241,7 +241,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
 
       {/* Mobile Bottom Sheet */}
       {selectedLocation && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border">
+        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 border-t border-border">
           <button
             onClick={() => setIsBottomSheetOpen(!isBottomSheetOpen)}
             className="w-full bg-card/95 backdrop-blur-sm p-3 flex items-center justify-center gap-2 hover:bg-card transition-colors"

@@ -10,6 +10,11 @@ import {
 import { calculateAnchorCost } from "@/lib/anchors/utils";
 import { calculateGlobalAnchorIndex } from "@/lib/api-helpers/server/anchors/utils";
 import { isOnLand, loadLandGeoJson } from "@/lib/node-spawn/node-generator";
+import { validateDiscount } from "@/lib/anchors/discount-validator";
+import {
+  calculateDiscountedCost,
+  calculatePointsBurned,
+} from "@/lib/anchors/discount-calculator";
 
 /**
  * ACTION: Initiate Resonance Anchor Staking (creates payment intent)
@@ -24,7 +29,7 @@ export async function initiateAnchorStaking(
       return { success: false, error: "Invalid Request" };
     }
 
-    const { accessToken, latitude, longitude } = data;
+    const { accessToken, latitude, longitude, discountLevels } = data;
 
     // Verify user authentication
     const user = await verifyTokenAndGetUser(accessToken);
@@ -63,14 +68,55 @@ export async function initiateAnchorStaking(
       globalAnchorIndex
     );
 
+    let finalCost = piCost;
+    let pointsBurned = 0;
+
+    if (discountLevels > 0) {
+      // Get user data for discount validation
+      const userWithDiscount = await prisma.user.findUnique({
+        where: { id: user.id }, // Replace with actual auth
+        select: { noOfReferrals: true, resonanceFidelity: true },
+      });
+
+      if (!userWithDiscount) {
+        return { success: false, error: "User not found" };
+      }
+
+      // Validate discount is applicable
+      const discountValidation = validateDiscount(
+        piCost,
+        discountLevels,
+        userWithDiscount.noOfReferrals,
+        userWithDiscount.resonanceFidelity
+      );
+
+      if (!discountValidation.valid) {
+        return { success: false, error: discountValidation.error };
+      }
+
+      // Calculate discounted cost
+      const discountResult = calculateDiscountedCost(piCost, discountLevels);
+      if (!discountResult) {
+        return { success: false, error: "Discount cannot be applied" };
+      }
+
+      finalCost = discountResult.cost;
+      pointsBurned = calculatePointsBurned(
+        userWithDiscount.resonanceFidelity,
+        discountLevels
+      );
+    }
+
     // Create resonant anchor record
     const resonantAnchor = await prisma.resonantAnchor.create({
       data: {
-        userId: user.piId, // Replace with actual user from auth
+        userId: user.piId,
         phaseId: phase.id,
         locationLat: latitude,
         locationLon: longitude,
-        piCost,
+        piCost: finalCost,
+        discountLevels,
+        referralPointsBurned: pointsBurned,
         paymentStatus: "PENDING",
       },
       select: { id: true },

@@ -12,6 +12,9 @@ model ResonantAnchor {
     paymentId       String? // Pi Network payment ID
     piTransactionId String?
 
+    discountLevels       Int @default(0) // Number of discount levels applied
+    referralPointsBurned Int @default(0) // Points used for this discount
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

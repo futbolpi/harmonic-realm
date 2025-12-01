@@ -41,6 +41,7 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
       level: true,
       sharePoints: true,
       noOfReferrals: true,
+      resonanceFidelity: true,
       totalEarned: true,
       username: true,
       achievements: {

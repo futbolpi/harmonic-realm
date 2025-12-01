@@ -44,6 +44,7 @@ export async function completeAnchorPayment({
         locationLon: true,
         phase: { select: { phaseNumber: true } },
         userId: true,
+        referralPointsBurned: true,
       },
     });
 
@@ -130,6 +131,18 @@ export async function completeAnchorPayment({
         },
         select: { totalNodes: true },
       });
+
+      // burns referral points
+
+      if (anchor.referralPointsBurned > 0) {
+        await prisma.user.update({
+          where: { piId: anchor.userId },
+          data: {
+            resonanceFidelity: { increment: 1 },
+            noOfReferrals: { decrement: anchor.referralPointsBurned },
+          },
+        });
+      }
     });
 
     await sendMockPayment(anchor.userId);

@@ -13,6 +13,7 @@ export const InitiateNodeAnchoringSchema = z.object({
     .min(-180, "Longitude must be between -180 and 180")
     .max(180, "Longitude must be between -180 and 180"),
   accessToken: z.string().min(1, "Access token is required"),
+  discountLevels: z.number().int().min(0),
 });
 
 export type InitiateNodeAnchoringParams = z.infer<

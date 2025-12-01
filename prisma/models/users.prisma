@@ -10,9 +10,12 @@ model User {
     xp          Int   @default(0)
 
     /// username of user's referrer
-    referrer      String?
+    referrer          String?
     /// no of users referred
-    noOfReferrals Int     @default(0)
+    noOfReferrals     Int     @default(0)
+    /// Number of times the user has used the resonance discount
+    /// Tracks how many discounts have been consumed (geometric cost progression)
+    resonanceFidelity Int     @default(0)
 
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt

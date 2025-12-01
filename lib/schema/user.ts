@@ -39,6 +39,7 @@ export const UserProfileSchema = z.object({
   level: z.number(),
   xp: z.number(),
   noOfReferrals: z.number(),
+  resonanceFidelity: z.number(),
   _count: z.object({ sessions: z.number(), achievements: z.number() }),
   achievements: z.array(UserProfileAchievementSchema),
   sessions: z.array(UserProfileSessionSchema),

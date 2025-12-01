@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Zap, AlertCircle } from "lucide-react";
+import { Zap, AlertCircle, ChevronUp, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import type { MapRef } from "react-map-gl/maplibre";
 import Decimal from "decimal.js";
@@ -27,15 +27,13 @@ import {
   calculatePointsBurned,
 } from "@/lib/anchors/discount-calculator";
 import { useProfile } from "@/hooks/queries/use-profile";
+import { FLOOR_PRICE } from "@/config/site";
+import { CostBreakdownCard } from "./cost-breakdown-card";
 
 interface AnchoringFormProps {
   anchorCost: string;
 }
 
-/**
- * Enhanced Anchoring Form with Discount System
- * Shows cost breakdown, discount showcase, and confirmation modal
- */
 export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
   const [isLoading, startTransition] = useTransition();
   const [selectedLat, setSelectedLat] = useState<number | null>(null);
@@ -43,6 +41,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [selectedDiscountLevels, setSelectedDiscountLevels] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const router = useRouter();
@@ -138,9 +137,13 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
       ? { lat: selectedLat, lon: selectedLon }
       : null;
 
+  const isBelowFloor =
+    selectedDiscountLevels > 0 && finalCost.lessThan(FLOOR_PRICE);
+
   return (
-    <div className="flex h-[calc(100vh-16rem)] md:h-screen w-full flex-col bg-background md:rounded-lg md:border md:border-border">
-      <div className="relative flex-1 md:min-h-[500px]">
+    <div className="flex h-[calc(100vh-120px)] w-full flex-col gap-0 md:flex-row md:gap-4 md:h-screen bg-background">
+      {/* Map Section - Full screen on mobile, 60% on desktop */}
+      <div className="relative flex-1 md:rounded-lg md:border md:border-border md:overflow-hidden">
         <LocationMap
           onLocationSelect={handleMapLocationSelect}
           onGeolocationClick={handleUseCurrentLocation}
@@ -149,36 +152,18 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
         />
       </div>
 
-      {/* Bottom Panel with Cost, Discount, and Submission */}
-      <div className="space-y-4 border-t border-border bg-card/50 px-4 py-4 backdrop-blur-sm md:space-y-4 md:border-t-0 md:bg-card md:p-6 md:max-h-[calc(100vh-500px)] md:overflow-y-auto">
-        {selectedLat !== null && selectedLon !== null && (
+      {/* Desktop Side Panel - Hidden on mobile */}
+      <div className="hidden md:flex md:w-[400px] md:flex-col md:gap-4 md:overflow-y-auto">
+        {selectedLocation && (
           <>
-            {/* Cost Breakdown */}
-            <div className="rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-                    <Zap className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Anchor Cost
-                    </p>
-                    <p className="text-sm font-semibold text-foreground">
-                      {anchorCost} π
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-muted-foreground">Coordinates</p>
-                  <p className="font-mono text-xs font-medium text-primary">
-                    {selectedLat.toFixed(4)}, {selectedLon.toFixed(4)}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <CostBreakdownCard
+              baseCost={baseCostDecimal}
+              finalCost={finalCost}
+              selectedLat={selectedLat}
+              selectedLon={selectedLon}
+              selectedDiscountLevels={selectedDiscountLevels}
+            />
 
-            {/* Discount Showcase */}
             {userReferralPoints > 0 && (
               <DiscountShowcase
                 baseCost={baseCostDecimal}
@@ -189,8 +174,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
               />
             )}
 
-            {/* Warning: Floor Price */}
-            {selectedDiscountLevels > 0 && (
+            {isBelowFloor && (
               <Alert
                 variant="destructive"
                 className="bg-amber-500/10 border-amber-500/50"
@@ -204,13 +188,11 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
               </Alert>
             )}
 
-            {/* Submission Button */}
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-3"
               >
-                {/* Cost Summary Before Submit */}
                 {selectedDiscountLevels > 0 && (
                   <div className="rounded-lg bg-muted/50 p-3 border-l-4 border-primary">
                     <div className="flex items-center justify-between">
@@ -247,15 +229,112 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
           </>
         )}
 
-        {/* Empty State */}
-        {selectedLat === null && (
-          <div className="text-center space-y-2 py-4">
-            <p className="text-sm text-muted-foreground">
-              Click on the map or use your location to choose anchor coordinates
+        {!selectedLocation && (
+          <div className="text-center space-y-2 py-8 text-muted-foreground">
+            <p className="text-sm">
+              Click on the map or use the crosshair button to choose anchor
+              coordinates
             </p>
           </div>
         )}
       </div>
+
+      {/* Mobile Bottom Sheet */}
+      {selectedLocation && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border">
+          <button
+            onClick={() => setIsBottomSheetOpen(!isBottomSheetOpen)}
+            className="w-full bg-card/95 backdrop-blur-sm p-3 flex items-center justify-center gap-2 hover:bg-card transition-colors"
+          >
+            {isBottomSheetOpen ? (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                <span className="text-sm font-medium">Close</span>
+              </>
+            ) : (
+              <>
+                <ChevronUp className="h-4 w-4" />
+                <span className="text-sm font-medium">Anchor Details</span>
+              </>
+            )}
+          </button>
+
+          {isBottomSheetOpen && (
+            <div className="bg-card/95 backdrop-blur-sm max-h-[70vh] overflow-y-auto space-y-4 px-4 py-4">
+              <CostBreakdownCard
+                baseCost={baseCostDecimal}
+                finalCost={finalCost}
+                selectedLat={selectedLat}
+                selectedLon={selectedLon}
+                selectedDiscountLevels={selectedDiscountLevels}
+              />
+
+              {userReferralPoints > 0 && (
+                <DiscountShowcase
+                  baseCost={baseCostDecimal}
+                  userReferralPoints={userReferralPoints}
+                  userFidelity={userFidelity}
+                  onDiscountLevelsChange={setSelectedDiscountLevels}
+                  selectedDiscountLevels={selectedDiscountLevels}
+                />
+              )}
+
+              {isBelowFloor && (
+                <Alert
+                  variant="destructive"
+                  className="bg-amber-500/10 border-amber-500/50"
+                >
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-xs text-amber-700 dark:text-amber-400">
+                    Cannot apply more discounts—cost would fall below the
+                    resonance floor (0.314 π). This is the limit of the
+                    Lattice&apos;s gift.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-3"
+                >
+                  {selectedDiscountLevels > 0 && (
+                    <div className="rounded-lg bg-muted/50 p-3 border-l-4 border-primary">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Final Cost</span>
+                        <span className="text-lg font-bold text-primary">
+                          {finalCost.toString()} π
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
+                    type="button"
+                    onClick={() => setShowConfirmation(true)}
+                    disabled={
+                      isPending || selectedLat === null || selectedLon === null
+                    }
+                    className="w-full game-button"
+                  >
+                    {isPending ? (
+                      <span className="flex items-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                        Anchoring...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Zap className="h-4 w-4" />
+                        Initiate Resonant Anchor
+                      </span>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       <ConfirmationModal

@@ -241,7 +241,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
 
       {/* Mobile Bottom Sheet */}
       {selectedLocation && (
-        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 border-t border-border">
+        <div className="md:hidden fixed bottom-20 left-4 right-4 z-40 border-t border-border">
           <button
             onClick={() => setIsBottomSheetOpen(!isBottomSheetOpen)}
             className="w-full bg-card/95 backdrop-blur-sm p-3 flex items-center justify-center gap-2 hover:bg-card transition-colors"

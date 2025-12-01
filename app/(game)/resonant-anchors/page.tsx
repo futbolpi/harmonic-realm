@@ -35,7 +35,7 @@ export default async function ResonantAnchorsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-background/80">
+    <main className="bg-gradient-to-b from-background to-background/80">
       <div className="container mx-auto max-w-6xl px-4 py-6 md:py-12">
         {/* Header */}
         <div className="mb-8 space-y-2">

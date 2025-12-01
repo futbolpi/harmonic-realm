@@ -19,15 +19,15 @@ import {
 } from "@/lib/schema/anchor";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import { initiateAnchorStaking } from "@/actions/anchor/initiate-staking";
-import LocationMap from "./location-map";
-import DiscountShowcase from "./discount-showcase";
-import { ConfirmationModal } from "./confirmation-modal";
 import {
   calculateDiscountedCost,
   calculatePointsBurned,
 } from "@/lib/anchors/discount-calculator";
 import { useProfile } from "@/hooks/queries/use-profile";
 import { FLOOR_PRICE } from "@/config/site";
+import LocationMap from "./location-map";
+import DiscountShowcase from "./discount-showcase";
+import { ConfirmationModal } from "./confirmation-modal";
 import { CostBreakdownCard } from "./cost-breakdown-card";
 
 interface AnchoringFormProps {

@@ -24,7 +24,6 @@ import {
   calculatePointsBurned,
 } from "@/lib/anchors/discount-calculator";
 import { useProfile } from "@/hooks/queries/use-profile";
-import { FLOOR_PRICE } from "@/config/site";
 import LocationMap from "./location-map";
 import DiscountShowcase from "./discount-showcase";
 import { ConfirmationModal } from "./confirmation-modal";
@@ -138,7 +137,8 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
       : null;
 
   const isBelowFloor =
-    selectedDiscountLevels > 0 && finalCost.lessThan(FLOOR_PRICE);
+    selectedDiscountLevels > 0 &&
+    calculateDiscountedCost(baseCostDecimal, selectedDiscountLevels) === null;
 
   return (
     <div className="flex h-[calc(100vh-16rem)] w-full flex-col gap-0 md:flex-row md:gap-4 md:h-screen bg-background">
@@ -313,7 +313,10 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
                     type="button"
                     onClick={() => setShowConfirmation(true)}
                     disabled={
-                      isPending || selectedLat === null || selectedLon === null
+                      isPending ||
+                      selectedLat === null ||
+                      selectedLon === null ||
+                      isBelowFloor
                     }
                     className="w-full game-button"
                   >

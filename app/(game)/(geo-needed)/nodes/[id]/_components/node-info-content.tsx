@@ -39,7 +39,7 @@ export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
           variant="outline"
           className="text-neon-green border-neon-green/50"
         >
-          Sponsored by {node.sponsor}
+          SPONSORED
         </Badge>
       )}
 
@@ -47,7 +47,7 @@ export const NodeInfoContent = ({ node }: NodeInfoContentProps) => {
         <div className="text-center p-3 rounded-lg bg-muted/20">
           <Zap className="h-5 w-5 text-neon-green mx-auto mb-1" />
           <div className="text-lg font-bold text-neon-green">
-            {node.type.baseYieldPerMinute.toFixed(1)}π
+            {node.type.baseYieldPerMinute.toFixed(1)}⚡︎
           </div>
           <div className="text-xs text-muted-foreground">Per Minute</div>
         </div>

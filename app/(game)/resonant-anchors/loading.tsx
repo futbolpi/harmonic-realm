@@ -1,34 +1,53 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ResonantAnchorsLoading() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      <div className="container mx-auto max-w-4xl px-4 py-6 md:py-12">
-        {/* Header */}
-        <div className="mb-8 space-y-2">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-4 w-full max-w-md" />
-        </div>
+    <main className="min-h-screen w-full bg-background flex flex-col">
+      {/* Header */}
+      <div className="px-4 py-4 md:px-6 md:py-6 border-b border-border">
+        <Skeleton className="h-8 w-48 mb-2" />
+        <Skeleton className="h-4 w-full max-w-md" />
+      </div>
 
-        {/* Tabs skeleton */}
-        <div className="flex gap-2 mb-6">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-10 w-32" />
-        </div>
+      {/* Map container - takes up most of screen */}
+      <div className="flex-1 relative w-full">
+        <Skeleton className="w-full h-full min-h-96 md:min-h-[500px] lg:min-h-[600px] rounded-none" />
+      </div>
 
-        {/* Content area */}
-        <Card className="min-h-96">
-          <CardHeader>
-            <Skeleton className="h-6 w-48 mb-2" />
-            <Skeleton className="h-4 w-full max-w-lg" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
+      {/* Bottom panel with form - fixed positioning on mobile */}
+      <div className="border-t border-border bg-background/95 backdrop-blur-sm w-full">
+        <div className="px-4 py-6 md:px-6 space-y-6">
+          {/* Cost breakdown section */}
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-32" />
+            <div className="grid grid-cols-3 gap-3">
+              <Skeleton className="h-16 w-full rounded-lg" />
+              <Skeleton className="h-16 w-full rounded-lg" />
+              <Skeleton className="h-16 w-full rounded-lg" />
+            </div>
+          </div>
+
+          {/* Discount showcase section */}
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+          </div>
+
+          {/* Form fields */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full rounded-md" />
+            </div>
+          </div>
+
+          {/* Submit button */}
+          <Skeleton className="h-11 w-full rounded-md" />
+        </div>
       </div>
     </main>
   );

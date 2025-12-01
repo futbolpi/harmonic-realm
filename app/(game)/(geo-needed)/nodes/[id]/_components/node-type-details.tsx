@@ -33,7 +33,7 @@ const NodeTypeDetails = ({
         <div className="flex justify-between items-center">
           <span className="text-xs text-muted-foreground">Base Rate:</span>
           <span className="text-xs font-medium">
-            {nodeType.baseYieldPerMinute.toFixed(1)}/min
+            {nodeType.baseYieldPerMinute.toFixed(1)}⚡︎/min
           </span>
         </div>
         <div className="flex justify-between items-center">
@@ -42,7 +42,7 @@ const NodeTypeDetails = ({
             {Math.floor(
               nodeType.baseYieldPerMinute * (1 + masteryBonusPercent / 100)
             )}
-            /min
+            ⚡︎/min
           </span>
         </div>
       </CardContent>

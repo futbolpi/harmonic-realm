@@ -2,7 +2,6 @@ import React from "react";
 import { Video } from "lucide-react";
 import ReactPlayer from "react-player";
 
-import { Button } from "../ui/button";
 import {
   DialogTrigger,
   DialogContent,
@@ -10,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "../ui/button";
 
 interface VideoModalProps {
   src: string;

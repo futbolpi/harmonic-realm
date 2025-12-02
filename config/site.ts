@@ -55,4 +55,4 @@ export const GENESIS_THRESHOLD = siteConfig.network === "testnet" ? 1 : 100;
 
 export const FLOOR_PRICE = new Decimal("0.314");
 
-export const BASE_XP = 4;
+export const BASE_XP = 10;

@@ -1,6 +1,8 @@
 import prisma from "@/lib/prisma";
 import { calculateAnchorCost } from "@/lib/anchors/utils";
 import { calculateGlobalAnchorIndex } from "@/lib/api-helpers/server/anchors/utils";
+import VideoModal from "@/components/shared/video-modal";
+import { videoLinks } from "@/config/site";
 import AnchoringForm from "./_components/anchoring-form";
 import { AnchorHelpModal } from "./_components/anchor-help-modal";
 
@@ -41,8 +43,12 @@ export default async function ResonantAnchorsPage() {
         <div className="mb-8 space-y-2">
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">
             Resonant Anchoring{" "}
-            <span>
+            <span className="gap-2">
               <AnchorHelpModal />
+              <VideoModal
+                src={videoLinks.resonantHelper.url}
+                title={videoLinks.resonantHelper.title}
+              />
             </span>
           </h1>
           <p className="text-sm text-muted-foreground md:text-base">

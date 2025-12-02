@@ -1,7 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-
+import VideoModal from "@/components/shared/video-modal";
+import { videoLinks } from "@/config/site";
 import { PhaseOverview } from "./_components/phase-overview";
 import { ContributionsTable } from "./_components/contributions-table";
 import { StakingForm } from "./_components/staking-form";
@@ -45,8 +46,12 @@ export default async function CalibrationPage() {
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             Lattice Calibration{" "}
-            <span>
+            <span className="gap-2">
               <CalibrationHelpModal />
+              <VideoModal
+                src={videoLinks.calibrationHelper.url}
+                title={videoLinks.calibrationHelper.title}
+              />
             </span>
           </h1>
           <p className="text-muted-foreground">

@@ -56,3 +56,19 @@ export const GENESIS_THRESHOLD = siteConfig.network === "testnet" ? 1 : 100;
 export const FLOOR_PRICE = new Decimal("0.314");
 
 export const BASE_XP = 10;
+
+export const videoLinks = {
+  hero: {
+    url: "https://youtu.be/PgVQgTbue-g",
+    title: "HarmonicRealm: A Geolocation Adventure Bound to Pi",
+  },
+  resonantHelper: {
+    url: "https://youtu.be/_6zlXWZ_cO0",
+    title:
+      "Resonant Anchoring: Claim Your Territory & Get the 50% Yield Bonus!",
+  },
+  calibrationHelper: {
+    url: "https://youtu.be/qZlZkLQ2qFo",
+    title: "Lattice Calibration: Power the Grid with Pi",
+  },
+};

@@ -2,6 +2,7 @@
 // HarmonicRealm Mastery Progression System
 // ========================================
 
+import { formatMastery } from ".";
 import { defaultSessionMastery } from "../api-helpers/client/masteries";
 import {
   NodeType,
@@ -270,7 +271,8 @@ async function updateMasteryProgression(
   const nodeType = existingMastery.nodeType;
 
   // Calculate new bonus percentage
-  const newBonusPercent = calculateMasteryBonus(newLevel, nodeType.rarity);
+  const newBonusPercentFrac = calculateMasteryBonus(newLevel, nodeType.rarity);
+  const newBonusPercent = newBonusPercentFrac / 100;
 
   // Determine if new lore should be unlocked
   let newLoreUnlocked: string | null = null;
@@ -440,7 +442,7 @@ async function getAllUserMasteriesInfo(
   if (userMasteries.length > 0) {
     const totalLevels = userMasteries.reduce((sum, m) => sum + m.level, 0);
     const totalBonuses = userMasteries.reduce(
-      (sum, m) => sum + m.bonusPercent,
+      (sum, m) => sum + formatMastery(m.bonusPercent),
       0
     );
 

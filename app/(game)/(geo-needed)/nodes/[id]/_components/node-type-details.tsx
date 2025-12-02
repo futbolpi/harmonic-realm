@@ -2,6 +2,7 @@ import { getRarityInfo } from "@/app/(game)/map/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import { formatMastery } from "@/lib/utils";
 
 type NodeTypeDetailsProps = {
   nodeType: {
@@ -40,7 +41,8 @@ const NodeTypeDetails = ({
           <span className="text-xs text-muted-foreground">Enhanced:</span>
           <span className="text-xs font-medium text-chart-2">
             {Math.floor(
-              nodeType.baseYieldPerMinute * (1 + masteryBonusPercent / 100)
+              nodeType.baseYieldPerMinute *
+                (1 + formatMastery(masteryBonusPercent) / 100)
             )}
             ⚡︎/min
           </span>

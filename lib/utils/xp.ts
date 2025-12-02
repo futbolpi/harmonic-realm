@@ -1,3 +1,5 @@
+import { BASE_XP } from "@/config/site";
+
 // Iterative Fibonacci to avoid recursion limits
 export function fib(n: number): number {
   let a = 0,
@@ -13,7 +15,7 @@ export function fib(n: number): number {
  * Uses fib(level) * baseXP.
  * Level 1 → fib(1)=1×baseXP, Level 2 → fib(2)=1×baseXP, Level 3 → fib(3)=2×baseXP…
  */
-export function xpForLevel(level: number, baseXP: number = 100): number {
+export function xpForLevel(level: number, baseXP: number = BASE_XP): number {
   return fib(level) * baseXP;
 }
 
@@ -23,7 +25,7 @@ export function xpForLevel(level: number, baseXP: number = 100): number {
  */
 export function calculateLevelFromXp(
   totalXP: number,
-  baseXP: number = 100,
+  baseXP: number = BASE_XP,
   maxLevel: number = 100
 ): number {
   let level = 1;

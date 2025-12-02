@@ -3,6 +3,7 @@ import { Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { TierName } from "@/lib/schema/mastery";
+import { formatMastery } from "@/lib/utils";
 
 type MasteryOverviewCardProps = {
   mastery: { level: number; bonusPercent: number; sessionsCompleted: number };
@@ -31,7 +32,7 @@ const MasteryOverviewCard = ({
           </div>
           <div>
             <div className="text-xl font-bold text-chart-2">
-              {mastery.bonusPercent}%
+              {formatMastery(mastery.bonusPercent)}%
             </div>
             <div className="text-xs text-muted-foreground">Bonus</div>
           </div>

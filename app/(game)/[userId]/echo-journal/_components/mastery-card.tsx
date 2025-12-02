@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { UserNodeMastery } from "@/lib/generated/prisma/client";
 import { getRarityInfo } from "@/app/(game)/map/utils";
+import { formatMastery } from "@/lib/utils";
 import DetailedViewDrawer from "./detailed-view-drawer";
 
 interface MasteryProgressInfo {
@@ -108,7 +109,9 @@ export function MasteryCard({ masteryInfo, animationDelay }: MasteryCardProps) {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="text-center p-2 rounded bg-foreground/20">
-            <div className="font-bold text-foreground">{mastery.bonusPercent}%</div>
+            <div className="font-bold text-foreground">
+              {formatMastery(mastery.bonusPercent)}%
+            </div>
             <div className="text-xs text-muted-foreground">Yield Bonus</div>
           </div>
           <div className="text-center p-2 rounded bg-foreground/20">

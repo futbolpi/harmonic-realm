@@ -83,3 +83,7 @@ export function truncateText(str: string, maxLength: number, ending = "...") {
     return str;
   }
 }
+
+export function formatMastery(masteryPct: number) {
+  return masteryPct > 20 ? masteryPct : masteryPct * 100;
+}

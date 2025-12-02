@@ -1,4 +1,4 @@
-import React from "react";
+import type { ReactNode } from "react";
 import { Video } from "lucide-react";
 import ReactPlayer from "react-player";
 
@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 interface VideoModalProps {
   src: string;
   title: string;
-  trigger?: React.ReactNode;
+  trigger?: ReactNode;
 }
 
 const VideoModal = ({ src, trigger, title }: VideoModalProps) => {

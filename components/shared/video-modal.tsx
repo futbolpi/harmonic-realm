@@ -30,7 +30,7 @@ const VideoModal = ({ src, trigger, title }: VideoModalProps) => {
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="px-4 py-4 max-h-[80vh] overflow-y-auto">
+        <div className="py-1 max-h-[80vh] overflow-y-auto">
           <ReactPlayer
             style={{ width: "100%", height: "auto", aspectRatio: "16/9" }}
             src={src}

@@ -8,7 +8,6 @@ import { createSerializer } from "nuqs";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import { authSearchParamsParsers } from "@/components/shared/auth/search-params";
 import { GameNavigation } from "./_components/navigation";
-import { TutorialTrigger } from "./_components/tutorial-trigger";
 
 export default function GameLayout({
   children,
@@ -48,7 +47,6 @@ export default function GameLayout({
     <div className="min-h-screen bg-gradient-to-br from-game-dark via-game-accent to-game-highlight">
       <GameNavigation />
       <main className="pb-20">{children}</main>
-      <TutorialTrigger />
     </div>
   );
 }

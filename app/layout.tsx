@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/shared/auth/auth-context";
 import TanstackQueryProvider from "@/components/shared/tanstack-query/provider";
 import { PiProvider } from "@/components/shared/pi/pi-provider";
-import NextStepProvider from "@/components/shared/next-step/next-step-provider";
 import {
   defaultMetadata,
   ogMetadata,
@@ -70,9 +69,7 @@ export default function RootLayout({
           <TanstackQueryProvider>
             <div vaul-drawer-wrapper="" className="bg-background">
               <NuqsAdapter>
-                <AuthProvider>
-                  <NextStepProvider>{children}</NextStepProvider>
-                </AuthProvider>
+                <AuthProvider>{children}</AuthProvider>
               </NuqsAdapter>
             </div>
           </TanstackQueryProvider>

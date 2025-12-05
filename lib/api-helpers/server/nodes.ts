@@ -58,6 +58,7 @@ export async function getNode(id: string): Promise<Node | null> {
       latitude: true,
       name: true,
       longitude: true,
+      echoIntensity: true,
       openForMining: true,
       sponsor: true,
       locationLore: { select: { id: true } },

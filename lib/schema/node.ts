@@ -25,6 +25,7 @@ export const NodeSchema = z.object({
   name: z.string(),
   latitude: z.number(),
   longitude: z.number(),
+  echoIntensity: z.number().optional(),
   openForMining: z.boolean(),
   sponsor: z.string().nullable(),
   sessions: z.array(NodeSessionSchema),

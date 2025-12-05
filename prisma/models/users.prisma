@@ -4,7 +4,7 @@ model User {
     username    String @unique // Pi Network Username
     accessToken String @unique // Pi access token
 
-    sharePoints Float @default(0.0)
+    sharePoints Float @default(0.0) // Used for Token conversion
     totalEarned Float @default(0.0)
     level       Int   @default(1)
     xp          Int   @default(0)
@@ -12,10 +12,13 @@ model User {
     /// username of user's referrer
     referrer          String?
     /// no of users referred
-    noOfReferrals     Int     @default(0)
+    noOfReferrals     Int       @default(0) // Used for Discounts
     /// Number of times the user has used the resonance discount
     /// Tracks how many discounts have been consumed (geometric cost progression)
-    resonanceFidelity Int     @default(0)
+    resonanceFidelity Int       @default(0)
+    // Retention
+    dailyStreak       Int       @default(0)
+    lastTunedAt       DateTime?
 
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
@@ -31,6 +34,7 @@ model User {
     loreContributions      LocationLoreStake[] // Pi staking for lore
     awakeningContributions AwakeningContribution[] // Pi contribution for lattice calibration
     resonantAnchors        ResonantAnchor[] // Pi contribution for resonant anchors
+    tuningSessions         TuningSession[]
 
     @@map("users")
 }

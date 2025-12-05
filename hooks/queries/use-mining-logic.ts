@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { calculateDistance } from "@/lib/utils";
-import { MINING_RANGE_METERS } from "@/config/site";
+import { MINING_RANGE_METERS, NODE_TUNING_DAILY_CAP } from "@/config/site";
 import {
   MiningState,
   UseMiningLogicProps,
@@ -89,5 +89,9 @@ export function useMiningLogic({
     showStartModal: miningState === MiningState.Eligible,
     showMiningModal: miningState === MiningState.Pending,
     showCompletedModal: miningState === MiningState.Completed,
+    showTuningModal:
+      miningState === MiningState.Completed &&
+      !!sessionQuery.data &&
+      sessionQuery.data.tuningSession.playCount < NODE_TUNING_DAILY_CAP,
   };
 }

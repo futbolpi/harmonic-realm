@@ -152,7 +152,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
       {/* Floating node info - Mobile: Drawer, Desktop: Sheet */}
 
       <div className="absolute bottom-4 right-4 z-10 flex gap-2">
-        <NodeInfoModal node={node} /> 
+        <NodeInfoModal node={node} />
         {/* Completed session drawer */}
         <CompletedSessionDrawer node={node} />
         <NodeMiningSessions node={node} />

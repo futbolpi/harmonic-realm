@@ -13,6 +13,7 @@ import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
 import { ActiveMiningDrawer } from "./active-mining-drawer";
 import { getFeedbackMessage } from "../_utils/feedback-message";
+import { ResonanceTuningModal } from "./tuning-modal";
 
 interface NodeDetailClientProps {
   node: Node;
@@ -22,15 +23,20 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
   const router = useRouter();
 
   // Fetch mining session data with range validation
-  const { showStartModal, showMiningModal, distance, miningState } =
-    useMiningLogic({
-      completedSessions: node.sessions.length,
-      isOpenForMining: node.openForMining,
-      maxSessions: node.type.maxMiners,
-      nodeId: node.id,
-      nodeLocation: { latitude: node.latitude, longitude: node.longitude },
-      allowedDistanceMeters: MINING_RANGE_METERS,
-    });
+  const {
+    showStartModal,
+    showMiningModal,
+    distance,
+    miningState,
+    showTuningModal,
+  } = useMiningLogic({
+    completedSessions: node.sessions.length,
+    isOpenForMining: node.openForMining,
+    maxSessions: node.type.maxMiners,
+    nodeId: node.id,
+    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
+    allowedDistanceMeters: MINING_RANGE_METERS,
+  });
 
   const isInRange = distance !== null && distance <= MINING_RANGE_METERS;
   const feedback = getFeedbackMessage({
@@ -122,7 +128,16 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       )}
 
       {/* Start mining drawer - only shown when user can mine */}
-      {showStartModal && <StartMiningDrawer node={node} />} 
+
+      {showStartModal && <StartMiningDrawer node={node} />}
+      {/* Start tuning drawer - only shown when user can tune */}
+      <ResonanceTuningModal
+        isOpen={isInRange && showTuningModal}
+        nodeId={node.id}
+        nodeFrequencySeed={node.echoIntensity ?? 1}
+        nodeRarity={node.type.rarity}
+        isSponsored={!!node.sponsor}
+      />
 
       {/* can't mine info */}
       {feedback && (

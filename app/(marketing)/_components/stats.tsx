@@ -20,9 +20,9 @@ const Stats = async () => {
       </div>
       <div className="text-center group">
         <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-400 to-violet-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
-          ⚡︎ {formatNumber(pioneersAggregate._sum.sharePoints || 0)}+
+          {formatNumber(pioneersAggregate._sum.sharePoints || 0)}+
         </div>
-        <p className="text-sm text-muted-foreground">Shares Awakened</p>
+        <p className="text-sm text-muted-foreground">Shares Earned</p>
       </div>
     </div>
   );

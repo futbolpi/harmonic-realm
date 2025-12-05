@@ -33,9 +33,10 @@ model Node {
     echoIntensity Float   @default(1.0)
 
     // Relations
-    type         NodeType        @relation(fields: [typeId], references: [id])
-    sessions     MiningSession[]
-    locationLore LocationLore? // New: One-to-one with location lore
+    type           NodeType        @relation(fields: [typeId], references: [id])
+    sessions       MiningSession[]
+    locationLore   LocationLore? // New: One-to-one with location lore
+    tuningSessions TuningSession[]
 
     @@index([phase]) // Efficient phase-based queries
     @@map("nodes")

@@ -1,0 +1,19 @@
+model TuningSession {
+    id     String @id @default(cuid())
+    userId String
+    nodeId String
+
+    score        Float // 0.0 - 100.0
+    sharesEarned Float
+
+    // Track if this specific session triggered the 5-day payout
+    milestoneReached Boolean @default(false)
+
+    timestamp DateTime @default(now())
+
+    user User @relation(fields: [userId], references: [id])
+    node Node @relation(fields: [nodeId], references: [id])
+
+    @@index([userId, timestamp])
+    @@index([nodeId])
+}

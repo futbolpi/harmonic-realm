@@ -3,6 +3,7 @@ import { z } from "zod";
 import { SessionStatus } from "../generated/prisma/enums";
 import { MasteryInfoSchema } from "./mastery";
 import { EchoTransmissionSchema } from "./echo";
+import { TuningSessionSchema } from "./tuning-session";
 
 // Mining session schemas
 export const MiningSessionSchema = z
@@ -43,6 +44,7 @@ export const MiningSessionAssetsSchema = z.object({
   session: MiningSessionSchema,
   masteryInfo: MasteryInfoSchema,
   echoInfo: EchoTransmissionSchema,
+  tuningSession: TuningSessionSchema,
 });
 
 export type MiningSession = z.infer<typeof MiningSessionSchema>;
@@ -89,4 +91,5 @@ export interface UseMiningLogicResult {
   showStartModal: boolean;
   showMiningModal: boolean;
   showCompletedModal: boolean;
+  showTuningModal: boolean;
 }

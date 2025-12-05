@@ -20,10 +20,8 @@ import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-asset
 type CompletedSessionDrawerProps = { node: Node };
 
 export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
-
   const { data } = useMiningSessionAssets(node.id);
 
-  
   const sessionData = data?.session;
 
   if (sessionData?.status !== "COMPLETED") {
@@ -97,21 +95,14 @@ export function CompletedSessionDrawer({ node }: CompletedSessionDrawerProps) {
 
           {/* Actions */}
           <div className="space-y-2">
-              <CredenzaClose asChild>
-             <Button
-              className="w-full"
-              variant="default"
-            >
-              Continue Exploring
-            </Button>
+            <CredenzaClose asChild>
+              <Button className="w-full" variant="default">
+                Continue Exploring
+              </Button>
             </CredenzaClose>
-           
-            <Button
-             asChild
-              className="w-full"
-              variant="outline"
-            >
-              <Link href="/dashboard">View Stats</Link>     
+
+            <Button asChild className="w-full" variant="outline">
+              <Link href="/dashboard">View Stats</Link>
             </Button>
           </div>
 

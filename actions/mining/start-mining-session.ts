@@ -104,8 +104,6 @@ export async function startMiningAction(
       data: { userId: user.id, nodeId },
     });
 
-    console.log("Created mining session:", session);
-
     // Revalidate the page to show the new session
     revalidatePath(`/nodes/${nodeId}`);
     revalidatePath("/dashboard");

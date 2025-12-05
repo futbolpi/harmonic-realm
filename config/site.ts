@@ -72,3 +72,10 @@ export const videoLinks = {
     title: "Lattice Calibration: Power the Grid with Pi",
   },
 };
+
+export const NODE_TUNING_DAILY_CAP = 5;
+export const TUNING_STREAK_REQ_DAYS = 5;
+export const TUNING_STREAK_REWARD = 3;
+
+// Landlord tax (3%) applied to tuning shares earned if node has a sponsor
+export const LANDLORD_TAX_RATE = 0.03;

@@ -27,7 +27,7 @@ export const completeMiningSession = async (
 
     const { accessToken, sessionId } = data;
 
-    const { id: userId, piId } = await verifyTokenAndGetUser(accessToken);
+    const { id: userId } = await verifyTokenAndGetUser(accessToken);
 
     // 1. Fetch session with related data
 
@@ -49,7 +49,6 @@ export const completeMiningSession = async (
             typeId: true,
             latitude: true,
             longitude: true,
-            sponsor: true,
             type: {
               select: {
                 baseYieldPerMinute: true,
@@ -120,16 +119,7 @@ export const completeMiningSession = async (
     const masteryBonusPct = mastery ? mastery.bonusPercent : 0;
 
     // add algorithm later
-    let miniTaskMultiplier = 1;
-
-    if (session.node.sponsor) {
-      const sponsor = await prisma.resonantAnchor.findUnique({
-        where: { id: session.node.sponsor },
-        select: { userId: true, id: true },
-      });
-
-      miniTaskMultiplier += sponsor?.userId === piId ? 0.5 : 0;
-    }
+    const miniTaskMultiplier = 1;
 
     // 4. Calculate shares, binlatlol & XP
     const sharesEarned = calculateMinerShares({

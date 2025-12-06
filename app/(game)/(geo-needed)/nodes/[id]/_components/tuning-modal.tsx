@@ -213,6 +213,10 @@ export function ResonanceTuningModal({
           });
           setUserFreq(50);
           refreshSessionAssets();
+        } else {
+          toast.error(
+            res.error || "There was an error, please try again later"
+          );
         }
       } catch (e) {
         toast.error((e as Error).message);

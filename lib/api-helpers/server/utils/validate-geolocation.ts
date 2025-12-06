@@ -1,7 +1,10 @@
 import { headers as nextHeaders } from "next/headers";
 
-import { MAX_DISTANCE_KM } from "@/config/site";
 import { calculateDistance } from "@/lib/utils";
+import {
+  BASE_MAX_DISTANCE_KM,
+  COUNTRY_IP_GEO_SLACK_KM,
+} from "@/config/spoof-detection";
 // import { cookies } from "next/headers";
 
 // Interface for stored location (for velocity check)
@@ -26,6 +29,10 @@ export async function validateGeolocation(
   const ipLongitude = parseFloat(
     headersList.get("x-vercel-ip-longitude") || "0"
   );
+  const country = headersList.get("x-vercel-ip-country") ?? "";
+
+  const slack = COUNTRY_IP_GEO_SLACK_KM[country] ?? 0;
+  const MAX_DISTANCE_KM = BASE_MAX_DISTANCE_KM + slack;
 
   // Edge case: No geo headers (e.g., local dev or rare failures)—bypass
   if (ipLatitude === 0 && ipLongitude === 0) {

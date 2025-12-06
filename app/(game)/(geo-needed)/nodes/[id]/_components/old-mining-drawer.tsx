@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { applyEchoTransmission } from "@/actions/echo/apply-echo-transmission";
 import { displayInterstitialAd, showRewardedAd } from "../_utils/pi-ads";
+import { useLocation } from "@/hooks/use-location";
 
 interface ActiveMiningDrawerProps {
   node: Node;
@@ -42,7 +43,8 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
   const [isApplyingTransmission, startApplyingTransmission] = useTransition();
 
   const { accessToken } = useAuth();
-
+  // Get user's current location
+  const userLocation = useLocation();
   const { data: sessionAssets, refreshSessionAssets } = useMiningSessionAssets(
     node.id
   );
@@ -60,7 +62,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
       const remaining = Math.max(0, endTime - now);
       setTimeRemaining(remaining);
 
-      if (remaining === 0 && !isPending) {
+      if (remaining === 0 && !isPending && !!userLocation) {
         startTransition(async () => {
           if (!accessToken || !sessionData?.id) {
             toast.error("Unauthorized");
@@ -71,6 +73,8 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
             const response = await completeMiningSession({
               accessToken,
               sessionId: sessionData.id,
+              userLatitude: userLocation.latitude,
+              userLongitude: userLocation.longitude,
             });
             if (response.success) {
               toast.success("Mining session completed!");
@@ -100,6 +104,7 @@ export function ActiveMiningDrawer({ node }: ActiveMiningDrawerProps) {
     node.longitude,
     isPending,
     refreshSessionAssets,
+    userLocation,
   ]);
 
   // Handle Echo Transmission activation

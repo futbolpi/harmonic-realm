@@ -26,8 +26,14 @@ export const MiningSessionSchema = z
 export const StartMiningSchema = z.object({
   nodeId: z.string(),
   accessToken: z.string(),
-  userLatitude: z.number(),
-  userLongitude: z.number(),
+  userLatitude: z
+    .number()
+    .min(-90, "Latitude must be between -90 and 90")
+    .max(90, "Latitude must be between -90 and 90"),
+  userLongitude: z
+    .number()
+    .min(-180, "Longitude must be between -180 and 180")
+    .max(180, "Longitude must be between -180 and 180"),
 });
 
 export const CompleteMiningResponseSchema = z.object({
@@ -38,6 +44,14 @@ export const CompleteMiningResponseSchema = z.object({
 export const CompleteMiningSchema = z.object({
   sessionId: z.string(),
   accessToken: z.string(),
+  userLatitude: z
+    .number()
+    .min(-90, "Latitude must be between -90 and 90")
+    .max(90, "Latitude must be between -90 and 90"),
+  userLongitude: z
+    .number()
+    .min(-180, "Longitude must be between -180 and 180")
+    .max(180, "Longitude must be between -180 and 180"),
 });
 
 export const MiningSessionAssetsSchema = z.object({

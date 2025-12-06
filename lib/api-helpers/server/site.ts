@@ -25,6 +25,7 @@ export const getSiteStats = async () => {
       },
       orderBy: { sharePoints: "desc" },
       take: 50,
+      where: { archivedAt: null },
     }),
     prisma.user.aggregate({
       _sum: { sharePoints: true, totalEarned: true },

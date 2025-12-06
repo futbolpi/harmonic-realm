@@ -16,6 +16,7 @@ import {
   TUNING_STREAK_REWARD,
   LANDLORD_TAX_RATE,
 } from "@/config/site";
+import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 
 type SucessResponse = {
   shares: number;
@@ -41,6 +42,16 @@ export async function submitTuningSession(
     }
 
     const { accessToken, accuracyScore, nodeId, userLat, userLng } = data;
+
+    // Validate against spoofing
+    const isValid = await validateGeolocation(userLat, userLng);
+
+    if (!isValid) {
+      return {
+        success: false,
+        error: "Forbidden: Location verification failed",
+      };
+    }
 
     // Verify user authentication
     const { id: userId, piId } = await verifyTokenAndGetUser(accessToken);

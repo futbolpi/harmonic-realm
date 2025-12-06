@@ -18,6 +18,7 @@ import {
 import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
 import { MiningState } from "@/lib/schema/mining-session";
 import { MINING_RANGE_METERS } from "@/config/site";
+import { useLocation } from "@/hooks/use-location";
 
 interface ActiveMiningDrawerProps {
   node: {
@@ -55,6 +56,8 @@ export function ActiveMiningDrawer({
   const completedCalledRef = useRef(false);
   const tickIntervalRef = useRef<number | null>(null);
 
+  // Get user's current location
+  const userLocation = useLocation();
   // session data for action and ui
   const { data: sessionAssets, refreshSessionAssets } = useMiningSessionAssets(
     node.id
@@ -72,7 +75,7 @@ export function ActiveMiningDrawer({
     if (completedCalledRef.current) return;
     completedCalledRef.current = true;
 
-    if (!accessToken || !sessionData?.id) {
+    if (!accessToken || !sessionData?.id || !userLocation) {
       toast.error("Unauthorized");
       return;
     }
@@ -81,6 +84,8 @@ export function ActiveMiningDrawer({
       const response = await completeMiningSession({
         accessToken,
         sessionId: sessionData.id,
+        userLatitude: userLocation.latitude,
+        userLongitude: userLocation.longitude,
       });
       if (response.success) {
         toast.success("Mining session completed!");
@@ -93,7 +98,13 @@ export function ActiveMiningDrawer({
       console.log(error);
       toast.error("Failed to complete mining session");
     }
-  }, [accessToken, refreshSessionAssets, sessionData?.id, onComplete]);
+  }, [
+    accessToken,
+    refreshSessionAssets,
+    sessionData?.id,
+    onComplete,
+    userLocation,
+  ]);
 
   // Reset timer whenever a new pending mining session starts for this node
   useEffect(() => {

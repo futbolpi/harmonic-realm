@@ -12,6 +12,7 @@ import { calculateDistance } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
 import { MINING_RANGE_METERS } from "@/config/site";
+import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 
 export async function startMiningAction(
   params: StartMiningRequest
@@ -25,6 +26,16 @@ export async function startMiningAction(
     }
 
     const { accessToken, nodeId, userLatitude, userLongitude } = data;
+
+    // Validate against spoofing
+    const isValid = await validateGeolocation(userLatitude, userLongitude);
+
+    if (!isValid) {
+      return {
+        success: false,
+        error: "Forbidden: Location verification failed",
+      };
+    }
 
     const user = await verifyTokenAndGetUser(accessToken);
 

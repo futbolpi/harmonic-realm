@@ -86,3 +86,5 @@ export const TUNING_STREAK_REWARD = 3;
 
 // Landlord tax (3%) applied to tuning shares earned if node has a sponsor
 export const LANDLORD_TAX_RATE = 0.03;
+
+export const MAX_DISTANCE_KM = 100; // Adjustable; balances spoof detection vs. IP precision

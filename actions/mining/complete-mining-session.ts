@@ -14,6 +14,7 @@ import { calculateMinerShares, calculateMiningXp } from "@/lib/utils/mining";
 import { binLatLon } from "@/lib/node-spawn/region-metrics";
 import { inngest } from "@/inngest/client";
 import { updateMasteryProgression } from "@/lib/utils/mastery";
+import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -25,7 +26,17 @@ export const completeMiningSession = async (
       return { success: false, error: "Invalid Request" };
     }
 
-    const { accessToken, sessionId } = data;
+    const { accessToken, sessionId, userLatitude, userLongitude } = data;
+
+    // Validate against spoofing
+    const isValid = await validateGeolocation(userLatitude, userLongitude);
+
+    if (!isValid) {
+      return {
+        success: false,
+        error: "Forbidden: Location verification failed",
+      };
+    }
 
     const { id: userId } = await verifyTokenAndGetUser(accessToken);
 

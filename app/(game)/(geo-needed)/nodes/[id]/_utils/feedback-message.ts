@@ -41,7 +41,7 @@ export const getFeedbackMessage = ({
       feedbackMessage = "You have a mining session in progress for this node.";
       break;
     case MiningState.Tune:
-      feedbackMessage = "You have a tuning session in progress for this node.";
+      feedbackMessage = "You’re in range — ready to mine this node!";
       break;
     case MiningState.Completed:
       feedbackMessage = "You have already mined this node.";

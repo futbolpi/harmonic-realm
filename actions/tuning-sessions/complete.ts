@@ -26,6 +26,10 @@ type SucessResponse = {
   // Tax breakdown for UI transparency
   grossShares?: number;
   landlordTax?: number;
+  // Competitive tuning bonus
+  competitiveBonusApplied?: boolean;
+  competitiveMultiplier?: number;
+  previousLocalHigh?: number;
 };
 
 /**
@@ -43,8 +47,16 @@ export async function submitTuningSession(
 
     const { accessToken, accuracyScore, nodeId, userLat, userLng } = data;
 
-    // Validate against spoofing
-    const isValid = await validateGeolocation(userLat, userLng);
+    // Verify user authentication first (needed for geolocation validation)
+    const { id: userId, piId } = await verifyTokenAndGetUser(accessToken);
+
+    // Validate against spoofing with user context for velocity tracking
+    const isValid = await validateGeolocation({
+      submittedLat: userLat,
+      submittedLng: userLng,
+      userId,
+      avoidRapidFire: false,
+    });
 
     if (!isValid) {
       return {
@@ -52,9 +64,6 @@ export async function submitTuningSession(
         error: "Forbidden: Location verification failed",
       };
     }
-
-    // Verify user authentication
-    const { id: userId, piId } = await verifyTokenAndGetUser(accessToken);
 
     // Fetch eligibility AND rarity
     const validation = await checkTuningEligibility({
@@ -78,7 +87,31 @@ export async function submitTuningSession(
     const accuracyFactor = accuracyScore / 100;
     const baseFactor = validation.baseYield / 100;
 
-    const sharesReward = baseFactor * accuracyFactor;
+    // Base reward before any multipliers
+    const baseSharesReward = baseFactor * accuracyFactor;
+
+    // --- Competitive Tuning: compare against last 5 other players on this node ---
+    // Efficient query: fetch only the last 5 tuning sessions (indexed by nodeId,timestamp)
+    // and compute the local high score in-memory. If the current accuracy beats the
+    // local high, apply a 1.5x multiplier to the session reward. This adds a lightweight
+    // localized competitive mechanic without extra joins or heavy queries.
+    const recent = await prisma.tuningSession.findMany({
+      where: { nodeId, userId: { not: userId } },
+      orderBy: { timestamp: "desc" },
+      take: 5,
+      select: { score: true },
+    });
+
+    const recentScores = recent.map((r) => r.score || 0);
+    const previousLocalHigh = recentScores.length
+      ? Math.max(...recentScores)
+      : 0;
+    const competitiveBonusApplied =
+      recentScores.length > 4 && accuracyScore > previousLocalHigh;
+    const competitiveMultiplier = competitiveBonusApplied ? 1.5 : 1;
+
+    // Apply multiplier BEFORE tax calculation so landlord tax scales with the rewarded amount
+    const sharesReward = baseSharesReward * competitiveMultiplier;
 
     // --- 1.5. Calculate Landlord Tax (3% if node has a sponsor) ---
     // Efficiency: Only query node's sponsor if we have shares to tax.
@@ -199,6 +232,9 @@ export async function submitTuningSession(
         referralPoints: earnedReferralPoints,
         currentStreak: newStreak,
         milestoneReached,
+        competitiveBonusApplied,
+        competitiveMultiplier,
+        previousLocalHigh,
       },
     };
   } catch (error) {

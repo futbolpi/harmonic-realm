@@ -169,6 +169,9 @@ export function ResonanceTuningModal({
             shares,
             grossShares,
             landlordTax,
+            competitiveBonusApplied,
+            competitiveMultiplier,
+            previousLocalHigh,
           } = res.data;
 
           // Build tax breakdown display (only show if tax was applied)
@@ -186,6 +189,18 @@ export function ResonanceTuningModal({
                     +{shares} Shares
                   </span>
                 </div>
+
+                {/* Competitive bonus notice */}
+                {competitiveBonusApplied && (
+                  <div className="text-xs text-emerald-300 bg-emerald-950/10 p-2 rounded border border-emerald-700">
+                    <div className="font-semibold">Competitive Bonus!</div>
+                    <div>
+                      You beat the local high ({previousLocalHigh}%). Reward x
+                      {competitiveMultiplier}
+                    </div>
+                  </div>
+                )}
+
                 {/* Show tax breakdown if applicable */}
                 {landlordTax && landlordTax > 0 && (
                   <div className="text-xs text-slate-400 bg-slate-900/50 p-2 rounded border border-slate-700">
@@ -194,6 +209,7 @@ export function ResonanceTuningModal({
                     </div>
                   </div>
                 )}
+
                 {milestoneReached ? (
                   <div className="flex items-center gap-2 text-amber-400 font-bold bg-amber-950/30 p-2 rounded animate-pulse">
                     <Trophy size={16} /> {TUNING_STREAK_REQ_DAYS}-Day Streak

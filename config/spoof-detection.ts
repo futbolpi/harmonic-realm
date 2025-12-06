@@ -45,4 +45,4 @@ export const COUNTRY_IP_GEO_SLACK_KM: Record<string, number> = {
 };
 
 // Default base threshold
-export const BASE_MAX_DISTANCE_KM = 1000;
+export const BASE_MAX_DISTANCE_KM = 10;

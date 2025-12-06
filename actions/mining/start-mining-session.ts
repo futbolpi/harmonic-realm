@@ -27,8 +27,15 @@ export async function startMiningAction(
 
     const { accessToken, nodeId, userLatitude, userLongitude } = data;
 
+    const { id: userId } = await verifyTokenAndGetUser(accessToken);
+
     // Validate against spoofing
-    const isValid = await validateGeolocation(userLatitude, userLongitude);
+    const isValid = await validateGeolocation({
+      submittedLat: userLatitude,
+      submittedLng: userLongitude,
+      avoidRapidFire: true,
+      userId,
+    });
 
     if (!isValid) {
       return {
@@ -36,8 +43,6 @@ export async function startMiningAction(
         error: "Forbidden: Location verification failed",
       };
     }
-
-    const user = await verifyTokenAndGetUser(accessToken);
 
     const node = await prisma.node.findUnique({
       where: { id: nodeId },
@@ -99,7 +104,7 @@ export async function startMiningAction(
 
     // Check if user already has an active session
     const hasActiveSession = await prisma.miningSession.findUnique({
-      where: { userId_nodeId: { nodeId, userId: user.id } },
+      where: { userId_nodeId: { nodeId, userId } },
       select: { id: true },
     });
 
@@ -112,7 +117,7 @@ export async function startMiningAction(
 
     // Create mining session
     const session = await prisma.miningSession.create({
-      data: { userId: user.id, nodeId },
+      data: { userId, nodeId },
     });
 
     // Revalidate the page to show the new session

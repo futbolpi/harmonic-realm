@@ -28,8 +28,15 @@ export const completeMiningSession = async (
 
     const { accessToken, sessionId, userLatitude, userLongitude } = data;
 
+    const { id: userId } = await verifyTokenAndGetUser(accessToken);
+
     // Validate against spoofing
-    const isValid = await validateGeolocation(userLatitude, userLongitude);
+    const isValid = await validateGeolocation({
+      submittedLat: userLatitude,
+      submittedLng: userLongitude,
+      avoidRapidFire: true,
+      userId,
+    });
 
     if (!isValid) {
       return {
@@ -37,8 +44,6 @@ export const completeMiningSession = async (
         error: "Forbidden: Location verification failed",
       };
     }
-
-    const { id: userId } = await verifyTokenAndGetUser(accessToken);
 
     // 1. Fetch session with related data
 

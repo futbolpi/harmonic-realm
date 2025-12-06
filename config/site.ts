@@ -63,13 +63,20 @@ export const videoLinks = {
     title: "HarmonicRealm: A Geolocation Adventure Bound to Pi",
   },
   resonantHelper: {
-    url: "https://youtu.be/_6zlXWZ_cO0",
-    title:
-      "Resonant Anchoring: Claim Your Territory & Get the 50% Yield Bonus!",
+    url: "https://youtu.be/YyflnWGrjAc",
+    title: "How to Anchor Your Own Node & Use Fidelity Discounts",
   },
   calibrationHelper: {
-    url: "https://youtu.be/qZlZkLQ2qFo",
-    title: "Lattice Calibration: Power the Grid with Pi",
+    url: "https://youtu.be/OjxqQX-GbdE",
+    title: "Lattice Calibration Explained",
+  },
+  mapHelper: {
+    url: "https://youtu.be/c8xg0RLSURw",
+    title: "World Map Navigation",
+  },
+  nodeDetailsHelper: {
+    url: "https://youtu.be/jw33VDe4HzU",
+    title: "Node Detail, Resonance Mining, and Daily Tuning Guide",
   },
 };
 

@@ -102,7 +102,9 @@ export function LeaderboardClient({ data }: LeaderboardClientProps) {
           <CardContent className="p-4 text-center">
             <Coins className="h-8 w-8 text-neon-orange mx-auto mb-2" />
             <div className="text-2xl font-bold text-neon-orange">
-              {formatNumber(data.globalStats.totalSharePoints)}
+              {formatNumber(
+                parseFloat(data.globalStats.totalSharePoints.toFixed(2))
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Total Shares</p>
           </CardContent>

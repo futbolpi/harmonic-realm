@@ -1,11 +1,13 @@
 "use client";
 
-import { Crosshair, MapPin } from "lucide-react";
+import { Crosshair, MapPin, Video } from "lucide-react";
 import { RefObject, useCallback } from "react";
 import { MapRef } from "react-map-gl/maplibre";
 
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/use-location";
+import { videoLinks } from "@/config/site";
+import VideoModal from "@/components/shared/video-modal";
 
 type FloatingControlsProps = {
   mapRef: RefObject<MapRef | null>;
@@ -53,6 +55,20 @@ const FloatingControls = ({ mapRef, node }: FloatingControlsProps) => {
           <Crosshair className="h-4 w-4" />
         </Button>
       )}
+      {/* Node details Video Button */}
+      <VideoModal
+        src={videoLinks.nodeDetailsHelper.url}
+        title={videoLinks.nodeDetailsHelper.title}
+        trigger={
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-10 w-10 p-0 shadow-lg"
+          >
+            <Video className="h-4 w-4" />
+          </Button>
+        }
+      />
     </div>
   );
 };

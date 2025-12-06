@@ -3,11 +3,15 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { MapRef } from "react-map-gl/maplibre";
 import { useRouter } from "next/navigation";
+import { Video } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { AwakeningPathwaysModal } from "@/components/shared/awakening-pathways-modal";
+import VideoModal from "@/components/shared/video-modal";
+import { videoLinks } from "@/config/site";
 import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
 import { MapControlModal } from "./map-control-modal";
@@ -109,8 +113,22 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
           {/* Awakening Modal */}
           <AwakeningPathwaysModal />
 
-          {/* Map Tour Button */}
+          {/* Map Help Button */}
           <MapHelpModal />
+
+          {/* Map Video Button */}
+          <VideoModal
+            src={videoLinks.mapHelper.url}
+            title={videoLinks.mapHelper.title}
+            trigger={
+              <Button
+                size="sm"
+                className="game-button cursor-pointer shadow-lg"
+              >
+                <Video className="h-4 w-4" />
+              </Button>
+            }
+          />
         </div>
 
         {/* Node Count Badge */}

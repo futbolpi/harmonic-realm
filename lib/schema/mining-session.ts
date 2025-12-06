@@ -67,6 +67,7 @@ export enum MiningState {
   NoLocation = "noLocation",
   TooFar = "tooFar",
   Eligible = "eligible",
+  Tune = "tune",
 }
 
 // Interfaces for type safety

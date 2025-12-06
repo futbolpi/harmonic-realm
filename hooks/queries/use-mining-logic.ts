@@ -51,6 +51,12 @@ export function useMiningLogic({
     // Prioritize existing session status
     if (session) {
       if (session.status === "ACTIVE") return MiningState.Pending;
+      if (
+        session.status === "COMPLETED" &&
+        !!sessionQuery.data &&
+        sessionQuery.data.tuningSession.playCount < NODE_TUNING_DAILY_CAP
+      )
+        return MiningState.Tune;
       if (session.status === "COMPLETED") return MiningState.Completed;
       if (session.status === "CANCELLED") {
         // Proceed to other checks (assuming cancelled allows retry)
@@ -81,6 +87,7 @@ export function useMiningLogic({
     distance,
     allowedDistanceMeters,
     allowRestartAfterCancelled,
+    sessionQuery.data,
   ]);
 
   return {
@@ -89,9 +96,6 @@ export function useMiningLogic({
     showStartModal: miningState === MiningState.Eligible,
     showMiningModal: miningState === MiningState.Pending,
     showCompletedModal: miningState === MiningState.Completed,
-    showTuningModal:
-      miningState === MiningState.Completed &&
-      !!sessionQuery.data &&
-      sessionQuery.data.tuningSession.playCount < NODE_TUNING_DAILY_CAP,
+    showTuningModal: miningState === MiningState.Tune,
   };
 }

@@ -108,11 +108,14 @@ export const columns: ColumnDef<Pioneer>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center font-medium text-neon-orange">
-        {formatNumber(row.getValue("sharePoints"))}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const shares: number = row.getValue("sharePoints");
+      return (
+        <div className="flex items-center justify-center font-medium text-neon-orange">
+          {formatNumber(parseFloat(shares.toFixed(2)))}
+        </div>
+      );
+    },
     size: 120,
   },
   {

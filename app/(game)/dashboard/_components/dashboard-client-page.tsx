@@ -9,6 +9,7 @@ import QuickStats from "./quick-stats";
 import { QuickActions } from "./quick-actions";
 import GlobalPhaseCard from "./global-phase-card";
 import GenesisPhaseCard from "./genesis-phase-card";
+import StartTutorialModal from "../../_components/start-tutorial-modal";
 
 type DashboardClientPageProps = {
   currentPhase?: number;
@@ -85,6 +86,8 @@ export default function DashboardClientPage({
       )}
 
       <QuickActions userId={userProfile.id} />
+      {/* Global Credenza modal prompting users to complete Ephemeral Spark tutorial */}
+      <StartTutorialModal />
     </div>
   );
 }

@@ -74,6 +74,7 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
           },
         },
       },
+      hasCompletedTutorial: true,
     },
   });
   return user;

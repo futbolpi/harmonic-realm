@@ -29,7 +29,7 @@ type SucessResponse = {
   // Competitive tuning bonus
   competitiveBonusApplied?: boolean;
   competitiveMultiplier?: number;
-  previousLocalHigh?: number;
+  averageAccuracy?: number;
 };
 
 /**
@@ -90,11 +90,10 @@ export async function submitTuningSession(
     // Base reward before any multipliers
     const baseSharesReward = baseFactor * accuracyFactor;
 
-    // --- Competitive Tuning: compare against last 5 other players on this node ---
+    // --- Competitive Tuning: compare against average of last 5 distinct other players ---
     // Efficient query: fetch only the last 5 tuning sessions (indexed by nodeId,timestamp)
-    // and compute the local high score in-memory. If the current accuracy beats the
-    // local high, apply a 1.5x multiplier to the session reward. This adds a lightweight
-    // localized competitive mechanic without extra joins or heavy queries.
+    // from other players. Compute average accuracy in-memory. If current accuracy beats
+    // the average, apply 1.5x multiplier. Lightweight localized competitive mechanic.
     const recent = await prisma.tuningSession.findMany({
       where: { nodeId, userId: { not: userId } },
       orderBy: { timestamp: "desc" },
@@ -103,11 +102,12 @@ export async function submitTuningSession(
     });
 
     const recentScores = recent.map((r) => r.score || 0);
-    const previousLocalHigh = recentScores.length
-      ? Math.max(...recentScores)
-      : 0;
+    const averageAccuracy =
+      recentScores.length > 0
+        ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length
+        : 0;
     const competitiveBonusApplied =
-      recentScores.length > 4 && accuracyScore > previousLocalHigh;
+      recentScores.length > 4 && accuracyScore > averageAccuracy;
     const competitiveMultiplier = competitiveBonusApplied ? 1.5 : 1;
 
     // Apply multiplier BEFORE tax calculation so landlord tax scales with the rewarded amount
@@ -234,7 +234,7 @@ export async function submitTuningSession(
         milestoneReached,
         competitiveBonusApplied,
         competitiveMultiplier,
-        previousLocalHigh,
+        averageAccuracy,
       },
     };
   } catch (error) {

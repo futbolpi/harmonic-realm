@@ -10,15 +10,17 @@ model User {
     xp          Int   @default(0)
 
     /// username of user's referrer
-    referrer          String?
+    referrer             String?
     /// no of users referred
-    noOfReferrals     Int       @default(0) // Used for Discounts
+    noOfReferrals        Int       @default(0) // Used for Discounts
     /// Number of times the user has used the resonance discount
     /// Tracks how many discounts have been consumed (geometric cost progression)
-    resonanceFidelity Int       @default(0)
+    resonanceFidelity    Int       @default(0)
     // Retention
-    dailyStreak       Int       @default(0)
-    lastTunedAt       DateTime?
+    dailyStreak          Int       @default(0)
+    lastTunedAt          DateTime?
+    // Tutorial completion flag for Ephemeral Spark (client-side virtual node)
+    hasCompletedTutorial Boolean   @default(false)
 
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt

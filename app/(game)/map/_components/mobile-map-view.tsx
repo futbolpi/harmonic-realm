@@ -10,8 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Node } from "@/lib/schema/node";
 import { useMapSearchParams } from "@/hooks/use-map-search-params";
 import { AwakeningPathwaysModal } from "@/components/shared/awakening-pathways-modal";
+import { EPHEMERAL_SPARK_NODE } from "@/config/tutorial";
 import VideoModal from "@/components/shared/video-modal";
 import { videoLinks } from "@/config/site";
+import { useProfile } from "@/hooks/queries/use-profile";
 import { filterNodes, sortNodes } from "../utils";
 import LocationButton from "./location-button";
 import { MapControlModal } from "./map-control-modal";
@@ -26,6 +28,10 @@ interface MobileMapViewProps {
 export function MobileMapView({ nodes }: MobileMapViewProps) {
   const router = useRouter();
   const mapRef = useRef<MapRef>(null);
+  const { data: userProfile } = useProfile();
+
+  // Check if user has completed tutorial
+  const hasCompletedTutorial = userProfile?.hasCompletedTutorial ?? false;
 
   // URL state management with nuqs
   const { searchParams } = useMapSearchParams();
@@ -59,7 +65,9 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
       sponsored: sponsoredFilter,
     });
 
-    return sortNodes(filtered, sortBy, userLocation);
+    return hasCompletedTutorial
+      ? sortNodes(filtered, sortBy, userLocation)
+      : [EPHEMERAL_SPARK_NODE];
   }, [
     nodes,
     rarityFilter,
@@ -68,6 +76,7 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
     sponsoredFilter,
     sortBy,
     userLocation,
+    hasCompletedTutorial,
   ]);
 
   // Handle node selection
@@ -85,7 +94,11 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
 
   const handleNodeDetails = useCallback(
     (nodeId: string) => {
-      router.push(`/nodes/${nodeId}`);
+      if (nodeId === EPHEMERAL_SPARK_NODE.id) {
+        router.push("/tutorial");
+      } else {
+        router.push(`/nodes/${nodeId}`);
+      }
     },
     [router]
   );
@@ -154,6 +167,16 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
           />
         </div>
       </div>
+
+      {!hasCompletedTutorial && (
+        <div className="absolute bottom-20 left-4 right-4 z-10">
+          <div className="bg-card text-card-foreground p-3 rounded-lg shadow-lg text-center">
+            <p className="text-xs opacity-90">
+              The Lattice recognizes you. Tap the Spark to mine.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,52 +4,38 @@ import { useEffect, useRef, useState } from "react";
 import Map, { Marker, Source, Layer, type MapRef } from "react-map-gl/maplibre";
 import circle from "@turf/circle";
 import { useTheme } from "next-themes";
-import Link from "next/link";
-import { BookOpen, Zap } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Node } from "@/lib/schema/node";
-import { useLocation } from "@/hooks/use-location";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
-import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
 import { MINING_RANGE_METERS } from "@/config/site";
-import { getRarityInfo, MAP_STYLES } from "../../../../map/utils";
-import FloatingControls from "./floating-controls";
-import NodeInfoModal from "./node-info-modal";
-import NodeMiningSessions from "./node-mining-sessions";
-import { UserNodeMastery } from "./user-node-mastery";
-import { CompletedSessionDrawer } from "./completed-session-drawer";
+import { useTutorial } from "@/hooks/use-tutorial";
+import { getRarityInfo, MAP_STYLES } from "@/app/(game)/map/utils";
 
-interface NodeDetailMapProps {
-  node: Node;
+interface TutorialDetailMapProps {
+  node: { name: string };
+  userLocation: { latitude: number; longitude: number };
 }
 
-export function NodeDetailMap({ node }: NodeDetailMapProps) {
+export function TutorialDetailMap({
+  userLocation,
+  node,
+}: TutorialDetailMapProps) {
   const mapRef = useRef<MapRef>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const { resolvedTheme } = useTheme();
 
-  const { distance } = useMiningLogic({
-    completedSessions: node.sessions.length,
-    isOpenForMining: node.openForMining,
-    maxSessions: node.type.maxMiners,
-    nodeId: node.id,
-    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
-    allowedDistanceMeters: MINING_RANGE_METERS,
-  });
+  const { distance } = useTutorial();
 
   const isInRange = distance !== null && distance <= MINING_RANGE_METERS;
 
-  const userLocation = useLocation();
   const { data: userProfile } = useProfile();
 
   // Create circle for mining radius
   const miningRadius = MINING_RANGE_METERS;
   const radiusCircle = circle(
-    [node.longitude, node.latitude],
+    [userLocation.longitude, userLocation.latitude],
     miningRadius / 1000,
     {
       units: "kilometers",
@@ -58,16 +44,16 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
   );
 
   useEffect(() => {
-    if (mapLoaded && userLocation) {
+    if (mapLoaded) {
       // Fit map to show both user and node
       const bounds = [
         [
-          Math.min(userLocation.longitude, node.longitude),
-          Math.min(userLocation.latitude, node.latitude),
+          Math.min(userLocation.longitude, userLocation.longitude),
+          Math.min(userLocation.latitude, userLocation.latitude),
         ],
         [
-          Math.max(userLocation.longitude, node.longitude),
-          Math.max(userLocation.latitude, node.latitude),
+          Math.max(userLocation.longitude, userLocation.longitude),
+          Math.max(userLocation.latitude, userLocation.latitude),
         ],
       ] as [[number, number], [number, number]];
 
@@ -77,7 +63,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
         duration: 1000,
       });
     }
-  }, [mapLoaded, userLocation, node]);
+  }, [mapLoaded, userLocation]);
 
   return (
     <div className="relative h-[calc(100vh-8rem)] md:h-screen w-full">
@@ -90,8 +76,8 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
             : MAP_STYLES.outdoorDark
         }
         initialViewState={{
-          longitude: node.longitude,
-          latitude: node.latitude,
+          longitude: userLocation.longitude,
+          latitude: userLocation.latitude,
           zoom: 15,
         }}
         style={{ width: "100%", height: "100%" }}
@@ -119,14 +105,12 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
         </Source>
 
         {/* Node marker */}
-        <Marker longitude={node.longitude} latitude={node.latitude}>
+        <Marker
+          longitude={userLocation.longitude}
+          latitude={userLocation.latitude}
+        >
           <div className="relative">
-            <NodeMarker
-              nodeColor={getRarityInfo(node.type.rarity)}
-              isActive={
-                node.openForMining && node.sessions.length < node.type.maxMiners
-              }
-            />
+            <NodeMarker nodeColor={getRarityInfo("Common")} isActive={true} />
             <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
               <Badge variant="secondary" className="text-xs">
                 {node.name}
@@ -145,36 +129,6 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
           </Marker>
         )}
       </Map>
-
-      {/* Floating controls */}
-      <FloatingControls mapRef={mapRef} node={node} />
-
-      {/* Floating node info - Mobile: Drawer, Desktop: Sheet */}
-
-      <div className="absolute bottom-4 right-4 z-10 flex gap-2">
-        <NodeInfoModal node={node} />
-        {/* Completed session drawer */}
-        <CompletedSessionDrawer node={node} />
-        <NodeMiningSessions node={node} />
-        <UserNodeMastery
-          nodeId={node.id}
-          nodeType={node.type}
-          trigger={
-            <Button size="icon" className="rounded-full shadow-lg">
-              <Zap className="h-4 w-4" />
-            </Button>
-          }
-        />
-        <Button asChild size="icon" className="rounded-full shadow-lg">
-          <Link
-            href={
-              !node.locationLore ? `/nodes/${node.id}/lore` : `/lore/${node.id}`
-            }
-          >
-            <BookOpen className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
 
       {/* Status indicator */}
       <div className="absolute top-4 left-28">

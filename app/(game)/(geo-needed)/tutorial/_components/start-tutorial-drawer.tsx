@@ -8,40 +8,31 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Node } from "@/lib/schema/node";
-import { useLocation } from "@/hooks/use-location";
-import { startMiningAction } from "@/actions/mining/start-mining-session";
-import { useAuth } from "@/components/shared/auth/auth-context";
 import {
   Credenza,
   CredenzaHeader,
   CredenzaTitle,
   CredenzaContent,
 } from "@/components/credenza";
-import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
 import { MINING_RANGE_METERS } from "@/config/site";
-import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
 import { MiningState } from "@/lib/schema/mining-session";
-import { getRarityInfo } from "../../../../map/utils";
-import { getFeedbackMessage } from "../_utils/feedback-message";
+import { getRarityInfo } from "@/app/(game)/map/utils";
+import { getFeedbackMessage } from "../../nodes/[id]/_utils/feedback-message";
 
-interface StartMiningDrawerProps {
+interface StartTutorialDrawerProps {
   node: Node;
+  onStartMining: () => void;
+  miningState: MiningState;
+  distance: number | null;
 }
 
-export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
+export function StartTutorialDrawer({
+  node,
+  onStartMining,
+  distance,
+  miningState,
+}: StartTutorialDrawerProps) {
   const [isPending, startTransition] = useTransition();
-
-  const userLocation = useLocation();
-  const { accessToken } = useAuth();
-  const { refreshSessionAssets } = useMiningSessionAssets(node.id);
-  const { miningState, distance } = useMiningLogic({
-    completedSessions: node.sessions.length,
-    isOpenForMining: node.openForMining,
-    maxSessions: node.type.maxMiners,
-    nodeId: node.id,
-    nodeLocation: { latitude: node.latitude, longitude: node.longitude },
-    allowedDistanceMeters: MINING_RANGE_METERS,
-  });
 
   const feedback = getFeedbackMessage({
     miningState,
@@ -50,34 +41,9 @@ export function StartMiningDrawer({ node }: StartMiningDrawerProps) {
   });
 
   const onSubmit = () => {
-    if (!userLocation) {
-      toast.error("Location required to start mining");
-      return;
-    }
-    if (!accessToken) {
-      toast.error("Unauthorized");
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const result = await startMiningAction({
-          nodeId: node.id,
-          userLatitude: userLocation.latitude,
-          userLongitude: userLocation.longitude,
-          accessToken,
-        });
-
-        if (result.success) {
-          toast.success("Mining session started successfully!");
-          refreshSessionAssets();
-        } else {
-          toast.error(result.error || "Failed to start mining session");
-        }
-      } catch (error) {
-        console.error("Mining session error:", error);
-        toast.error("An unexpected error occurred");
-      }
+    startTransition(() => {
+      onStartMining();
+      toast.success("Mining session started successfully!");
     });
   };
 

@@ -171,7 +171,7 @@ export function ResonanceTuningModal({
             landlordTax,
             competitiveBonusApplied,
             competitiveMultiplier,
-            previousLocalHigh,
+            averageAccuracy,
           } = res.data;
 
           // Build tax breakdown display (only show if tax was applied)
@@ -195,8 +195,8 @@ export function ResonanceTuningModal({
                   <div className="text-xs text-emerald-300 bg-emerald-950/10 p-2 rounded border border-emerald-700">
                     <div className="font-semibold">Competitive Bonus!</div>
                     <div>
-                      You beat the local high ({previousLocalHigh}%). Reward x
-                      {competitiveMultiplier}
+                      You beat the average accuracy ({averageAccuracy}%). Reward
+                      x{competitiveMultiplier}
                     </div>
                   </div>
                 )}

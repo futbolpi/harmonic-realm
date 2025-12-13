@@ -37,6 +37,7 @@ model Node {
     sessions       MiningSession[]
     locationLore   LocationLore? // New: One-to-one with location lore
     tuningSessions TuningSession[]
+    drifts         NodeDrift[] // Relation to track drifts for this node
 
     @@index([phase]) // Efficient phase-based queries
     @@map("nodes")

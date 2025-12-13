@@ -44,6 +44,8 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
       resonanceFidelity: true,
       totalEarned: true,
       username: true,
+      driftCount: true,
+      lastDriftAt: true,
       achievements: {
         orderBy: { unlockedAt: "desc" },
         select: {

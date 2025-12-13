@@ -26,17 +26,21 @@ model User {
     updatedAt  DateTime  @updatedAt
     archivedAt DateTime?
 
+    lastDriftAt DateTime? // Cooldown tracking
+    driftCount  Int       @default(0) // Tracks number of drifts performed (0 = new player eligibility)
+
     // Relations
+    echoTransmission       EchoTransmission? // One-to-one relationship
     sessions               MiningSession[]
     mastery                UserNodeMastery[]
     firmwareBoosts         FirmwareBoost[]
     redemptions            ShareRedemption[]
     achievements           UserAchievement[]
-    echoTransmission       EchoTransmission? // One-to-one relationship
     loreContributions      LocationLoreStake[] // Pi staking for lore
     awakeningContributions AwakeningContribution[] // Pi contribution for lattice calibration
     resonantAnchors        ResonantAnchor[] // Pi contribution for resonant anchors
     tuningSessions         TuningSession[]
+    drifts                 NodeDrift[] // Relation to user's drifts
 
     @@map("users")
 }

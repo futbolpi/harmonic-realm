@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { differenceInHours, differenceInMinutes } from "date-fns";
 
 import { MINING_RANGE_METERS } from "@/config/site";
 
@@ -89,4 +90,20 @@ export function truncateText(str: string, maxLength: number, ending = "...") {
 
 export function formatMastery(masteryPct: number) {
   return masteryPct > 20 ? masteryPct : masteryPct * 100;
+}
+
+/**
+ * Helper function to format cooldown time remaining (e.g., "23h 14m")
+ */
+export function formatCooldown(cooldownEnd: Date): string {
+  const now = new Date();
+  if (now >= cooldownEnd) return "Ready";
+
+  const hours = differenceInHours(cooldownEnd, now);
+  const minutes = differenceInMinutes(cooldownEnd, now) % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m`;
 }

@@ -1,0 +1,29 @@
+model NodeDrift {
+    id     String @id @default(cuid())
+    userId String
+    nodeId String
+
+    // Spatial data
+    originalLatitude  Float // Node's pre-drift location
+    originalLongitude Float
+    newLatitude       Float // Node's post-drift location
+    newLongitude      Float
+
+    // Economics
+    sharePointsCost Float // Cost paid (in sharePoints)
+    nodeRarity      NodeTypeRarity
+
+    // Metadata
+    driftRadius      Float @default(10.0) // km radius for spawn
+    originalDistance Float // km from user to original node
+
+    timestamp DateTime @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+    @@index([userId, timestamp])
+    @@index([nodeId])
+    @@map("node_drifts")
+}

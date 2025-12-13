@@ -20,6 +20,7 @@ import { MapControlModal } from "./map-control-modal";
 import { NodesListModal } from "./nodes-list-modal";
 import NodesMap from "./nodes-map";
 import { MapHelpModal } from "./map-help-modal";
+import { ResonantDriftModal } from "./resonant-drift-modal";
 
 interface MobileMapViewProps {
   nodes: Node[];
@@ -125,6 +126,9 @@ export function MobileMapView({ nodes }: MobileMapViewProps) {
 
           {/* Awakening Modal */}
           <AwakeningPathwaysModal />
+
+          {/* Resonant Drift Modal */}
+          <ResonantDriftModal />
 
           {/* Map Help Button */}
           <MapHelpModal />

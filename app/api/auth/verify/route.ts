@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { isValidAccessToken } from "@/lib/pi/platform-api-client";
 import { verifyTokenSchema } from "@/lib/schema/auth";

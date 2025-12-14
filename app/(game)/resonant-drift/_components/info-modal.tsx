@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
+import type { StatusInfo } from "@/lib/schema/drift";
 
 import {
   Credenza,
@@ -16,9 +17,10 @@ import { Button } from "@/components/ui/button";
 interface Props {
   showInfoModal: boolean;
   setShowInfoModal: Dispatch<SetStateAction<boolean>>;
+  statusInfo?: StatusInfo;
 }
 
-const InfoModal = ({ setShowInfoModal, showInfoModal }: Props) => {
+const InfoModal = ({ setShowInfoModal, showInfoModal, statusInfo }: Props) => {
   return (
     <Credenza open={showInfoModal} onOpenChange={setShowInfoModal}>
       <CredenzaContent className="p-4 max-w-lg">
@@ -26,12 +28,24 @@ const InfoModal = ({ setShowInfoModal, showInfoModal }: Props) => {
           <div className="flex items-center justify-between w-full">
             <div>
               <CredenzaTitle>Resonant Drift</CredenzaTitle>
-              <CredenzaDescription>Key mechanics & quick tips</CredenzaDescription>
+              <CredenzaDescription>
+                Key mechanics & quick tips
+              </CredenzaDescription>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end">
+              {statusInfo && (
+                <div className="mb-1">
+                  <span className="text-sm font-medium">{statusInfo.icon}</span>
+                  <div className="text-xs text-muted-foreground">
+                    {statusInfo.text}
+                  </div>
+                </div>
+              )}
               <span className="text-xs text-muted-foreground">Tip</span>
               <div className="mt-1">
-                <span className="bg-muted rounded-full px-2 py-1 text-xs">Know the void radius</span>
+                <span className="bg-muted rounded-full px-2 py-1 text-xs">
+                  Know the void radius
+                </span>
               </div>
             </div>
           </div>
@@ -44,17 +58,8 @@ const InfoModal = ({ setShowInfoModal, showInfoModal }: Props) => {
             </h3>
             <p className="text-sm text-muted-foreground">
               The 10km safe zone around your location. Nodes here are protected
-              and cannot be drifted to. You must venture beyond this zone to
+              and cannot be summoned. You must venture beyond this zone to
               access drift opportunities.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-sm mb-2">Cooldown</h3>
-            <p className="text-sm text-muted-foreground">
-              After drifting, pioneers enter a 72-hour cooldown before they can
-              drift again. Make sure your last drift was more than 72 hours
-              ago for new opportunities to appear.
             </p>
           </div>
 
@@ -72,14 +77,6 @@ const InfoModal = ({ setShowInfoModal, showInfoModal }: Props) => {
               Glowing nodes beyond the 10km zone. These are active drift targets
               that meet the eligibility criteria. Tap a node to initiate a
               drift.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-sm mb-2">Dimmed Nodes</h3>
-            <p className="text-sm text-muted-foreground">
-              Nodes within the safe zone are shown as dimmed and unavailable for
-              drifting.
             </p>
           </div>
         </CredenzaBody>

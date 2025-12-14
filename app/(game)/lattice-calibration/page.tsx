@@ -87,7 +87,10 @@ export default async function CalibrationPage() {
           {/* Staking Tab */}
           <TabsContent value="stake" className="space-y-6">
             <StakingForm
-              phase={{ requiredPiFunding: phase.requiredPiFunding.toFixed(2) }}
+              phase={{
+                requiredPiFunding: phase.requiredPiFunding.toFixed(2),
+                currentProgress: phase.currentProgress.toString(),
+              }}
             />
           </TabsContent>
         </Tabs>

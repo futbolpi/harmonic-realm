@@ -349,7 +349,7 @@ export function ResonantDriftClient({
 
       {/* Empty State */}
       {nodesToRender.length === 0 && userLocation && (
-        <EmptyState setShowInfoModal={setShowInfoModal} />
+        <EmptyState setShowInfoModal={setShowInfoModal} statusInfo={statusInfo} />
       )}
 
       {/* Eligible Nodes Modal */}
@@ -380,6 +380,7 @@ export function ResonantDriftClient({
       <InfoModal
         setShowInfoModal={setShowInfoModal}
         showInfoModal={showInfoModal}
+        statusInfo={statusInfo}
       />
     </div>
   );

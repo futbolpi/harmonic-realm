@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Zap } from "lucide-react";
 import type { MapRef } from "react-map-gl/maplibre";
 
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -29,7 +30,7 @@ import { getUserLocation } from "@/lib/utils/location";
 import { LocationMap } from "./location-map";
 
 interface StakingFormProps {
-  phase: { requiredPiFunding: string };
+  phase: { requiredPiFunding: string; currentProgress?: string };
 }
 
 export function StakingForm({ phase }: StakingFormProps) {
@@ -138,6 +139,26 @@ export function StakingForm({ phase }: StakingFormProps) {
       </div>
 
       <div className="space-y-3 border-t border-border bg-card/50 px-4 py-4 backdrop-blur-sm md:space-y-4 md:border-t-0 md:bg-card md:p-6">
+        {/* Progress */}
+        <div className="mb-2">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-foreground">
+              Pi Funding Progress
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {phase.currentProgress ?? "0"} / {phase.requiredPiFunding} Pi
+            </span>
+          </div>
+          <Progress
+            value={Math.min(
+              (parseFloat(phase.currentProgress ?? "0") /
+                parseFloat(phase.requiredPiFunding)) *
+                100,
+              100
+            )}
+            className="h-2"
+          />
+        </div>
         {/* Location Info & Pi Amount Card */}
         {selectedLat !== null && selectedLon !== null && (
           <div className="rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4">

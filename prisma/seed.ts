@@ -2,6 +2,7 @@ import { achievementsData } from "@/config/achievements-data";
 // import { nodesData, nodeTypesData } from "@/lib/seed/node-data";
 // import { miningSessionsData, usersData } from "@/lib/seed/user-data";
 import prisma from "@/lib/prisma";
+import { vaultUpgrades } from "@/lib/seed/vault-upgrade-data";
 
 async function seedAchievements() {
   for (const ach of achievementsData) {
@@ -12,6 +13,17 @@ async function seedAchievements() {
     });
   }
   console.log("Achievements seeded.");
+}
+
+async function seedVaultUpgrades() {
+  for (const upgrade of vaultUpgrades) {
+    await prisma.vaultUpgrade.upsert({
+      where: { level: upgrade.level },
+      update: upgrade,
+      create: upgrade,
+    });
+  }
+  console.log("Vault upgrades seeded.");
 }
 
 // async function seedNodesAndTypes() {
@@ -98,6 +110,7 @@ async function seedAchievements() {
 
 async function main() {
   await seedAchievements();
+  await seedVaultUpgrades();
   // if (process.env.NODE_ENV === "development") {
   //   await seedNodesAndTypes();
   //   await seedUsersAndSessions();

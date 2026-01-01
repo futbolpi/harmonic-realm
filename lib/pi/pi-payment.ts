@@ -5,6 +5,7 @@ import { getPiSDK } from "@/components/shared/pi/pi-sdk";
 import { PaymentDTO, PiPaymentData } from "@/types/pi";
 import { piPaymentCallbacks } from "./payment-callbacks";
 import { ContributionTier } from "../generated/prisma/enums";
+import { GUILD_CREATION_FEE } from "@/config/guilds/constants";
 
 /**
  * Pi Network Payment Service
@@ -95,6 +96,22 @@ export class PiPaymentService {
       metadata: {
         modelId: contributionId,
         type: "LATTICE_CALIBRATION",
+      },
+    };
+
+    return this.processPayment(paymentData);
+  }
+
+  /**
+   * Create payment for Guild creation
+   */
+  async createGuildPayment(guildId: string): Promise<void> {
+    const paymentData: PiPaymentData = {
+      amount: GUILD_CREATION_FEE,
+      memo: `HarmonicRealm: Payment for Guild Creation`,
+      metadata: {
+        modelId: guildId,
+        type: "GUILD_CREATION",
       },
     };
 

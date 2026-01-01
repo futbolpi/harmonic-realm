@@ -17,6 +17,7 @@ import {
   LANDLORD_TAX_RATE,
 } from "@/config/site";
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
+import { awardMemberSP } from "@/lib/api-helpers/server/guilds/share-points-helpers";
 
 type SucessResponse = {
   shares: number;
@@ -139,7 +140,12 @@ export async function submitTuningSession(
     // --- 2. Calculate Milestone Streak (Retention Logic) ---
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, dailyStreak: true, lastTunedAt: true },
+      select: {
+        id: true,
+        dailyStreak: true,
+        lastTunedAt: true,
+        guildMembership: { select: { id: true } },
+      },
     });
 
     if (!user) {
@@ -218,6 +224,12 @@ export async function submitTuningSession(
     }
 
     await prisma.$transaction(transactionOps);
+
+    await awardMemberSP({
+      memberId: user.guildMembership?.id,
+      sharePoints: grossShares,
+      perfectTuning: accuracyScore === 100,
+    });
 
     revalidatePath(`/nodes/${nodeId}`);
 

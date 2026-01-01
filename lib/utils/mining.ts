@@ -8,6 +8,7 @@
  * @param miniTaskMultiplier e.g. 1.2 for +20%
  * @param maxMiners NodeType.maxMiners
  * @param activeMiners count of COMPLETED sessions
+ * @param guildBonus e.g 5.0
  * @returns shares earned
  */
 export function calculateMinerShares(params: {
@@ -17,13 +18,16 @@ export function calculateMinerShares(params: {
   miniTaskMultiplier: number;
   maxMiners: number;
   activeMiners: number;
+  guildBonus: number;
 }): number {
   const lockedDuration = params.durationMinutes;
+  const guildBonusPct = params.guildBonus === 0 ? 0 : params.guildBonus / 100;
   const divisor = Math.max(1, Math.min(params.maxMiners, params.activeMiners));
   const rawShares =
     (params.baseYieldPerMinute *
       lockedDuration *
       (1 + params.masteryBonusPct) *
+      (1 + guildBonusPct) *
       params.miniTaskMultiplier) /
     divisor;
 

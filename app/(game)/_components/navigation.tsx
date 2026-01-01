@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import UserAvatar from "@/components/shared/user-avatar";
 import { siteConfig } from "@/config/site";
+import GuildLink from "./guild-link";
 
 export function GameNavigation() {
   const { user, logout } = useAuth();
@@ -33,7 +34,7 @@ export function GameNavigation() {
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/map", label: "Map", icon: Map },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
-    { href: "/settings", label: "Settings", icon: Settings },
+    // { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   if (!user) return null;
@@ -110,6 +111,7 @@ export function GameNavigation() {
               <span>{item.label}</span>
             </Link>
           ))}
+          <GuildLink />
         </div>
       </nav>
     </>

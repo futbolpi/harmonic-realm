@@ -15,6 +15,10 @@ import { binLatLon } from "@/lib/node-spawn/region-metrics";
 import { inngest } from "@/inngest/client";
 import { updateMasteryProgression } from "@/lib/utils/mastery";
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
+import {
+  awardMemberSP,
+  getMemberBonus,
+} from "@/lib/api-helpers/server/guilds/share-points-helpers";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -28,7 +32,7 @@ export const completeMiningSession = async (
 
     const { accessToken, sessionId, userLatitude, userLongitude } = data;
 
-    const { id: userId } = await verifyTokenAndGetUser(accessToken);
+    const { id: userId, username } = await verifyTokenAndGetUser(accessToken);
 
     // Validate against spoofing
     const isValid = await validateGeolocation({
@@ -121,15 +125,16 @@ export const completeMiningSession = async (
       };
     }
 
-    // 3. Gather upgrade, sponsor & mastery bonuses
+    // 3. Gather upgrade, guild, sponsor & mastery bonuses
 
-    const [mastery] = await Promise.all([
+    const [mastery, guildBonus] = await Promise.all([
       prisma.userNodeMastery.findUnique({
         where: {
           user_node_mastery_unique: { userId, nodeTypeId },
         },
         select: { bonusPercent: true },
       }),
+      getMemberBonus(username),
     ]);
 
     const masteryBonusPct = mastery ? mastery.bonusPercent : 0;
@@ -145,6 +150,7 @@ export const completeMiningSession = async (
       miniTaskMultiplier,
       maxMiners,
       activeMiners,
+      guildBonus: guildBonus.level?.sharePointsBonus || 0,
     });
 
     const xpGained = calculateMiningXp({
@@ -169,20 +175,27 @@ export const completeMiningSession = async (
           latitudeBin,
           longitudeBin,
         },
+        select: { id: true },
       }),
       prisma.user.update({
         where: { id: userId },
         data: {
           sharePoints: { increment: sharesEarned },
         },
+        select: { id: true },
       }),
     ]);
 
-    // 6. Award XP and mastery & handle level-up
+    // 6. Award XP, member SP and mastery & handle level-up
     // get returned value for good user experience
     await Promise.all([
       awardXp(userId, xpGained),
       updateMasteryProgression(userId, nodeTypeId, 1, prisma),
+      awardMemberSP({
+        memberId: guildBonus.member?.id,
+        sharePoints: sharesEarned,
+        completedMining: true,
+      }),
     ]);
 
     // 7. check if user is eligible for Surge Survivor achievement

@@ -107,3 +107,30 @@ export function formatCooldown(cooldownEnd: Date): string {
   }
   return `${minutes}m`;
 }
+
+/**
+ * Calculates what percentage `part` is of `total`.
+ * * @param part - The numerator (a)
+ * @param total - The denominator (b)
+ * @returns The percentage as a number rounded to 2 decimal places.
+ * Returns 0 if total is 0 or inputs are invalid.
+ */
+export function calculatePercentage(part: number, total: number): number {
+  // 1. Guard clause: Handle Division by Zero immediately
+  if (total === 0) {
+    return 0;
+  }
+
+  // 2. Guard clause: Ensure inputs are finite numbers (handles NaN and Infinity)
+  if (!Number.isFinite(part) || !Number.isFinite(total)) {
+    return 0;
+  }
+
+  // 3. Calculate the raw percentage
+  const rawPercentage = (part / total) * 100;
+
+  // 4. Robust Rounding
+  // We use Number.EPSILON to handle floating point math errors (e.g. 1.005 rounding down)
+  // Logic: Shift decimal right by 2, round, then shift left by 2.
+  return Math.round((rawPercentage + Number.EPSILON) * 100) / 100;
+}

@@ -5,6 +5,7 @@ import { ApiResponse } from "@/lib/schema/api";
 import { completeLocationLorePayment } from "@/lib/api-helpers/server/location-lore/complete-lore-payment";
 import { completeCalibrationPayment } from "@/lib/api-helpers/server/calibration/complete-calibration-payment";
 import { completeAnchorPayment } from "@/lib/api-helpers/server/anchors/complete-anchor-payment";
+import { completeGuildPayment } from "@/lib/api-helpers/server/guilds/complete-guild-payment";
 
 type VerifyPaymentParams = {
   txURL: string;
@@ -86,6 +87,15 @@ export const completePayment = async ({
         txid,
       });
       return anchorResponse;
+
+    case "GUILD_CREATION":
+      const guildResponse = await completeGuildPayment({
+        amount,
+        paymentId,
+        guildId: modelId,
+        txid,
+      });
+      return guildResponse;
 
     default:
       return { success: false };

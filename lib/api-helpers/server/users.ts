@@ -16,7 +16,7 @@ export async function verifyTokenAndGetUser(accessToken: string) {
 
   const dbUser = await prisma.user.findUnique({
     where: { accessToken },
-    select: { id: true, piId: true },
+    select: { id: true, piId: true, username: true },
   });
 
   if (!dbUser) {
@@ -77,6 +77,14 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
         },
       },
       hasCompletedTutorial: true,
+      guildMembership: {
+        select: {
+          guildId: true,
+          role: true,
+          isActive: true,
+          vaultContribution: true,
+        },
+      },
     },
   });
   return user;

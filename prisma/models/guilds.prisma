@@ -1,0 +1,78 @@
+model Guild {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Basic Info
+    name        String  @unique
+    description String?
+    emblem      String  @default("default") // emoji or URL
+    tag         String  @unique // 3-4 char (e.g., "HRMT")
+
+    // Leadership
+    leaderUsername String @unique
+    leader         User   @relation("GuildLeader", fields: [leaderUsername], references: [username])
+
+    // Membership
+    members    GuildMember[]
+    maxMembers Int           @default(20) // Upgradeable
+
+    // Economy (Feature 1: Guild Vault)
+    vaultBalance     Float @default(0) // RESONANCE
+    totalContributed Float @default(0)
+    vaultLevel       Int   @default(1) // 1-10
+
+    // Stats (for leaderboards)
+    totalSharePoints  Float @default(0)
+    totalNodesMined   Int   @default(0)
+    totalTunesPerfect Int   @default(0)
+    weeklyActivity    Float @default(0) // Decays over time
+
+    // Settings
+    isPublic         Boolean @default(true)
+    requireApproval  Boolean @default(false)
+    autoKickInactive Boolean @default(false)
+    minRF            Int     @default(0) // Minimum Resonance Fidelity to join
+
+    // Creation Payment
+    paymentId       String? // Pi Network payment ID
+    piTransactionId String?
+
+    @@index([weeklyActivity])
+}
+
+model GuildMember {
+    id       String   @id @default(cuid())
+    joinedAt DateTime @default(now())
+
+    guildId String
+    guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+    username String @unique
+    user     User   @relation(fields: [username], references: [username], onDelete: Cascade)
+
+    // Role
+    role GuildRole @default(MEMBER)
+
+    // Contributions (tracking for rewards)
+    vaultContribution    Float @default(0)
+    weeklySharePoints    Float @default(0) // Resets weekly
+    totalSharePoints     Float @default(0) // Guild membership lifetime points
+    challengeCompletions Int   @default(0)
+
+    // Activity
+    lastActiveAt DateTime @default(now())
+    isActive     Boolean  @default(true) // Auto-flagged if inactive 7+ days
+
+    // Guild activity
+    vaultTransactions VaultTransaction[]
+
+    @@unique([guildId, username])
+    @@index([guildId, weeklySharePoints]) // For leaderboards
+}
+
+enum GuildRole {
+    LEADER
+    OFFICER
+    MEMBER
+}

@@ -1,5 +1,6 @@
 import { approveAnchorPayment } from "@/lib/api-helpers/server/anchors/approve-anchor-payment";
 import { approveCalibrationPayment } from "@/lib/api-helpers/server/calibration/approve-calibration-payment";
+import { approveGuildPayment } from "@/lib/api-helpers/server/guilds/approve-guild-payment";
 import { approveLocationLorePayment } from "@/lib/api-helpers/server/location-lore/approve-lore-payment";
 import { PaymentType } from "@/lib/generated/prisma/enums";
 import { ApiResponse } from "@/lib/schema/api";
@@ -42,6 +43,13 @@ export const verifyPaymentApproval = async ({
       });
       return anchorResponse;
 
+    case "GUILD_CREATION":
+      const guildResponse = await approveGuildPayment({
+        amount,
+        paymentId,
+        guildId: modelId,
+      });
+      return guildResponse;
     default:
       return { success: false };
   }

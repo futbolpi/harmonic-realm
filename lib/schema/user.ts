@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SessionStatus } from "../generated/prisma/enums";
+import { GuildRole, SessionStatus } from "../generated/prisma/enums";
 
 // User Profile Achievement Schema
 const UserProfileAchievementSchema = z.object({
@@ -46,6 +46,14 @@ export const UserProfileSchema = z.object({
   _count: z.object({ sessions: z.number(), achievements: z.number() }),
   achievements: z.array(UserProfileAchievementSchema),
   sessions: z.array(UserProfileSessionSchema),
+  guildMembership: z
+    .object({
+      guildId: z.string(),
+      role: z.enum(GuildRole),
+      isActive: z.boolean(),
+      vaultContribution: z.number(),
+    })
+    .nullish(),
 });
 
 // Types

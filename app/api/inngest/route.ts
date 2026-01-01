@@ -10,6 +10,8 @@ import { generateLocationLore } from "@/inngest/workflows/location-lores/generat
 import { appToUserPayment } from "@/inngest/workflows/payments/app-to-user";
 import { loreGenerationHealthCheck } from "@/inngest/workflows/location-lores/lore-generation-health-check";
 import { calibrationTriggeredWorkflow } from "@/inngest/workflows/phases/calibration-triggered-workflow";
+import { distributeWeeklyRewards } from "@/inngest/workflows/guilds/distribute-weekly-rewards";
+import { dailyCleanUp } from "@/inngest/workflows/site/daily-cleanup";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -25,5 +27,10 @@ export const { GET, POST, PUT } = serve({
     appToUserPayment,
     loreGenerationHealthCheck,
     calibrationTriggeredWorkflow,
+    // Guild workflows
+    // Distribute weekly guild vault rewards (Mon 00:00 UTC)
+    distributeWeeklyRewards,
+    // Site workflows
+    dailyCleanUp,
   ],
 });

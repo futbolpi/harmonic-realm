@@ -1,0 +1,48 @@
+model VaultTransaction {
+    id         String    @id @default(cuid())
+    createdAt  DateTime  @default(now())
+    archivedAt DateTime?
+
+    memberUsername String
+    guildMember    GuildMember @relation(fields: [memberUsername], references: [username], onDelete: Cascade)
+
+    type          VaultTransactionType
+    amount        Float // RESONANCE
+    balanceBefore Float
+    balanceAfter  Float
+
+    // Context
+    reason   String? // "Guild Challenge Reward", "Member Deposit", etc.
+    metadata Json? // Extra data (e.g., challenge ID)
+
+    @@index([memberUsername, createdAt])
+}
+
+enum VaultTransactionType {
+    DEPOSIT // Member contributes
+    WITHDRAWAL // Leader/Officer spends
+    REWARD // Auto-credit from challenges
+    UPGRADE // Spent on vault level
+    DISTRIBUTION // Weekly payouts
+}
+
+model VaultUpgrade {
+    id    String @id @default(cuid())
+    level Int    @unique
+
+    // Costs
+    resonanceCost Float
+
+    // Benefits
+    maxMembers         Int
+    prestigeBonus      Float // % bonus to prestige gain
+    artifactSlots      Int // How many artifacts guild can equip
+    sharePointsBonus   Float // member sharePoints bonus percentage
+    challengesUnlocked Boolean
+    territoryUnlocked  Boolean
+    exclusiveCosmetics Boolean
+
+    // Flavor
+    name        String // "Humble Echo", "Resonant Sanctum", etc.
+    description String
+}

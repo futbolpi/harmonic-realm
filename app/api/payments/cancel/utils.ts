@@ -51,6 +51,19 @@ export const cancelPayment = async ({
       }
       return { success: true };
 
+    case "GUILD_CREATION":
+      const guild = await prisma.guild.findFirst({
+        where: { id: modelId },
+        select: { id: true },
+      });
+      if (guild) {
+        await prisma.guild.update({
+          where: { id: guild.id },
+          data: { paymentId: null, piTransactionId: null },
+        });
+      }
+      return { success: true };
+
     default:
       return { success: false };
   }

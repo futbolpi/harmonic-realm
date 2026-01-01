@@ -135,7 +135,7 @@ export async function completeAnchorPayment({
       // burns referral points
 
       if (anchor.referralPointsBurned > 0) {
-        await prisma.user.update({
+        await tx.user.update({
           where: { piId: anchor.userId },
           data: {
             resonanceFidelity: { increment: 1 },

@@ -28,6 +28,7 @@ enum PaymentType {
     SHARE_REDEMPTION
     LATTICE_CALIBRATION
     MOCK_PAYMENT
+    GUILD_CREATION
 }
 
 enum PaymentStatus {

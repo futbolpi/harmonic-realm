@@ -30,7 +30,7 @@ const ContributionCard = ({
 }: ContributionCardProps) => {
   const [isDepositing, startTransition] = useTransition();
 
-  const { data: profile } = useProfile();
+  const { data: profile, refreshProfile } = useProfile();
   const balance = profile?.sharePoints || 0;
 
   const [selected, setSelected] = useState<number>(
@@ -69,6 +69,7 @@ const ContributionCard = ({
         if (!response.success) {
           toast.error(response.error || "Deposit failed");
         } else {
+          refreshProfile();
           toast.success(`✓ ${selected} SP deposited`);
           confetti({ particleCount: 80, spread: 60, origin: { y: 0.35 } });
         }
@@ -130,6 +131,7 @@ const ContributionCard = ({
               min={1}
               max={Math.max(1, Math.round(balance))}
               onValueChange={(v) => setSelected(v[0])}
+              className="mt-6"
             />
             <div className="flex items-center justify-between mt-2">
               <div className="text-sm">{selected} SP</div>

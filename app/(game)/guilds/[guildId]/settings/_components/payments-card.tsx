@@ -22,10 +22,14 @@ const PaymentsCard = ({ guild, isLeader }: Props) => {
       <CardContent>
         <div className="space-y-3">
           {guild.paymentId ? (
-            <div className="rounded-md border p-4 bg-green-50">
-              <p className="font-semibold">Payment Completed</p>
+            <div className="rounded-md border p-4">
+              <p className="font-semibold">
+                Payment {guild.piTransactionId ? "Completed" : "Processing"}
+              </p>
               <p className="text-sm text-muted-foreground">
-                Transaction ID: {guild.piTransactionId}
+                {guild.piTransactionId
+                  ? "Payment is Completed (tx confirmed)"
+                  : "Payment is Processing (awaiting confirmation)"}
               </p>
             </div>
           ) : (

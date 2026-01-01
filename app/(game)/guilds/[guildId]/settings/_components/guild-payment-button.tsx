@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { piPayment } from "@/lib/pi/pi-payment";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import { GUILD_CREATION_FEE } from "@/config/guilds/constants";
+import { useProfile } from "@/hooks/queries/use-profile";
 
 export function GuildPaymentButton({
   guildId,
@@ -20,8 +21,10 @@ export function GuildPaymentButton({
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const { user, logout } = useAuth();
+  const { refreshProfile } = useProfile();
 
   useEffect(() => {
     // Initialize Pi SDK
@@ -40,13 +43,18 @@ export function GuildPaymentButton({
   const handlePay = () => {
     startTransition(async () => {
       try {
+        setPaymentProcessing(true);
         await piPayment.createGuildPayment(guildId);
         toast.success("Payment initiated — await confirmation.");
         // In real app we'd listen for webhook and refresh
-        setTimeout(() => router.refresh(), 60000);
+        setTimeout(() => {
+          setPaymentProcessing(false);
+          refreshProfile();
+          router.refresh();
+        }, 60000);
       } catch (error) {
         console.error("Payment failed:", error);
-
+        setPaymentProcessing(false);
         if (error instanceof Error) {
           if (error.name === "PiPaymentError") {
             toast.error("Session expired, please sign in again.");
@@ -67,10 +75,10 @@ export function GuildPaymentButton({
   return (
     <Button
       onClick={handlePay}
-      disabled={isPending || disabled}
+      disabled={paymentProcessing || isPending || disabled}
       className="game-button"
     >
-      {isPending
+      {isPending || paymentProcessing
         ? "Processing..."
         : `Pay Guild Creation Fee (${GUILD_CREATION_FEE})`}
     </Button>

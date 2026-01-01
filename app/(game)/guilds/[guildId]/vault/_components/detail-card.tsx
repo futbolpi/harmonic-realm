@@ -43,7 +43,7 @@ const DetailCard = async ({
           </div>
 
           {currentLevel && (
-            <div className="p-4 bg-muted rounded">
+            <div className="p-4 bg-muted text-muted-foreground rounded w-full">
               <h3 className="font-semibold mb-2">Current Benefits:</h3>
               <ul className="space-y-1 text-sm">
                 <li>
@@ -59,7 +59,7 @@ const DetailCard = async ({
             <div className="w-full mt-3">
               <Progress
                 value={Math.min(
-                  (guild.vaultBalance + 1 / nextLevel.resonanceCost) * 100,
+                  ((guild.vaultBalance + 1) / nextLevel.resonanceCost) * 100,
                   100
                 )}
                 className="h-2"

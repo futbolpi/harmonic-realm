@@ -1,5 +1,7 @@
 "use client";
 
+import { UserStar, View } from "lucide-react";
+
 import UserAvatar from "@/components/shared/user-avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +41,7 @@ const ActiveMembers = ({
         {filtered.map((m) => (
           <div
             key={m.id}
-            className="p-3 rounded-lg border border-border bg-card flex flex-col sm:flex-row items-center justify-between"
+            className="p-3 rounded-lg border border-border bg-card flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
               <UserAvatar size={40} userId={m.username} />
@@ -58,12 +60,16 @@ const ActiveMembers = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => openProfile(m)}>
-                View Profile
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => openProfile(m)}
+              >
+                <View />
               </Button>
               {isLeader && m.role === "MEMBER" && (
-                <Button onClick={() => handleAction(m, "PROMOTE")}>
-                  Promote to Officer
+                <Button size="icon" onClick={() => handleAction(m, "PROMOTE")}>
+                  <UserStar />
                 </Button>
               )}
               {/* ensure leader doesnt remove himself */}

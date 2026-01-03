@@ -39,7 +39,7 @@ const ActiveMembers = ({
         {filtered.map((m) => (
           <div
             key={m.id}
-            className="p-3 rounded-lg border border-border bg-card flex items-center justify-between"
+            className="p-3 rounded-lg border border-border bg-card flex flex-col sm:flex-row items-center justify-between"
           >
             <div className="flex items-center gap-3">
               <UserAvatar size={40} userId={m.username} />

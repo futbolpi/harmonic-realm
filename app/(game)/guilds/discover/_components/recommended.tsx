@@ -4,6 +4,7 @@ import { type SetStateAction } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useProfile } from "@/hooks/queries/use-profile";
 import type { Guild } from "../services";
 
 type RecommendedProps = {
@@ -19,6 +20,10 @@ const Recommended = ({
   setShowRequestModal,
   setSelected,
 }: RecommendedProps) => {
+  const { data: profile } = useProfile();
+  const showJoinBtn =
+    !profile?.guildMembership || !profile.guildMembership.isActive;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -49,15 +54,17 @@ const Recommended = ({
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                   <Button onClick={() => openDetails(g)}>View Details</Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSelected(g);
-                      setShowRequestModal(true);
-                    }}
-                  >
-                    {g.requireApproval ? "Request Join" : "Join Instantly"}
-                  </Button>
+                  {showJoinBtn && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSelected(g);
+                        setShowRequestModal(true);
+                      }}
+                    >
+                      {g.requireApproval ? "Request Join" : "Join Instantly"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

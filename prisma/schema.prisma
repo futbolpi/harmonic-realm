@@ -1,7 +1,6 @@
 generator client {
   provider   = "prisma-client"
   output     = "../lib/generated/prisma"
-  engineType = "client" // enable Prisma ORM without Rust
 }
 
 generator json {
@@ -12,5 +11,4 @@ generator json {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }

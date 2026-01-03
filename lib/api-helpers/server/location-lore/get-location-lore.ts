@@ -1,4 +1,4 @@
-import { Decimal } from "@prisma/client/runtime/library";
+import { Decimal } from "@prisma/client/runtime/client";
 
 import { ContributionTier } from "@/lib/generated/prisma/enums";
 import { LORE_LEVELS, LoreLevel } from "@/lib/node-lore/location-lore";

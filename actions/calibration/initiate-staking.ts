@@ -1,7 +1,6 @@
 "use server";
 
-import { Decimal } from "@prisma/client/runtime/library";
-
+import { Decimal } from "@prisma/client/runtime/client";
 import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
 import prisma from "@/lib/prisma";
 import { ApiResponse } from "@/lib/schema/api";

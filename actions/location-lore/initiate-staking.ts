@@ -1,6 +1,6 @@
 "use server";
 
-import { Decimal } from "@prisma/client/runtime/library";
+import { Decimal } from "@prisma/client/runtime/client";
 
 import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
 import { LORE_LEVELS, LoreLevel } from "@/lib/node-lore/location-lore";

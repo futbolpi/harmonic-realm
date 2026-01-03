@@ -4,6 +4,16 @@ import { achievementsData } from "@/config/achievements-data";
 import prisma from "@/lib/prisma";
 import { vaultUpgrades } from "@/lib/seed/vault-upgrade-data";
 
+async function addNodeGenEvents() {
+  console.log("Updating Anchored Nodes");
+  const awakenedNodes = await prisma.node.updateMany({
+    where: { genEvent: "Awakening", sponsor: { not: null } },
+    data: { genEvent: "Anchoring" },
+  });
+
+  console.log({ awakenedNodes });
+}
+
 async function seedAchievements() {
   for (const ach of achievementsData) {
     await prisma.achievement.upsert({
@@ -111,6 +121,7 @@ async function seedVaultUpgrades() {
 async function main() {
   await seedAchievements();
   await seedVaultUpgrades();
+  await addNodeGenEvents();
   // if (process.env.NODE_ENV === "development") {
   //   await seedNodesAndTypes();
   //   await seedUsersAndSessions();

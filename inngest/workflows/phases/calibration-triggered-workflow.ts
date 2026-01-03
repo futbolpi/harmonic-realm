@@ -9,7 +9,7 @@ import {
   calculatePiCost,
 } from "@/lib/calibration";
 import { getBinId } from "@/lib/node-spawn/region-metrics";
-import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import { NodeGenEvent, NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { generateNodes } from "@/lib/node-spawn/node-generator";
 
 /**
@@ -155,10 +155,15 @@ export const calibrationTriggeredWorkflow = inngest.createFunction(
       });
     });
 
+    const nodesWithEvent = batchNodes.map((node) => ({
+      ...node,
+      genEvent: NodeGenEvent.Calibration,
+    }));
+
     // Step 9: Create nodes in database
     const createdNodes = await step.run("create-nodes", async () => {
       const nodes = await prisma.node.createMany({
-        data: batchNodes,
+        data: nodesWithEvent,
         skipDuplicates: true,
       });
       return nodes;

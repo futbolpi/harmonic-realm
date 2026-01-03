@@ -2,7 +2,10 @@ import { revalidatePath } from "next/cache";
 
 import prisma from "@/lib/prisma";
 import type { ApiResponse } from "@/lib/schema/api";
-import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import {
+  NodeGenEvent,
+  type NodeTypeRarity,
+} from "@/lib/generated/prisma/enums";
 import type { NodeCreateManyInput } from "@/lib/generated/prisma/models";
 import {
   chooseWeighted,
@@ -103,6 +106,7 @@ export async function completeAnchorPayment({
       echoIntensity,
       lore,
       sponsor: anchorId,
+      genEvent: NodeGenEvent.Anchoring,
     };
 
     // Create node, Update anchor record, and update phase progress in a transaction

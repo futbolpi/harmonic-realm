@@ -21,16 +21,17 @@ model NodeType {
 
 // Individual node instances
 model Node {
-    id            String  @id @default(cuid())
+    id            String       @id @default(cuid())
     name          String
     typeId        String
     latitude      Float
     longitude     Float
-    openForMining Boolean @default(true)
+    openForMining Boolean      @default(true)
     sponsor       String?
     lore          String
     phase         Int? // Mirrors NodeType phase for direct node filtering
-    echoIntensity Float   @default(1.0)
+    echoIntensity Float        @default(1.0)
+    genEvent      NodeGenEvent @default(Awakening)
 
     // Relations
     type           NodeType        @relation(fields: [typeId], references: [id])
@@ -71,4 +72,10 @@ enum NodeTypeRarity {
     Rare
     Epic
     Legendary
+}
+
+enum NodeGenEvent {
+    Awakening
+    Calibration
+    Anchoring
 }

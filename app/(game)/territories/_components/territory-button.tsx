@@ -32,7 +32,7 @@ const TerritoryButton = ({
 }: TerritoryButtonProps) => {
   const router = useRouter();
   const { accessToken } = useAuth();
-  const { data: profile } = useProfile();
+  const { data: profile, refreshProfile } = useProfile();
   const [isPending, startTransition] = useTransition();
 
   const userGuildId = profile?.guildMembership?.guildId;
@@ -115,10 +115,9 @@ const TerritoryButton = ({
         if (result.success) {
           toast.success("Territory claimed! Entering detail page...");
           setShowModal(false);
+          refreshProfile();
           // Route to territory detail page
-          setTimeout(() => {
-            router.push(`/territories/${currentHex}`);
-          }, 500);
+          router.push(`/territories/${currentHex}`);
         } else {
           toast.error(result.error || "Failed to stake territory");
         }

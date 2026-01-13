@@ -166,6 +166,7 @@ export async function challengeTerritory(
     // await notifyGuild(territory.guildId, "Your territory is under attack!");
     // await notifyGuild(member.guildId, "Challenge initiated!");
     revalidatePath(`/territories/${hexId}`);
+    revalidatePath("/territories");
 
     return { success: true, data: { hexId } };
   } catch (error) {

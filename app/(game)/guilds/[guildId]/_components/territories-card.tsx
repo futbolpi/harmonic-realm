@@ -22,7 +22,7 @@ const TerritoriesCard = async ({ guildId }: { guildId: string }) => {
         <CardTitle>Territories ({territories.length} Controlled)</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-3 flex-wrap overflow-x-auto">
           {territories.slice(0, 3).map((t) => (
             <div
               key={t.id}
@@ -39,15 +39,14 @@ const TerritoriesCard = async ({ guildId }: { guildId: string }) => {
               </p>
             </div>
           ))}
-
-          <div className="flex items-center">
-            <Link
-              href={`/guilds/${guildId}/territories`}
-              className="text-sm text-primary"
-            >
-              [More →]
-            </Link>
-          </div>
+        </div>
+        <div className="flex items-center">
+          <Link
+            href={`/guilds/${guildId}/territories`}
+            className="text-sm text-primary"
+          >
+            [More →]
+          </Link>
         </div>
 
         <div className="mt-4">

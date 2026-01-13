@@ -4,7 +4,7 @@ import { TERRITORY_H3_RES } from "@/config/guilds/constants";
 import prisma from "@/lib/prisma";
 
 export const getNodesToClaim = async (hexId: string): Promise<string[]> => {
-  const boundary = cellToBoundary(hexId, true);
+  const boundary = cellToBoundary(hexId);
   const lats = boundary.map((p: [number, number]) => p[0]);
   const lngs = boundary.map((p: [number, number]) => p[1]);
   const minLat = Math.min(...lats);

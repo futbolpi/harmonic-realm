@@ -166,6 +166,7 @@ export async function stakeTerritory(
     );
 
     revalidatePath(`/territories/${hexId}`);
+    revalidatePath("/territories");
 
     return { success: true, data: { hexId } };
   } catch (error) {

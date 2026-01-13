@@ -31,7 +31,7 @@ export const getEligibleNodesForDrift = async ({
 
   //   Fetch eligible nodes within 100km
   const eligibleNodes = await prisma.$queryRaw<DriftQueryResponse[]>`
-    SELECT n.id, n.latitude, n.longitude, n.territoryHexId, nt.rarity, nt."maxMiners",
+    SELECT n.id, n.latitude, n.longitude, n."territoryHexId", nt.rarity, nt."maxMiners",
     (6371 * acos(cos(radians(${userLat})) * cos(radians(n.latitude)) * cos(radians(n.longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(n.latitude)))) AS distance
     FROM "nodes" n
     JOIN "node_types" nt ON n."typeId" = nt.id
@@ -70,7 +70,7 @@ export const getEligibleNodeForDrift = async ({
 }: EligibleNodeParams): Promise<EligibleNodeQueryResponse | null> => {
   //   Fetch eligible nodes within 100km
   const result = await prisma.$queryRaw<EligibleNodeQueryResponse[]>`
-    SELECT n.id, n.latitude, n.longitude, n.territoryHexId, nt.rarity, nt."maxMiners",
+    SELECT n.id, n.latitude, n.longitude, n."territoryHexId", nt.rarity, nt."maxMiners",
     (6371 * acos(cos(radians(${userLat})) * cos(radians(n.latitude)) * cos(radians(n.longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(n.latitude)))) AS distance
     FROM "nodes" n
     JOIN "node_types" nt ON n."typeId" = nt.id
@@ -117,7 +117,7 @@ export const getEligibleNodeForDrift = async ({
 export const getDriftOpportunities = async () => {
   //   Fetch all eligible nodes without distance constraint
   const eligibleNodes = await prisma.$queryRaw<DriftQueryResponse[]>`
-    SELECT n.id, n.latitude, n.longitude, n.territoryHexId, nt.rarity, nt."maxMiners"
+    SELECT n.id, n.latitude, n.longitude, n."territoryHexId", nt.rarity, nt."maxMiners"
     FROM "nodes" n
     JOIN "node_types" nt ON n."typeId" = nt.id
     LEFT JOIN "location_lore" ll ON n.id = ll."nodeId"

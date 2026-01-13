@@ -22,6 +22,11 @@ model Guild {
     totalContributed Float @default(0)
     vaultLevel       Int   @default(1) // 1-10
 
+    // Territory (Feature 2: Territory Stakes)
+    territories       Territory[]
+    defenceChallenges TerritoryChallenge[] @relation("TerritoryDefender")
+    attackChallenges  TerritoryChallenge[] @relation("TerritoryAttacker")
+
     // Stats (for leaderboards)
     totalSharePoints  Float @default(0)
     totalNodesMined   Int   @default(0)
@@ -65,7 +70,8 @@ model GuildMember {
     isActive     Boolean  @default(true) // Auto-flagged if inactive 7+ days
 
     // Guild activity
-    vaultTransactions VaultTransaction[]
+    vaultTransactions      VaultTransaction[]
+    territoryContributions TerritoryContribution[]
 
     @@unique([guildId, username])
     @@index([guildId, weeklySharePoints]) // For leaderboards

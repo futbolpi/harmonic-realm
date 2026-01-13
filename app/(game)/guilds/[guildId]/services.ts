@@ -13,7 +13,9 @@ export const getGuildDetailsData = async (guildId: string) => {
       totalSharePoints: true,
       leaderUsername: true,
       piTransactionId: true,
-      _count: { select: { members: { where: { isActive: true } } } },
+      _count: {
+        select: { members: { where: { isActive: true } }, territories: true },
+      },
       members: {
         select: { username: true, weeklySharePoints: true },
         orderBy: { weeklySharePoints: "desc" },

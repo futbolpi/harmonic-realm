@@ -80,7 +80,10 @@ const ContributionCard = ({
     });
   };
 
-  const personalContribution = profile?.guildMembership?.vaultContribution || 0;
+  const personalContribution =
+    profile?.guildMembership?.guildId === guild.id
+      ? profile.guildMembership.vaultContribution
+      : 0;
 
   const pctContribution = calculatePercentage(
     personalContribution,

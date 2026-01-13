@@ -12,6 +12,13 @@ import { loreGenerationHealthCheck } from "@/inngest/workflows/location-lores/lo
 import { calibrationTriggeredWorkflow } from "@/inngest/workflows/phases/calibration-triggered-workflow";
 import { distributeWeeklyRewards } from "@/inngest/workflows/guilds/distribute-weekly-rewards";
 import { dailyCleanUp } from "@/inngest/workflows/site/daily-cleanup";
+import { resolveChallengeOnStart } from "@/inngest/workflows/territories/resolve-challenge-on-start";
+import { resolveExpiredChallengesCron } from "@/inngest/workflows/territories/resolve-expired-challenges-cron";
+import { recomputeTrafficScores } from "@/inngest/workflows/territories/recompute-traffic-scores";
+import {
+  territoryClaimedScheduler,
+  expireTerritoriesCron,
+} from "@/inngest/workflows/territories/expire-territories";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -32,5 +39,12 @@ export const { GET, POST, PUT } = serve({
     distributeWeeklyRewards,
     // Site workflows
     dailyCleanUp,
+
+    // Territory workflows
+    resolveChallengeOnStart,
+    resolveExpiredChallengesCron,
+    recomputeTrafficScores,
+    territoryClaimedScheduler,
+    expireTerritoriesCron,
   ],
 });

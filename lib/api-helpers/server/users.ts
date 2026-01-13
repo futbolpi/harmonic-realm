@@ -83,6 +83,7 @@ export async function getUserProfile(id: string): Promise<UserProfile> {
           role: true,
           isActive: true,
           vaultContribution: true,
+          guild: { select: { vaultBalance: true, vaultLevel: true } },
         },
       },
     },

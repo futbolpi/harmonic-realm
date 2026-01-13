@@ -118,7 +118,11 @@ export async function executeDrift(params: ExecuteDriftParams): Promise<
       // 4. Update Node (lat, lng,).
       await tx.node.update({
         where: { id: nodeId },
-        data: { latitude: randomLocation.lat, longitude: randomLocation.lon },
+        data: {
+          latitude: randomLocation.lat,
+          longitude: randomLocation.lon,
+          territoryHexId: null,
+        },
         select: { id: true },
       });
       // 5. Create DriftLog.

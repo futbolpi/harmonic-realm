@@ -52,6 +52,9 @@ export const UserProfileSchema = z.object({
       role: z.enum(GuildRole),
       isActive: z.boolean(),
       vaultContribution: z.number(),
+      guild: z
+        .object({ vaultBalance: z.number(), vaultLevel: z.number() })
+        .nullish(),
     })
     .nullish(),
 });

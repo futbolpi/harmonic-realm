@@ -40,7 +40,12 @@ model Node {
     tuningSessions TuningSession[]
     drifts         NodeDrift[] // Relation to track drifts for this node
 
+    // Territory association
+    territoryHexId String?
+    territory      Territory? @relation(fields: [territoryHexId], references: [hexId])
+
     @@index([phase]) // Efficient phase-based queries
+    @@index([territoryHexId])
     @@map("nodes")
 }
 

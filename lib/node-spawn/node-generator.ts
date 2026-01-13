@@ -7,7 +7,9 @@ import type {
 } from "geojson";
 import Decimal from "decimal.js";
 import { promises as fs } from "fs";
+import { latLngToCell } from "h3-js";
 
+import { TERRITORY_H3_RES } from "@/config/guilds/constants";
 import { NodeTypeRarity } from "../generated/prisma/enums";
 import { NodeCreateManyInput } from "../generated/prisma/models";
 import { redis } from "../redis";
@@ -184,6 +186,10 @@ export function chooseWeighted<T>(items: T[], weights: number[]): T {
   return items[cumWeights.findIndex((cw) => rand <= cw)];
 }
 
+export function getTerritoryHexId(lat: number, lng: number) {
+  return latLngToCell(lat, lng, TERRITORY_H3_RES);
+}
+
 // Generate nodes
 export async function generateNodes({
   adaptive,
@@ -246,6 +252,8 @@ export async function generateNodes({
         ) / 99999;
       const lore = generateLore(selectedRarity, phaseId).lore;
       const name = generateNodeName(selectedRarity, offset);
+      // const territoryHexId = getTerritoryHexId(point.lat, point.lng);
+
       nodes.push({
         name,
         latitude: point.lat,
@@ -254,6 +262,7 @@ export async function generateNodes({
         phase: phaseId,
         echoIntensity,
         lore,
+        // territoryHexId,
       });
     }
 

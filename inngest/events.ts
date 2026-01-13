@@ -210,6 +210,22 @@ export interface CalibrationTriggeredEvent {
   };
 }
 
+export interface TerritoryChallengeStartedEvent {
+  name: "territory/challenge.started";
+  data: {
+    challengeId: string;
+    endsAt?: string; // ISO date optional convenience
+  };
+}
+
+export interface TerritoryClaimedEvent {
+  name: "territory/claimed";
+  data: {
+    territoryId: string;
+    controlEndsAt: string;
+  };
+}
+
 export type Events =
   | UserCreated
   | PhaseCompletedEvent
@@ -230,4 +246,6 @@ export type Events =
   | PiPaymentFailedEvent
   | PiPaymentProcessedEvent
   | AppToUserPaymentEvent
-  | CalibrationTriggeredEvent;
+  | CalibrationTriggeredEvent
+  | TerritoryChallengeStartedEvent
+  | TerritoryClaimedEvent;

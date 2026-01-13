@@ -9,7 +9,7 @@ import {
 type Props = {
   vaultBalance: number;
   totalSharePoints: number;
-  totalTerritories?: number;
+  totalTerritories: number;
 };
 
 const Stats = ({ totalSharePoints, vaultBalance, totalTerritories }: Props) => {
@@ -39,7 +39,7 @@ const Stats = ({ totalSharePoints, vaultBalance, totalTerritories }: Props) => {
           </div>
           <div className="min-w-[180px] p-3 rounded-lg border border-border bg-card">
             <p className="text-xs text-muted-foreground">Territories</p>
-            <p className="text-xl font-bold">{totalTerritories || 0}</p>
+            <p className="text-xl font-bold">{totalTerritories}</p>
           </div>
         </div>
       </CardContent>

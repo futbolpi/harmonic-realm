@@ -10,6 +10,7 @@ import type { NodeCreateManyInput } from "@/lib/generated/prisma/models";
 import {
   chooseWeighted,
   generateNodeName,
+  // getTerritoryHexId,
 } from "@/lib/node-spawn/node-generator";
 import { generateLore } from "@/lib/node-spawn/generate-lore";
 import { sendMockPayment } from "../mock-payments";
@@ -107,6 +108,7 @@ export async function completeAnchorPayment({
       lore,
       sponsor: anchorId,
       genEvent: NodeGenEvent.Anchoring,
+      // territoryHexId: getTerritoryHexId(anchor.locationLat, anchor.locationLon),
     };
 
     // Create node, Update anchor record, and update phase progress in a transaction

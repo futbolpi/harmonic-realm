@@ -1,0 +1,87 @@
+// ============================================
+// FEATURE 2: TERRITORY STAKES (Async PvP)
+// ============================================
+
+model Territory {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Location (hex grid)
+  hexId      String @unique // Format: "h3_8a2a1072b59ffff"
+  centerLat  Float
+  centerLon  Float
+  resolution Int    @default(7) // H3 resolution (7 = ~5.1km² hexes)
+
+  // Control
+  guildId String?
+  guild   Guild?  @relation(fields: [guildId], references: [id])
+
+  controlledAt  DateTime?
+  controlEndsAt DateTime? // 7 days from controlledAt
+
+  // Staking
+  currentStake Float @default(0) // RESONANCE staked by controlling guild
+
+  // Challenges (Feature 2B: Territory Wars)
+  activeChallengeId String?              @unique
+  activeChallenge   TerritoryChallenge?  @relation("ActiveChallenge", fields: [activeChallengeId], references: [id])
+  // Current + History
+  challengeHistory  TerritoryChallenge[] @relation("TerritoryHistory")
+
+  // Metadata
+  nodes        Node[] // Nodes in this hex
+  trafficScore Float  @default(0) // Avg daily miners/tuners (auto-calculated)
+
+  @@index([guildId])
+  @@index([hexId])
+}
+
+model TerritoryChallenge {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  territoryId String
+  territory   Territory  @relation("TerritoryHistory", fields: [territoryId], references: [id])
+  // Inverse of the "ActiveChallenge" relation
+  activeFor   Territory? @relation("ActiveChallenge")
+
+  // Defender (current owner)
+  defenderId    String
+  defender      Guild  @relation("TerritoryDefender", fields: [defenderId], references: [id])
+  defenderStake Float
+  defenderScore Float  @default(0)
+
+  // Attacker (challenger)
+  attackerId    String
+  attacker      Guild  @relation("TerritoryAttacker", fields: [attackerId], references: [id])
+  attackerStake Float
+  attackerScore Float  @default(0)
+
+  // Duration (24 hours)
+  endsAt   DateTime
+  resolved Boolean  @default(false)
+  winnerId String?
+
+  // Contributions (for member rewards)
+  contributions TerritoryContribution[]
+
+  @@index([territoryId, resolved])
+  @@index([endsAt])
+}
+
+model TerritoryContribution {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  challengeId String
+  challenge   TerritoryChallenge @relation(fields: [challengeId], references: [id])
+
+  username    String
+  guildMember GuildMember @relation(fields: [username], references: [username])
+
+  // Score from tuning (at nodes in contested territory)
+  sharePoints Float
+  tuneCount   Int
+
+  @@unique([challengeId, username])
+}

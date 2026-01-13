@@ -104,6 +104,30 @@ export class InngestEventDispatcher {
   }
 
   /**
+   * Schedule a challenge resolution workflow by emitting a challenge.started event.
+   * The challenge workflow will sleep until the challenge ends and then resolve it.
+   */
+  static async scheduleChallengeResolution(
+    challengeId: string,
+    endsAt?: string
+  ) {
+    return await inngest.send({
+      name: "territory/challenge.started",
+      data: { challengeId, endsAt },
+    });
+  }
+
+  /**
+   * Notify that a territory was claimed (schedules expiry workflow if desired)
+   */
+  static async territoryClaimed(territoryId: string, controlEndsAt: string) {
+    return await inngest.send({
+      name: "territory/claimed",
+      data: { territoryId, controlEndsAt },
+    });
+  }
+
+  /**
    * Batch send multiple events
    */
   static async sendBatch(events: Array<Events>) {

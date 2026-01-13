@@ -19,6 +19,7 @@ import {
   awardMemberSP,
   getMemberBonus,
 } from "@/lib/api-helpers/server/guilds/share-points-helpers";
+import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -69,6 +70,14 @@ export const completeMiningSession = async (
             typeId: true,
             latitude: true,
             longitude: true,
+            territory: {
+              select: {
+                id: true,
+                hexId: true,
+                guildId: true,
+                activeChallengeId: true,
+              },
+            },
             type: {
               select: {
                 baseYieldPerMinute: true,
@@ -164,6 +173,27 @@ export const completeMiningSession = async (
       session.node.longitude
     );
 
+    // Territory bonus: +15% sharePoints if node is in a territory controlled by the user's active guild
+    let finalShares = sharesEarned;
+    try {
+      if (session.node.territory?.guildId) {
+        const member = await prisma.guildMember.findFirst({
+          where: {
+            username,
+            guildId: session.node.territory.guildId,
+            isActive: true,
+          },
+          select: { id: true },
+        });
+        if (member) {
+          const territoryBonus = parseFloat((sharesEarned * 0.15).toFixed(4));
+          finalShares = parseFloat((sharesEarned + territoryBonus).toFixed(4));
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to compute/apply territory bonus", e);
+    }
+
     // 5. Persist all changes atomically
     await prisma.$transaction([
       prisma.miningSession.update({
@@ -171,7 +201,7 @@ export const completeMiningSession = async (
         data: {
           status: "COMPLETED",
           endTime: now,
-          minerSharesEarned: sharesEarned,
+          minerSharesEarned: finalShares,
           latitudeBin,
           longitudeBin,
         },
@@ -180,7 +210,7 @@ export const completeMiningSession = async (
       prisma.user.update({
         where: { id: userId },
         data: {
-          sharePoints: { increment: sharesEarned },
+          sharePoints: { increment: finalShares },
         },
         select: { id: true },
       }),
@@ -193,10 +223,19 @@ export const completeMiningSession = async (
       updateMasteryProgression(userId, nodeTypeId, 1, prisma),
       awardMemberSP({
         memberId: guildBonus.member?.id,
-        sharePoints: sharesEarned,
+        sharePoints: finalShares,
         completedMining: true,
       }),
     ]);
+
+    // 7. If territory is under challenge, contribute to it (best-effort)
+    try {
+      if (!!session.node.territory?.activeChallengeId) {
+        await contributeToChallengeScore(session.nodeId, username, finalShares);
+      }
+    } catch (e) {
+      console.warn("Failed to add territory contribution", e);
+    }
 
     // 7. check if user is eligible for Surge Survivor achievement
     if (activeMiners === maxMiners) {

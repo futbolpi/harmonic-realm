@@ -18,6 +18,7 @@ import {
 } from "@/config/site";
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 import { awardMemberSP } from "@/lib/api-helpers/server/guilds/share-points-helpers";
+import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
 
 type SucessResponse = {
   shares: number;
@@ -49,7 +50,11 @@ export async function submitTuningSession(
     const { accessToken, accuracyScore, nodeId, userLat, userLng } = data;
 
     // Verify user authentication first (needed for geolocation validation)
-    const { id: userId, piId } = await verifyTokenAndGetUser(accessToken);
+    const {
+      id: userId,
+      username,
+      piId,
+    } = await verifyTokenAndGetUser(accessToken);
 
     // Validate against spoofing with user context for velocity tracking
     const isValid = await validateGeolocation({
@@ -152,6 +157,37 @@ export async function submitTuningSession(
       return { success: false, error: "Invalid Request" };
     }
 
+    // Territory bonus: +15% SP if node is in territory controlled by user's active guild
+    let finalNetShares = netShares;
+    let activeChallengeId: string | undefined | null;
+    try {
+      const nodeTerr = await prisma.node.findUnique({
+        where: { id: nodeId },
+        select: {
+          territory: { select: { guildId: true, activeChallengeId: true } },
+        },
+      });
+      activeChallengeId = nodeTerr?.territory?.activeChallengeId;
+
+      if (nodeTerr?.territory?.guildId) {
+        const member = await prisma.guildMember.findFirst({
+          where: {
+            username,
+            guildId: nodeTerr.territory.guildId,
+            isActive: true,
+          },
+          select: { id: true },
+        });
+        if (member) {
+          const territoryBonus = parseFloat((netShares * 0.15).toFixed(4));
+          finalNetShares = parseFloat((netShares + territoryBonus).toFixed(4));
+          netShares = finalNetShares; // update for transaction below
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to compute/apply territory tuning bonus", e);
+    }
+
     let newStreak = user.dailyStreak;
     let earnedReferralPoints = 0;
     let milestoneReached = false;
@@ -225,11 +261,21 @@ export async function submitTuningSession(
 
     await prisma.$transaction(transactionOps);
 
+    // Award guild/member SP based on the actual shares awarded to the player (final net)
     await awardMemberSP({
       memberId: user.guildMembership?.id,
-      sharePoints: grossShares,
+      sharePoints: netShares,
       perfectTuning: accuracyScore === 100,
     });
+
+    // If territory under challenge, record contribution (best-effort)
+    try {
+      if (!!activeChallengeId) {
+        await contributeToChallengeScore(nodeId, username, netShares);
+      }
+    } catch (e) {
+      console.warn("Failed to add territory contribution for tuning", e);
+    }
 
     revalidatePath(`/nodes/${nodeId}`);
 

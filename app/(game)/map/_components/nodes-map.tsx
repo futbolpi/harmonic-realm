@@ -11,7 +11,12 @@ import {
   useCallback,
   useRef,
 } from "react";
-import Map, { MapRef, Marker, Popup, ViewStateChangeEvent } from "react-map-gl/maplibre";
+import Map, {
+  MapRef,
+  Marker,
+  Popup,
+  ViewStateChangeEvent,
+} from "react-map-gl/maplibre";
 import { useTheme } from "next-themes";
 import useSupercluster from "use-supercluster";
 import { BBox, GeoJsonProperties } from "geojson";
@@ -22,10 +27,10 @@ import type { Node } from "@/lib/schema/node";
 import { NodeMarker } from "@/app/(game)/_components/node-markers";
 import { UserMarker } from "@/app/(game)/_components/user-markers";
 import { useProfile } from "@/hooks/queries/use-profile";
+import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import { getRarityInfo, MAP_STYLES } from "../utils";
 import { NodePopup } from "./node-popup";
-
 
 // ============================================================================
 // Types
@@ -41,8 +46,12 @@ type ClusterProperties = GeoJsonProperties & {
 };
 
 type PointProperties = {
-  node: Node;
-  nodeColor: ReturnType<typeof getRarityInfo>;
+  node: {
+    longitude: number;
+    latitude: number;
+    id: string;
+    rarity: NodeTypeRarity;
+  };
 };
 
 // ============================================================================
@@ -72,11 +81,11 @@ const MemoizedNodeMarker = memo(
     node,
     handleNodeClick,
     isSelected,
-    nodeColor
+    nodeColor,
   }: {
-    node: Node;
-    handleNodeClick: (node: Node) => void;
-    nodeColor: ReturnType<typeof getRarityInfo>
+    node: { longitude: number; latitude: number; id: string };
+    handleNodeClick: (nodeId: string) => void;
+    nodeColor: ReturnType<typeof getRarityInfo>;
     isSelected: boolean;
   }) => (
     <Marker
@@ -84,7 +93,7 @@ const MemoizedNodeMarker = memo(
       latitude={node.latitude}
       onClick={(e) => {
         e.originalEvent.stopPropagation();
-        handleNodeClick(node);
+        handleNodeClick(node.id);
       }}
     >
       <NodeMarker
@@ -115,16 +124,23 @@ const MemoizedClusterMarker = memo(
     // Dynamically size the cluster based on point count for visual distinction
     const size = 30 + Math.min(pointCount / 10, 30);
 
-    return(
-    <Marker longitude={longitude} latitude={latitude} onClick={onClusterClick}>
-      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm cursor-pointer border-2 border-primary-foreground shadow-lg transition-transform hover:scale-110" style={{ width: `${size}px`, height: `${size}px` }}>
-        {pointCount}
-      </div>
-    </Marker>
-  )}
+    return (
+      <Marker
+        longitude={longitude}
+        latitude={latitude}
+        onClick={onClusterClick}
+      >
+        <div
+          className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm cursor-pointer border-2 border-primary-foreground shadow-lg transition-transform hover:scale-110"
+          style={{ width: `${size}px`, height: `${size}px` }}
+        >
+          {pointCount}
+        </div>
+      </Marker>
+    );
+  }
 );
 MemoizedClusterMarker.displayName = "MemoizedClusterMarker";
-
 
 // ============================================================================
 // Main Map Component
@@ -149,12 +165,17 @@ const NodesMap = ({
    * Pre-processes the nodes into a format required by `useSupercluster`.
    * This is memoized to avoid re-computation on every render.
    */
-  const points= useMemo<Supercluster.PointFeature<PointProperties>[]>(
+  const points = useMemo<Supercluster.PointFeature<PointProperties>[]>(
     () =>
       filteredAndSortedNodes.map((node) => ({
         type: "Feature",
         properties: {
-          node, nodeColor: getRarityInfo(node.type.rarity),
+          node: {
+            id: node.id,
+            latitude: node.latitude,
+            longitude: node.longitude,
+            rarity: node.type.rarity,
+          },
           cluster: false,
         },
         geometry: {
@@ -181,14 +202,17 @@ const NodesMap = ({
    */
   const initialViewState = useMemo(() => {
     return {
-      latitude: hasNodes ? filteredAndSortedNodes[0].latitude : urlLat ?? 40.7128,
-      longitude: hasNodes ? filteredAndSortedNodes[0].longitude : urlLng ?? -74.006,
+      latitude: hasNodes
+        ? filteredAndSortedNodes[0].latitude
+        : urlLat ?? 40.7128,
+      longitude: hasNodes
+        ? filteredAndSortedNodes[0].longitude
+        : urlLng ?? -74.006,
       zoom: hasNodes ? 16 : 12,
     };
   }, [hasNodes, urlLat, urlLng, filteredAndSortedNodes]);
 
-
-   /**
+  /**
    * The current zoom level of the map.
    * @state
    */
@@ -235,17 +259,22 @@ const NodesMap = ({
    * This is crucial for `useSupercluster` to recalculate clusters.
    * Debounced to prevent excessive updates during rapid movements.
    */
-  const handleMapMove = useCallback((e: ViewStateChangeEvent) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      setZoom(e.viewState.zoom);
-      if (mapRef.current) {
-        setBounds(mapRef.current.getMap().getBounds().toArray().flat() as BBox);
+  const handleMapMove = useCallback(
+    (e: ViewStateChangeEvent) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-    }, 200); // 200ms debounce delay
-  }, [mapRef]);
+      timeoutRef.current = setTimeout(() => {
+        setZoom(e.viewState.zoom);
+        if (mapRef.current) {
+          setBounds(
+            mapRef.current.getMap().getBounds().toArray().flat() as BBox
+          );
+        }
+      }, 200); // 200ms debounce delay
+    },
+    [mapRef]
+  );
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -259,20 +288,22 @@ const NodesMap = ({
   /**
    * Zooms into a cluster when it's clicked.
    */
-  const handleClusterClick = useCallback((id: number, longitude: number, latitude: number) => {
+  const handleClusterClick = useCallback(
+    (id: number, longitude: number, latitude: number) => {
       const expansionZoom = Math.min(
-          supercluster?.getClusterExpansionZoom(id) ?? 20,
-          20
+        supercluster?.getClusterExpansionZoom(id) ?? 20,
+        20
       );
       if (mapRef.current) {
-          mapRef.current.flyTo({
-              center: [longitude, latitude],
-              zoom: expansionZoom,
-              duration: 500,
-          });
-      } 
-  }, [mapRef, supercluster]);
-
+        mapRef.current.flyTo({
+          center: [longitude, latitude],
+          zoom: expansionZoom,
+          duration: 500,
+        });
+      }
+    },
+    [mapRef, supercluster]
+  );
 
   return (
     <div className="absolute inset-0">
@@ -308,9 +339,8 @@ const NodesMap = ({
       >
         {/* Render Clusters and Markers */}
         {clusters.map((cluster) => {
-          
           const [longitude, latitude] = cluster.geometry.coordinates;
-          const { cluster: isCluster, point_count:pointCount } =
+          const { cluster: isCluster, point_count: pointCount } =
             cluster.properties as ClusterProperties;
 
           if (isCluster) {
@@ -320,18 +350,28 @@ const NodesMap = ({
                 pointCount={pointCount}
                 longitude={longitude}
                 latitude={latitude}
-                onClusterClick={() => handleClusterClick(cluster.id as number, longitude, latitude)}
+                onClusterClick={() =>
+                  handleClusterClick(cluster.id as number, longitude, latitude)
+                }
               />
             );
           }
-          
-          const { node, nodeColor } = (cluster.properties as Supercluster.PointFeature<PointProperties>['properties']);
+
+          const { node } =
+            cluster.properties as Supercluster.PointFeature<PointProperties>["properties"];
           return (
             <MemoizedNodeMarker
               key={`node-${node.id}`}
               node={node}
-              nodeColor={nodeColor}
-              handleNodeClick={handleNodeClick}
+              nodeColor={getRarityInfo(node.rarity)}
+              handleNodeClick={(nodeId) => {
+                const node = filteredAndSortedNodes.find(
+                  ({ id }) => id === nodeId
+                );
+                if (node) {
+                  handleNodeClick(node);
+                }
+              }}
               isSelected={selectedNode?.id === node.id}
             />
           );

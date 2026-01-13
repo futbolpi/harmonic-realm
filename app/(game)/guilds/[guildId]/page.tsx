@@ -7,6 +7,8 @@ import TopContributors from "./_components/top-contributors";
 import RecentActivity from "./_components/recent-activity";
 import RecentActivityFallback from "./_components/recent-activity-loading";
 import { getGuildDetailsData } from "./services";
+import TerritoriesCard from "./_components/territories-card";
+import TerritoriesCardLoading from "./_components/territories-card-loading";
 
 type Props = {
   params: Promise<{ guildId: string }>;
@@ -54,6 +56,7 @@ export default async function GuildPage({ params }: Props) {
             <Stats
               totalSharePoints={guild.totalSharePoints}
               vaultBalance={guild.vaultBalance}
+              totalTerritories={guild._count.territories}
             />
 
             {/* Active Challenges */}
@@ -103,41 +106,9 @@ export default async function GuildPage({ params }: Props) {
             </Card> */}
 
             {/* Territories */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>
-                  Territories ({guild.territories.length} Controlled)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-3 flex-wrap">
-                  {guild.territories.slice(0, 3).map((t) => (
-                    <div
-                      key={t.id}
-                      className="p-3 w-44 rounded-lg border border-border bg-card"
-                    >
-                      <p className="font-semibold">Zone {t.zone}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t.status === "WAR" ? "⚔️ WAR" : "✓"}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {t.timeLeft}
-                      </p>
-                    </div>
-                  ))}
-
-                  <div className="flex items-center">
-                    <Link href="#" className="text-sm text-primary">
-                      [More →]
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <Button variant="outline">Stake New Territory</Button>
-                </div>
-              </CardContent>
-            </Card> */}
+            <Suspense fallback={<TerritoriesCardLoading />}>
+              <TerritoriesCard guildId={guildId} />
+            </Suspense>
 
             {/* Artifacts */}
             {/* <Card>

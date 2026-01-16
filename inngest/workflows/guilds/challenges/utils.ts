@@ -63,8 +63,7 @@ export async function generateCompleteChallengeAnnouncement(
   guildName: string,
   challengeName: string,
   resonanceReward: number,
-  prestigeReward: number,
-  memberCount: number
+  prestigeReward: number
 ): Promise<string> {
   return `
 <b>🌟 CHALLENGE COMPLETE: ${challengeName.toUpperCase()} 🌟</b>
@@ -72,7 +71,7 @@ export async function generateCompleteChallengeAnnouncement(
 The guild <b>${guildName}</b> has successfully conquered the challenge: <b>${challengeName}</b>
 
 <b>Rewards Distributed:</b>
-💰 <b>${resonanceReward}</b> RESONANCE (shared across ${memberCount} members)
+💰 <b>${resonanceReward}</b> RESONANCE 
 ⭐ <b>${prestigeReward}</b> Prestige points
 
 The Lattice acknowledges your triumph. Your synchronized frequencies have strengthened the collective resonance. May this victory inspire your next ascent!

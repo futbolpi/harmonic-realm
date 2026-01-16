@@ -37,7 +37,11 @@ export const completeChallengeWorkflow = inngest.createFunction(
             },
           },
           guild: {
-            select: { leaderUsername: true, vaultBalance: true, name: true },
+            select: {
+              leaderUsername: true,
+              vaultBalance: true,
+              name: true,
+            },
           },
         },
       });
@@ -109,7 +113,7 @@ export const completeChallengeWorkflow = inngest.createFunction(
 
     try {
       await step.run("send-notification", async () => {
-        const message = generateCompleteChallengeAnnouncement(
+        const message = await generateCompleteChallengeAnnouncement(
           progress.guild.name,
           progress.challenge.template.name,
           progress.challenge.rewardResonance,

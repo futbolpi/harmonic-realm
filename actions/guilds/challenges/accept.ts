@@ -117,7 +117,8 @@ export async function acceptChallenge(
       select: { id: true },
     });
 
-    revalidatePath(`/guilds/${guildId}`, "layout");
+    revalidatePath(`/guilds/${guildId}`);
+    revalidatePath(`/guilds/${guildId}/challenges`);
 
     return {
       success: true,

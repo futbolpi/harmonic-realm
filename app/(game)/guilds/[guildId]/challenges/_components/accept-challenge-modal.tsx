@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { AlertCircle, Zap } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,7 +35,6 @@ export default function AcceptChallengeModal({
   guildId,
   onClose,
 }: AcceptChallengeModalProps) {
-  const router = useRouter();
   const { accessToken } = useAuth();
   const { data: profile } = useProfile();
   const [isPending, startTransition] = useTransition();
@@ -111,7 +109,6 @@ export default function AcceptChallengeModal({
           toast.success(
             `🎯 ${name} accepted! Your guild rises to the challenge.`
           );
-          router.refresh();
           onClose();
         } else {
           toast.error(result.error || "Failed to accept challenge");

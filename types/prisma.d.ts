@@ -31,6 +31,8 @@ declare global {
       harmonics: number[];
       instruments: string[];
     };
+
+    type MemberContributions = Record<string, number>;
   }
 }
 

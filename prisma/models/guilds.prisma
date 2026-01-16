@@ -27,6 +27,9 @@ model Guild {
     defenceChallenges TerritoryChallenge[] @relation("TerritoryDefender")
     attackChallenges  TerritoryChallenge[] @relation("TerritoryAttacker")
 
+    challengesActive GuildChallenge[]    @relation("ActiveChallenges")
+    challengeHistory ChallengeProgress[]
+
     // Stats (for leaderboards)
     totalSharePoints  Float @default(0)
     totalNodesMined   Int   @default(0)

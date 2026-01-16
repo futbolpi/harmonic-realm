@@ -22,6 +22,26 @@ export const getGuildDetailsData = async (guildId: string) => {
         take: 3,
         where: { isActive: true },
       },
+      challengeHistory: {
+        where: {
+          completed: false,
+          completedAt: null,
+          challenge: { endDate: { lt: new Date() } },
+        },
+        select: {
+          id: true,
+          currentValue: true,
+          targetValue: true,
+          challenge: {
+            select: {
+              endDate: true,
+              rewardPrestige: true,
+              rewardResonance: true,
+              template: { select: { name: true } },
+            },
+          },
+        },
+      },
     },
   });
 };

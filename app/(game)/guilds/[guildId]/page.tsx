@@ -9,6 +9,7 @@ import RecentActivityFallback from "./_components/recent-activity-loading";
 import { getGuildDetailsData } from "./services";
 import TerritoriesCard from "./_components/territories-card";
 import TerritoriesCardLoading from "./_components/territories-card-loading";
+import ActiveChallenges from "./_components/active-challenges";
 
 type Props = {
   params: Promise<{ guildId: string }>;
@@ -60,50 +61,10 @@ export default async function GuildPage({ params }: Props) {
             />
 
             {/* Active Challenges */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>
-                  Active Challenges ({guild.activeChallenges.length}/4 Active)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {guild.activeChallenges.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    No active challenges
-                  </p>
-                )}
-
-                {guild.activeChallenges.map((c) => (
-                  <div
-                    key={c.id}
-                    className="p-3 rounded-lg border border-border bg-card"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">🎯</span>
-                        <div>
-                          <p className="font-semibold">{c.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {c.current.toLocaleString()} /{" "}
-                            {c.target.toLocaleString()} • {c.endsIn} left
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right text-xs text-muted-foreground">
-                        💎 {c.rewardRes} • ⭐ {c.rewardPrestige}
-                      </div>
-                    </div>
-                    <Progress value={c.progress} className="h-2 rounded-full" />
-                  </div>
-                ))}
-
-                <div>
-                  <Link href="#" className="text-sm text-primary">
-                    View All Challenges →
-                  </Link>
-                </div>
-              </CardContent>
-            </Card> */}
+            <ActiveChallenges
+              activeChallenges={guild.challengeHistory}
+              guildId={guildId}
+            />
 
             {/* Territories */}
             <Suspense fallback={<TerritoriesCardLoading />}>

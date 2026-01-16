@@ -1,0 +1,113 @@
+// ============================================
+// FEATURE 3: GUILD CHALLENGES (Co-op Goals)
+// ============================================
+
+model GuildChallenge {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    // Metadata
+    templateId String
+    template   ChallengeTemplate @relation(fields: [templateId], references: [id])
+
+    // Active guilds
+    guilds Guild[] @relation("ActiveChallenges")
+
+    // Duration
+    startDate DateTime
+    endDate   DateTime
+
+    // Progress tracking
+    progress ChallengeProgress[]
+
+    // Rewards (distributed on completion)
+    rewardResonance Float
+    rewardPrestige  Int
+
+    @@index([startDate, endDate])
+    @@map("guild_challenges")
+}
+
+model ChallengeTemplate {
+    id String @id @default(cuid())
+
+    // Identity
+    name        String              @unique
+    description String
+    difficulty  ChallengeDifficulty
+
+    // Goal (what to track)
+    goalType    ChallengeGoalType
+    targetValue Int // e.g., 1000 sharePoints, 50 nodes, etc.
+
+    // Requirements
+    minMembers    Int @default(5)
+    minVaultLevel Int @default(1)
+
+    // Rewards
+    resonanceReward Float
+    prestigeReward  Int
+
+    // Frequency
+    frequency ChallengeFrequency
+
+    // Lore
+    loreText String
+    icon     String
+
+    // Active instances
+    challenges GuildChallenge[]
+
+    createdAt DateTime @default(now())
+
+    @@index([difficulty, frequency])
+    @@map("challenge_templates")
+}
+
+enum ChallengeDifficulty {
+    EASY
+    MEDIUM
+    HARD
+    BRUTAL
+}
+
+enum ChallengeGoalType {
+    TOTAL_SHAREPOINTS // Cumulative SP from all members
+    UNIQUE_NODES_MINED // Different nodes mined by guild
+    PERFECT_TUNES // Count of perfect tuning sessions
+    TERRITORY_CAPTURED // Win X territory challenges
+    VAULT_CONTRIBUTIONS // Total RESONANCE deposited
+    MEMBER_STREAKS // Members with 3+ day streaks
+}
+
+enum ChallengeFrequency {
+    DAILY
+    WEEKLY
+    MONTHLY
+    SEASONAL
+}
+
+model ChallengeProgress {
+    id        String   @id @default(cuid())
+    updatedAt DateTime @updatedAt
+
+    challengeId String
+    challenge   GuildChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+    guildId String
+    guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+    // Progress
+    currentValue Int       @default(0)
+    targetValue  Int
+    completed    Boolean   @default(false)
+    completedAt  DateTime?
+
+    // Member contributions (for internal tracking)
+    /// [MemberContributions]
+    contributions Json? // {username: value, username: value, ...}
+
+    @@unique([challengeId, guildId])
+    @@index([guildId, completed])
+    @@map("challenge_progress")
+}

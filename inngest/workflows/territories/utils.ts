@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 
 import { TERRITORY_CONTROL_DAYS } from "@/config/guilds/constants";
 import type { Prisma } from "@/lib/generated/prisma/client";
+import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
 
 /**
  * Shared helper to resolve a territory challenge inside a transaction.
@@ -79,6 +80,16 @@ export async function resolveTerritoryChallenge(
       metadata: { challengeId: ch.id },
     },
   });
+
+  if (!!winnerGuild) {
+    await updateChallengeProgress({
+      guildId: winnerId,
+      username: winnerGuild.leaderUsername,
+      updates: {
+        territoriesCaptured: 1, // +1 to TERRITORY_CAPTURED challenges
+      },
+    });
+  }
 
   return {
     winnerId,

@@ -19,6 +19,7 @@ import {
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 import { awardMemberSP } from "@/lib/api-helpers/server/guilds/share-points-helpers";
 import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
+import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
 
 type SucessResponse = {
   shares: number;
@@ -149,7 +150,7 @@ export async function submitTuningSession(
         id: true,
         dailyStreak: true,
         lastTunedAt: true,
-        guildMembership: { select: { id: true } },
+        guildMembership: { select: { id: true, guildId: true } },
       },
     });
 
@@ -275,6 +276,24 @@ export async function submitTuningSession(
       }
     } catch (e) {
       console.warn("Failed to add territory contribution for tuning", e);
+    }
+
+    // Contributes to TOTAL_SHAREPOINTS and PERFECT_TUNES challenges
+    try {
+      const member = user.guildMembership;
+      if (member) {
+        await updateChallengeProgress({
+          guildId: member.guildId,
+          username,
+          updates: {
+            sharePoints: netShares, // Contributes to TOTAL_SHAREPOINTS
+            // Award 1 point for perfect tunes (100 accuracy), 0 otherwise
+            perfectTunes: accuracyScore === 100 ? 1 : 0,
+          },
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to update challenge progress for tuning", e);
     }
 
     revalidatePath(`/nodes/${nodeId}`);

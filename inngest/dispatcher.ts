@@ -127,6 +127,17 @@ export class InngestEventDispatcher {
     });
   }
 
+  static async completeChallengeForGuild(
+    progressId: string,
+    guildId: string,
+    challengeId: string
+  ) {
+    return await inngest.send({
+      name: "guild/challenge.completed",
+      data: { progressId, guildId, challengeId },
+    });
+  }
+
   /**
    * Batch send multiple events
    */

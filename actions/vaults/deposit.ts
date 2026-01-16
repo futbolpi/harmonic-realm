@@ -10,6 +10,7 @@ import {
 import { ApiResponse } from "@/lib/schema/api";
 import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
 import { canUserDeposit } from "@/lib/guild/utils";
+import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
 
 /**
  * ACTION: deposits to guild vault
@@ -113,6 +114,19 @@ export async function depositToVault(
 
       return guild;
     });
+
+    // Contributes to VAULT_CONTRIBUTIONS challenges
+    try {
+      await updateChallengeProgress({
+        guildId: guildId,
+        username: user.username,
+        updates: {
+          vaultContribution: amount, // Track RESONANCE deposited to vault
+        },
+      });
+    } catch (e) {
+      console.warn("Failed to update vault contribution challenge", e);
+    }
 
     revalidatePath(`/guilds/${guildId}`, "layout");
     return { success: true, data: { id: result.id } };

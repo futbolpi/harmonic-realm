@@ -20,6 +20,7 @@ import {
   getMemberBonus,
 } from "@/lib/api-helpers/server/guilds/share-points-helpers";
 import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
+import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest
@@ -237,7 +238,31 @@ export const completeMiningSession = async (
       console.warn("Failed to add territory contribution", e);
     }
 
-    // 7. check if user is eligible for Surge Survivor achievement
+    //n8. Contributes to TOTAL_SHAREPOINTS and UNIQUE_NODES_MINED challenges
+    try {
+      const member = await prisma.guildMember.findFirst({
+        where: {
+          username,
+          isActive: true,
+        },
+        select: { guildId: true },
+      });
+
+      if (member) {
+        await updateChallengeProgress({
+          guildId: member.guildId,
+          username,
+          updates: {
+            sharePoints: finalShares, // Contributes to TOTAL_SHAREPOINTS
+            nodesMined: 1, // Each mining session counts as 1 node
+          },
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to update challenge progress for mining", e);
+    }
+
+    // 9. check if user is eligible for Surge Survivor achievement
     if (activeMiners === maxMiners) {
       const surgeAchievement = await prisma.achievement.findUnique({
         where: { name: "Surge Survivor" }, // Assuming this achievement exists from seed
@@ -260,13 +285,13 @@ export const completeMiningSession = async (
       }
     }
 
-    // 8. call the achievement unlock workflow
+    // 10. call the achievement unlock workflow
     await inngest.send({
       name: "game.achievement.check",
       data: { eventType: "miningCompleted", userId },
     });
 
-    // 9. Revalidate pages showing balances & levels
+    // 11. Revalidate pages showing balances & levels
     revalidatePath("/");
     revalidatePath(`/nodes/${session.nodeId}`);
 

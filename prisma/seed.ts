@@ -2,17 +2,18 @@ import { achievementsData } from "@/config/achievements-data";
 // import { nodesData, nodeTypesData } from "@/lib/seed/node-data";
 // import { miningSessionsData, usersData } from "@/lib/seed/user-data";
 import prisma from "@/lib/prisma";
+import { seedChallengeTemplates } from "@/lib/seed/seed-challenges";
 import { vaultUpgrades } from "@/lib/seed/vault-upgrade-data";
 
-async function addNodeGenEvents() {
-  console.log("Updating Anchored Nodes");
-  const awakenedNodes = await prisma.node.updateMany({
-    where: { genEvent: "Awakening", sponsor: { not: null } },
-    data: { genEvent: "Anchoring" },
-  });
+// async function addNodeGenEvents() {
+//   console.log("Updating Anchored Nodes");
+//   const awakenedNodes = await prisma.node.updateMany({
+//     where: { genEvent: "Awakening", sponsor: { not: null } },
+//     data: { genEvent: "Anchoring" },
+//   });
 
-  console.log({ awakenedNodes });
-}
+//   console.log({ awakenedNodes });
+// }
 
 async function seedAchievements() {
   for (const ach of achievementsData) {
@@ -121,7 +122,8 @@ async function seedVaultUpgrades() {
 async function main() {
   await seedAchievements();
   await seedVaultUpgrades();
-  await addNodeGenEvents();
+  await seedChallengeTemplates();
+  // await addNodeGenEvents();
   // if (process.env.NODE_ENV === "development") {
   //   await seedNodesAndTypes();
   //   await seedUsersAndSessions();

@@ -226,6 +226,15 @@ export interface TerritoryClaimedEvent {
   };
 }
 
+export interface ChallengeCompletedEvent {
+  name: "guild/challenge.completed";
+  data: {
+    progressId: string;
+    guildId: string;
+    challengeId: string;
+  };
+}
+
 export type Events =
   | UserCreated
   | PhaseCompletedEvent
@@ -248,4 +257,5 @@ export type Events =
   | AppToUserPaymentEvent
   | CalibrationTriggeredEvent
   | TerritoryChallengeStartedEvent
-  | TerritoryClaimedEvent;
+  | TerritoryClaimedEvent
+  | ChallengeCompletedEvent;

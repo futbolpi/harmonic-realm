@@ -22,30 +22,34 @@ const TerritoriesCard = async ({ guildId }: { guildId: string }) => {
         <CardTitle>Territories ({territories.length} Controlled)</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-3 flex-wrap overflow-x-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
           {territories.slice(0, 3).map((t) => (
-            <div
+            <Link
               key={t.id}
-              className="p-3 w-44 rounded-lg border border-border bg-card"
+              href={`/territories/${t.hexId}`}
+              prefetch={false}
+              className="group p-3 rounded-lg border border-border bg-card hover:bg-accent hover:border-primary transition-colors"
             >
-              <p className="font-semibold">Zone {t.hexId}</p>
-              <p className="text-xs text-muted-foreground">
-                {t.activeChallengeId ? "⚔️ WAR" : "✓"}
+              <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                Zone {t.hexId.substring(5)}..
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {t.activeChallengeId ? "⚔️ WAR" : "✓ Stable"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {formatDistanceToNow(t.controlEndsAt || new Date(), {
                   addSuffix: true,
                 })}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
         <div className="flex items-center">
           <Link
             href={`/guilds/${guildId}/territories`}
-            className="text-sm text-primary"
+            className="text-sm text-primary hover:underline"
           >
-            [More →]
+            [View all →]
           </Link>
         </div>
 

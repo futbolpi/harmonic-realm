@@ -44,7 +44,7 @@ export async function acceptMember(
     }
 
     // ensure it is within guild membership limit
-    if (leader.guildLed.maxMembers >= leader.guildLed._count.members) {
+    if (leader.guildLed.maxMembers <= leader.guildLed._count.members) {
       return { success: false, error: "Guild membership limit reached" };
     }
 

@@ -33,6 +33,17 @@ declare global {
     };
 
     type MemberContributions = Record<string, number>;
+
+    type PrestigeLogMetadata = {
+      challengeId?: string;
+      progressId?: string;
+      memberId?: string;
+      amount?: number;
+      reason?: string;
+      decayReason?: "INACTIVITY" | "CHALLENGE_LOSS";
+      previousLevel?: number;
+      newLevel?: number;
+    };
   }
 }
 

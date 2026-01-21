@@ -30,6 +30,14 @@ model Guild {
     challengesActive GuildChallenge[]    @relation("ActiveChallenges")
     challengeHistory ChallengeProgress[]
 
+    // Add these fields to existing Guild model:
+
+    // Prestige (Feature 4: Guild Prestige)
+    prestigePoints     Int           @default(0)
+    prestigeLevel      Int           @default(1) // 1-100
+    prestigeMultiplier Float         @default(1.0) // Bonus for members
+    prestigeLogs       PrestigeLog[]
+
     // Stats (for leaderboards)
     totalSharePoints  Float @default(0)
     totalNodesMined   Int   @default(0)
@@ -46,6 +54,7 @@ model Guild {
     paymentId       String? // Pi Network payment ID
     piTransactionId String?
 
+    @@index([prestigeLevel])
     @@index([weeklyActivity])
 }
 

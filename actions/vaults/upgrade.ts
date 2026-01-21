@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { ApiResponse } from "@/lib/schema/api";
 import { type JoinGuildParams, JoinGuildSchema } from "@/lib/schema/guild/join";
 import { canUserUpgrade } from "@/lib/guild/utils";
+import { awardPrestige } from "@/lib/api-helpers/server/guilds/prestige";
 
 /**
  * ACTION: upgrades guild vault level (only leader/officer)
@@ -115,15 +116,16 @@ export async function upgradeVault(
         },
       });
 
-      // Award prestige
-      //   await tx.prestigeLog.create({
-      //     data: {
-      //       guildId,
-      //       amount: 50 * nextLevel, // Scaling prestige reward
-      //       source: "VAULT_UPGRADE",
-      //       metadata: { level: nextLevel },
-      //     },
-      //   });
+      await awardPrestige({
+        guildId,
+        amount: 50 * nextLevel, // Scaling prestige reward,
+        metadata: {
+          amount: 50 * nextLevel,
+          newLevel: nextLevel,
+          previousLevel: nextLevel - 1,
+        },
+        source: "VAULT_UPGRADE",
+      });
     });
 
     revalidatePath(`/guilds/${guildId}`, "layout");

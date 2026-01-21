@@ -5,14 +5,15 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { getPrestigeTier } from "@/lib/utils/prestige";
 
 type Props = {
   vaultBalance: number;
-  totalSharePoints: number;
+  prestigeLevel: number;
   totalTerritories: number;
 };
 
-const Stats = ({ totalSharePoints, vaultBalance, totalTerritories }: Props) => {
+const Stats = ({ prestigeLevel, vaultBalance, totalTerritories }: Props) => {
   return (
     <Card>
       <CardHeader>
@@ -33,8 +34,8 @@ const Stats = ({ totalSharePoints, vaultBalance, totalTerritories }: Props) => {
           <div className="min-w-[180px] p-3 rounded-lg border border-border bg-card">
             <p className="text-xs text-muted-foreground">Prestige</p>
             <p className="text-xl font-bold">
-              {totalSharePoints.toLocaleString()}{" "}
-              <span className="text-sm">Points</span>
+              {getPrestigeTier(prestigeLevel)}{" "}
+              <span className="text-sm">Tier</span>
             </p>
           </div>
           <div className="min-w-[180px] p-3 rounded-lg border border-border bg-card">

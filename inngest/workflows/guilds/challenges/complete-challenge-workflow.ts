@@ -1,6 +1,7 @@
 import { inngest } from "@/inngest/client";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
+import { awardPrestige } from "@/lib/api-helpers/server/guilds/prestige";
 import { generateCompleteChallengeAnnouncement } from "./utils";
 
 /**
@@ -74,20 +75,8 @@ export const completeChallengeWorkflow = inngest.createFunction(
           where: { id: guildId },
           data: {
             vaultBalance: { increment: progress.challenge.rewardResonance },
-            // Award prestige
-            // prestigePoints: { increment: progress.challenge.rewardPrestige },
           },
         });
-
-        // Log prestige transaction
-        // await tx.prestigeLog.create({
-        //   data: {
-        //     guildId,
-        //     amount: progress.challenge.rewardPrestige,
-        //     source: "CHALLENGE_COMPLETE",
-        //     metadata: { challengeId, progressId },
-        //   },
-        // });
 
         // Log vault transaction
         await tx.vaultTransaction.create({
@@ -108,6 +97,16 @@ export const completeChallengeWorkflow = inngest.createFunction(
         guildId,
         resonance: progress.challenge.rewardResonance,
         prestige: progress.challenge.rewardPrestige,
+      });
+    });
+
+    // Award prestige for challenge completion (50-200 points)
+    await step.run("award-prestige", async () => {
+      await awardPrestige({
+        guildId,
+        amount: progress.challenge.rewardPrestige || 100,
+        source: "CHALLENGE_COMPLETE",
+        metadata: { challengeId, progressId },
       });
     });
 

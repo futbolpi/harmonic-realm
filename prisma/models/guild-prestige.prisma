@@ -1,0 +1,31 @@
+// ============================================
+// FEATURE 4: GUILD PRESTIGE (Long-term Growth)
+// ============================================
+
+enum PrestigeSource {
+  CHALLENGE_COMPLETE
+  TERRITORY_VICTORY
+  MEMBER_MILESTONE // Member hits RF 10, 20, etc.
+  VAULT_UPGRADE
+  WEEKLY_ACTIVITY // Bonus for sustained engagement
+  SPECIAL_EVENT // Limited-time events
+}
+
+model PrestigeLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  guildId String
+  guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  amount Int // Prestige points earned
+  source PrestigeSource
+
+  // Context
+  username String? // If earned by specific member action
+  /// [PrestigeLogMetadata]
+  metadata Json?
+
+  @@index([guildId, createdAt])
+  @@index([guildId, source])
+}

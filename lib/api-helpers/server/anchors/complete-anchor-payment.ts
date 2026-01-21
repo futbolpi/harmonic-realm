@@ -14,6 +14,7 @@ import {
 } from "@/lib/node-spawn/node-generator";
 import { generateLore } from "@/lib/node-spawn/generate-lore";
 import { sendMockPayment } from "../mock-payments";
+import { awardPrestige } from "../guilds/prestige";
 
 type Params = {
   paymentId: string;
@@ -141,13 +142,32 @@ export async function completeAnchorPayment({
       // burns referral points
 
       if (anchor.referralPointsBurned > 0) {
-        await tx.user.update({
+        const updatedUser = await tx.user.update({
           where: { piId: anchor.userId },
           data: {
             resonanceFidelity: { increment: 1 },
             noOfReferrals: { decrement: anchor.referralPointsBurned },
           },
+          select: {
+            resonanceFidelity: true,
+            guildMembership: {
+              select: { guildId: true, id: true },
+              where: { isActive: true },
+            },
+          },
         });
+
+        if (
+          !!updatedUser.guildMembership &&
+          updatedUser.resonanceFidelity % 10 === 0
+        ) {
+          await awardPrestige({
+            amount: 100,
+            guildId: updatedUser.guildMembership.guildId,
+            metadata: { amount: 100, memberId: updatedUser.guildMembership.id },
+            source: "MEMBER_MILESTONE",
+          });
+        }
       }
     });
 

@@ -55,7 +55,7 @@ export default async function GuildPage({ params }: Props) {
           <div className="lg:col-span-2 space-y-6">
             {/* Stats horizontal */}
             <Stats
-              totalSharePoints={guild.totalSharePoints}
+              prestigeLevel={guild.prestigeLevel}
               vaultBalance={guild.vaultBalance}
               totalTerritories={guild._count.territories}
             />

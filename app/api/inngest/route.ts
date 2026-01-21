@@ -21,6 +21,7 @@ import {
 } from "@/inngest/workflows/territories/expire-territories";
 import { spawnWeeklyChallenges } from "@/inngest/workflows/guilds/challenges/spawn-weekly-challenges";
 import { completeChallengeWorkflow } from "@/inngest/workflows/guilds/challenges/complete-challenge-workflow";
+import { applyPrestigeDecayWorkflow } from "@/inngest/workflows/guilds/prestige/apply-prestige-decay";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -49,8 +50,10 @@ export const { GET, POST, PUT } = serve({
     territoryClaimedScheduler,
     expireTerritoriesCron,
 
-    // Chalenge workflows
+    // Challenge workflows
     spawnWeeklyChallenges,
     completeChallengeWorkflow,
+
+    applyPrestigeDecayWorkflow,
   ],
 });

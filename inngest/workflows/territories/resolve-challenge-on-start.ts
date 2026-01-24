@@ -82,7 +82,7 @@ export const resolveChallengeOnStart = inngest.createFunction(
         async (tx) => {
           return await resolveTerritoryChallenge(tx, ch);
         },
-        { timeout: 20000 }
+        { timeout: 50000 }
       );
 
       // Emit territory.claimed event so expiry scheduler can be set

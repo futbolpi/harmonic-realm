@@ -47,56 +47,60 @@ export async function resolveTerritoryChallenge(
 
   const now = new Date();
 
-  // Transfer territory and credit winner vault, mark challenge resolved, and write vault txs
-  await _tx.territory.update({
-    where: { id: ch.territoryId },
-    data: {
-      guildId: winnerId,
-      currentStake: winnerStake,
-      controlledAt: now,
-      controlEndsAt: addDays(now, TERRITORY_CONTROL_DAYS),
-      activeChallengeId: null,
-    },
-  });
-
-  await _tx.guild.update({
-    where: { id: winnerId },
-    data: { vaultBalance: { increment: winnerReward } },
-  });
-
-  await _tx.territoryChallenge.update({
-    where: { id: ch.id },
-    data: { resolved: true, winnerId },
-  });
-
-  // Record vault transaction for winner (audit)
-  await _tx.vaultTransaction.create({
-    data: {
-      memberUsername: winnerGuild?.leaderUsername ?? "system",
-      type: "REWARD",
-      amount: winnerReward,
-      balanceBefore: winnerGuild?.vaultBalance ?? 0,
-      balanceAfter: (winnerGuild?.vaultBalance ?? 0) + winnerReward,
-      reason: "Territory challenge reward",
-      metadata: { challengeId: ch.id },
-    },
-  });
+  await Promise.all([
+    // Transfer territory and credit winner vault, mark challenge resolved, and write vault txs
+    _tx.territory.update({
+      where: { id: ch.territoryId },
+      data: {
+        guildId: winnerId,
+        currentStake: winnerStake,
+        controlledAt: now,
+        controlEndsAt: addDays(now, TERRITORY_CONTROL_DAYS),
+        activeChallengeId: null,
+      },
+      select: { id: true },
+    }),
+    _tx.guild.update({
+      where: { id: winnerId },
+      data: { vaultBalance: { increment: winnerReward } },
+      select: { id: true },
+    }),
+    _tx.territoryChallenge.update({
+      where: { id: ch.id },
+      data: { resolved: true, winnerId },
+      select: { id: true },
+    }),
+    // Record vault transaction for winner (audit)
+    _tx.vaultTransaction.create({
+      data: {
+        memberUsername: winnerGuild?.leaderUsername ?? "system",
+        type: "REWARD",
+        amount: winnerReward,
+        balanceBefore: winnerGuild?.vaultBalance ?? 0,
+        balanceAfter: (winnerGuild?.vaultBalance ?? 0) + winnerReward,
+        reason: "Territory challenge reward",
+        metadata: { challengeId: ch.id },
+      },
+      select: { id: true },
+    }),
+  ]);
 
   if (!!winnerGuild) {
-    await updateChallengeProgress({
-      guildId: winnerId,
-      username: winnerGuild.leaderUsername,
-      updates: {
-        territoriesCaptured: 1, // +1 to TERRITORY_CAPTURED challenges
-      },
-    });
-
-    await awardPrestige({
-      guildId: winnerId,
-      amount: 100,
-      metadata: { amount: 100 },
-      source: "TERRITORY_VICTORY",
-    });
+    await Promise.all([
+      updateChallengeProgress({
+        guildId: winnerId,
+        username: winnerGuild.leaderUsername,
+        updates: {
+          territoriesCaptured: 1, // +1 to TERRITORY_CAPTURED challenges
+        },
+      }),
+      awardPrestige({
+        guildId: winnerId,
+        amount: 100,
+        metadata: { amount: 100 },
+        source: "TERRITORY_VICTORY",
+      }),
+    ]);
   }
 
   return {

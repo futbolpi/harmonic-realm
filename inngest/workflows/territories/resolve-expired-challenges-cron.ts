@@ -37,9 +37,12 @@ export const resolveExpiredChallengesCron = inngest.createFunction(
       await step.run(`resolve-${ch.id}`, async () => {
         // Use the same resolution logic as the scheduled resolver
         // Run shared resolution logic inside a transaction
-        const winner = await prisma.$transaction(async (tx) => {
-          return await resolveTerritoryChallenge(tx, ch);
-        });
+        const winner = await prisma.$transaction(
+          async (tx) => {
+            return await resolveTerritoryChallenge(tx, ch);
+          },
+          { timeout: 20000 }
+        );
 
         // Notify via herald (or dedicated guild notifications in future)
         try {

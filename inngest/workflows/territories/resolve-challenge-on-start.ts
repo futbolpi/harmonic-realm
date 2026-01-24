@@ -78,9 +78,12 @@ export const resolveChallengeOnStart = inngest.createFunction(
       if (ch.resolved) return { skipped: true };
 
       // Run shared resolution logic inside a transaction
-      const winner = await prisma.$transaction(async (tx) => {
-        return await resolveTerritoryChallenge(tx, ch);
-      });
+      const winner = await prisma.$transaction(
+        async (tx) => {
+          return await resolveTerritoryChallenge(tx, ch);
+        },
+        { timeout: 20000 }
+      );
 
       // Emit territory.claimed event so expiry scheduler can be set
       try {

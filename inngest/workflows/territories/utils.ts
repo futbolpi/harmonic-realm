@@ -1,18 +1,20 @@
 import { addDays } from "date-fns";
 
+import type { DefaultArgs } from "@prisma/client/runtime/client";
 import { TERRITORY_CONTROL_DAYS } from "@/config/guilds/constants";
-import type { Prisma } from "@/lib/generated/prisma/client";
-import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
-import { awardPrestige } from "@/lib/api-helpers/server/guilds/prestige";
+import type { PrismaClient } from "@/lib/generated/prisma/client";
 
 /**
  * Shared helper to resolve a territory challenge inside a transaction.
  * - This function DOES NOT call $transaction itself; callers should run it inside a tx or pass a tx client.
  * - Returns an object with resolution details for logging/announcements.
  */
-// Allow `any` for the transaction client here (used inside prisma.$transaction callbacks)
+
 export async function resolveTerritoryChallenge(
-  _tx: Prisma.TransactionClient,
+  _tx: Omit<
+    PrismaClient<never, undefined, DefaultArgs>,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
+  >,
   ch: {
     id: string;
     territoryId: string;
@@ -85,27 +87,10 @@ export async function resolveTerritoryChallenge(
     }),
   ]);
 
-  if (!!winnerGuild) {
-    await Promise.all([
-      updateChallengeProgress({
-        guildId: winnerId,
-        username: winnerGuild.leaderUsername,
-        updates: {
-          territoriesCaptured: 1, // +1 to TERRITORY_CAPTURED challenges
-        },
-      }),
-      awardPrestige({
-        guildId: winnerId,
-        amount: 100,
-        metadata: { amount: 100 },
-        source: "TERRITORY_VICTORY",
-      }),
-    ]);
-  }
-
   return {
     winnerId,
-    winnerName: winnerGuild?.name ?? winnerId,
+    winnerName: winnerGuild?.name,
     reward: winnerReward,
+    leaderUsername: winnerGuild?.leaderUsername,
   };
 }

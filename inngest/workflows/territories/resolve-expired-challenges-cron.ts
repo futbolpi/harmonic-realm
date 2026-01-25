@@ -5,6 +5,8 @@ import prisma from "@/lib/prisma";
 import { TERRITORY_CONTROL_DAYS } from "@/config/guilds/constants";
 import { resolveTerritoryChallenge } from "./utils";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
+import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
+import { awardPrestige } from "@/lib/api-helpers/server/guilds/prestige";
 
 /**
  * WORKFLOW: Resolve any expired challenges (safety net)
@@ -34,47 +36,68 @@ export const resolveExpiredChallengesCron = inngest.createFunction(
     logger.info(`Found ${expired.length} expired challenges`);
 
     for (const ch of expired) {
-      await step.run(`resolve-${ch.id}`, async () => {
-        // Use the same resolution logic as the scheduled resolver
-        // Run shared resolution logic inside a transaction with extended timeout
+      const result = await step.run(`resolve-${ch.id}`, async () => {
+        // Run shared resolution logic inside a transaction
         const winner = await prisma.$transaction(
           async (tx) => {
-            return await resolveTerritoryChallenge(tx, ch);
+            return resolveTerritoryChallenge(tx, ch);
           },
           { timeout: 50000 }
         );
 
-        // Notify via herald (or dedicated guild notifications in future)
-        try {
-          await step.run("announce-results", async () => {
-            await InngestEventDispatcher.sendHeraldAnnouncement(
-              `Territory challenge ${ch.id} resolved: winner ${winner.winnerName} (+${winner.reward} RES)`,
-              "announcement"
-            );
-          });
-        } catch (e) {
-          logger.warn("Failed to send herald announcement", e);
-        }
+        return { success: true, winner };
+      });
 
-        // Emit territory claimed event so expiry scheduler can be set
-        try {
-          const controlEndsAt = addDays(
-            new Date(),
-            TERRITORY_CONTROL_DAYS
-          ).toISOString();
+      // award challenge / prestige points
+      if (!!result.winner.leaderUsername) {
+        await step.run(
+          `award-challenge-points-${result.winner.winnerId}`,
+          async () => {
+            if (result.winner.leaderUsername) {
+              await updateChallengeProgress({
+                guildId: result.winner.winnerId,
+                username: result.winner.leaderUsername,
+                updates: {
+                  territoriesCaptured: 1, // +1 to TERRITORY_CAPTURED challenges
+                },
+              });
+            }
+          }
+        );
 
-          await InngestEventDispatcher.territoryClaimed(
-            ch.territoryId,
-            controlEndsAt
-          );
-        } catch (e) {
-          logger.warn("Failed to emit territory.claimed event", e);
-        }
+        await step.run(
+          `award-prestige-points-${result.winner.winnerId}`,
+          async () => {
+            return awardPrestige({
+              guildId: result.winner.winnerId,
+              amount: 100,
+              metadata: { amount: 100 },
+              source: "TERRITORY_VICTORY",
+            });
+          }
+        );
+      }
 
-        logger.info(
-          `Resolved expired challenge ${ch.id}, winner ${winner.winnerId}`
+      await step.run("announce-results", async () => {
+        InngestEventDispatcher.sendHeraldAnnouncement(
+          `Territory challenge ${ch.id} resolved: winner ${result.winner.winnerName} (+${result.winner.reward} RES)`,
+          "announcement"
         );
       });
+
+      const controlEndsAt = addDays(
+        new Date(),
+        TERRITORY_CONTROL_DAYS
+      ).toISOString();
+
+      await step.sendEvent(`send-territory-claimed-event-${ch.territoryId}`, {
+        name: "territory/claimed",
+        data: { controlEndsAt, territoryId: ch.territoryId },
+      });
+
+      logger.info(
+        `Resolved expired challenge ${ch.id}, winner ${result.winner.winnerId}`
+      );
     }
 
     return { processed: expired.length };

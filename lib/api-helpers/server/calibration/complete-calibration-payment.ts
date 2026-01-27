@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
 import prisma from "@/lib/prisma";
 import { ApiResponse } from "@/lib/schema/api";
+import { addEchoShards } from "../guilds/artifacts";
 import { sendMockPayment } from "../mock-payments";
 
 type Params = {
@@ -35,6 +36,7 @@ export async function completeCalibrationPayment({
         piContributed: true,
         gamePhase: { select: { currentProgress: true } },
         userId: true,
+        user: { select: { username: true } },
       },
     });
 
@@ -62,13 +64,16 @@ export async function completeCalibrationPayment({
         where: { id: contribution.gamePhaseId },
         data: {
           currentProgress: contribution.gamePhase.currentProgress.plus(
-            contribution.piContributed
+            contribution.piContributed,
           ),
         },
         select: { currentProgress: true, requiredPiFunding: true },
       });
 
-      return { updatedContribution, updatedPhase };
+      return {
+        updatedContribution,
+        updatedPhase,
+      };
     });
 
     const { updatedContribution, updatedPhase } = result;
@@ -76,14 +81,30 @@ export async function completeCalibrationPayment({
     // Check if calibration is now triggered
     const isCalibrationTriggered =
       updatedPhase.currentProgress.greaterThanOrEqualTo(
-        updatedPhase.requiredPiFunding
+        updatedPhase.requiredPiFunding,
       );
 
     if (isCalibrationTriggered) {
       // Trigger the Inngest workflow for node generation
       await InngestEventDispatcher.startLatticeCalibration(
-        contribution.gamePhaseId
+        contribution.gamePhaseId,
       );
+    }
+
+    // Award echo shards for calibration (team milestone - fair share distribution)
+    // Only if contributor is in a guild
+    const username = contribution.user.username;
+    const member = await prisma.guildMember.findFirst({
+      where: { username, isActive: true },
+      select: { guildId: true },
+    });
+
+    if (member) {
+      await addEchoShards(member.guildId, username, "CALIBRATION", {
+        piStaked: contribution.piContributed.toNumber(),
+        totalContributionPi: updatedPhase.requiredPiFunding.toNumber(),
+        calPhaseNumber: contribution.gamePhaseId,
+      });
     }
 
     await sendMockPayment(contribution.userId);

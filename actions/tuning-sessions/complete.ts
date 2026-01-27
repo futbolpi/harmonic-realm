@@ -18,6 +18,7 @@ import {
 } from "@/config/site";
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 import { awardMemberSP } from "@/lib/api-helpers/server/guilds/share-points-helpers";
+import { addEchoShards } from "@/lib/api-helpers/server/guilds/artifacts";
 import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
 import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
 
@@ -39,7 +40,7 @@ type SucessResponse = {
  * Processes game results with Rarity and 5-Day Milestone Logic.
  */
 export async function submitTuningSession(
-  params: TuningSubmissionParams
+  params: TuningSubmissionParams,
 ): Promise<ApiResponse<SucessResponse>> {
   try {
     const { success, data } = TuningSubmissionSchema.safeParse(params);
@@ -256,18 +257,28 @@ export async function submitTuningSession(
             // award the landlord tax to the sponsor
             sharePoints: { increment: landlordTax },
           },
-        })
+        }),
       );
     }
 
     await prisma.$transaction(transactionOps);
 
     // Award guild/member SP based on the actual shares awarded to the player (final net)
-    await awardMemberSP({
-      memberId: user.guildMembership?.id,
-      sharePoints: netShares,
-      perfectTuning: accuracyScore === 100,
-    });
+    if (!!user.guildMembership?.id) {
+      await Promise.all([
+        awardMemberSP({
+          memberId: user.guildMembership.id,
+          sharePoints: netShares,
+          perfectTuning: accuracyScore === 100,
+        }),
+        // Award echo shards based on accuracy and streak
+        addEchoShards(user.guildMembership.guildId, username, "TUNING", {
+          accuracyScore,
+          dailyStreak: newStreak,
+          competitiveBonus: competitiveBonusApplied,
+        }),
+      ]);
+    }
 
     // If territory under challenge, record contribution (best-effort)
     try {

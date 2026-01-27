@@ -5,6 +5,7 @@ import { InngestEventDispatcher } from "@/inngest/dispatcher";
 import { LORE_LEVELS, LoreLevel } from "@/lib/node-lore/location-lore";
 import prisma from "@/lib/prisma";
 import { ApiResponse } from "@/lib/schema/api";
+import { addEchoShards } from "../guilds/artifacts";
 
 type Params = {
   paymentId: string;
@@ -30,6 +31,19 @@ export async function completeLocationLorePayment({
         paymentId,
         paymentStatus: "PROCESSING",
         piAmount: { lte: amount },
+      },
+      select: {
+        nodeId: true,
+        piAmount: true,
+        targetLevel: true,
+        user: {
+          select: {
+            guildMembership: {
+              select: { guildId: true, username: true },
+              where: { isActive: true },
+            },
+          },
+        },
       },
     });
 
@@ -65,12 +79,13 @@ export async function completeLocationLorePayment({
             increment: stake.piAmount,
           },
         },
+        select: { totalPiStaked: true },
       });
 
       // Check if we have enough Pi for the target level
       const levelConfig = LORE_LEVELS[stake.targetLevel as LoreLevel];
       const requiredTotal = new Decimal(
-        levelConfig.totalRequired || levelConfig.piRequired
+        levelConfig.totalRequired || levelConfig.piRequired,
       );
 
       if (updatedLore.totalPiStaked.gte(requiredTotal)) {
@@ -94,7 +109,31 @@ export async function completeLocationLorePayment({
       await InngestEventDispatcher.startLoreGeneration(
         stake.nodeId,
         stake.targetLevel as LoreLevel,
-        result.jobId
+        result.jobId,
+      );
+    }
+
+    // Award echo shards for lore staking (narrative resonance)
+    // Only if staker is in a guild
+
+    const guildMembership = stake.user.guildMembership;
+
+    if (guildMembership) {
+      // Fetch node rarity for context
+      const node = await prisma.node.findUnique({
+        where: { id: stake.nodeId },
+        select: { type: { select: { rarity: true } } },
+      });
+
+      await addEchoShards(
+        guildMembership.guildId,
+        guildMembership.username,
+        "LORE_STAKING",
+        {
+          piLoreStaked: stake.piAmount.toNumber(),
+          loreLevel: stake.targetLevel,
+          nodeRarity_lore: node?.type?.rarity,
+        },
       );
     }
 

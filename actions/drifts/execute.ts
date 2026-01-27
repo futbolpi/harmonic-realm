@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getEligibleNodeForDrift } from "@/lib/api-helpers/server/drifts/get-eligibile-nodes";
 import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
+import { addEchoShards } from "@/lib/api-helpers/server/guilds/artifacts";
 import prisma from "@/lib/prisma";
 import { ApiResponse } from "@/lib/schema/api";
 import { ExecuteDriftParams, ExecuteDriftSchema } from "@/lib/schema/drift";
@@ -33,7 +34,7 @@ export async function executeDrift(params: ExecuteDriftParams): Promise<
     const { accessToken, latitude, longitude, nodeId } = data;
 
     // Verify user authentication
-    const { id: userId } = await verifyTokenAndGetUser(accessToken);
+    const { id: userId, username } = await verifyTokenAndGetUser(accessToken);
 
     // Validate against spoofing
     const isValid = await validateGeolocation({
@@ -142,7 +143,21 @@ export async function executeDrift(params: ExecuteDriftParams): Promise<
       });
     });
 
-    // 6. Revalidate Next.js cache tags ['nodes', 'map'].
+    // 6. Award echo shards (20% trigger chance for rare event bonus)
+    // Only if user is in a guild - otherwise no artifact system for solo players
+    const userGuild = await prisma.guildMember.findFirst({
+      where: { username, isActive: true },
+      select: { guildId: true },
+    });
+
+    if (userGuild) {
+      await addEchoShards(userGuild.guildId, username, "DRIFTING", {
+        driftDistance: node.distance,
+        driftCount: user.driftCount + 1,
+      });
+    }
+
+    // 7. Revalidate Next.js cache tags ['nodes', 'map'].
     revalidatePath("/map");
     revalidatePath("/nodes");
     revalidatePath("/resonant-drift");

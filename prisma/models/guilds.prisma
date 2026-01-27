@@ -38,6 +38,10 @@ model Guild {
     prestigeMultiplier Float         @default(1.0) // Bonus for members
     prestigeLogs       PrestigeLog[]
 
+    // Artifacts (Feature 5: Guild Artifacts - Shared Buffs)
+
+    artifacts GuildArtifact[]
+
     // Stats (for leaderboards)
     totalSharePoints  Float @default(0)
     totalNodesMined   Int   @default(0)
@@ -80,6 +84,9 @@ model GuildMember {
     // Activity
     lastActiveAt DateTime @default(now())
     isActive     Boolean  @default(true) // Auto-flagged if inactive 7+ days
+
+    // Artifacts (Feature 5: Echo Shards for crafting)
+    echoShards Int @default(0) // Accumulated from completed sessions/drifts
 
     // Guild activity
     vaultTransactions      VaultTransaction[]

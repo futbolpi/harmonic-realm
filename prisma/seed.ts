@@ -2,6 +2,7 @@ import { achievementsData } from "@/config/achievements-data";
 // import { nodesData, nodeTypesData } from "@/lib/seed/node-data";
 // import { miningSessionsData, usersData } from "@/lib/seed/user-data";
 import prisma from "@/lib/prisma";
+import { ARTIFACT_TEMPLATES } from "@/lib/seed/artifact";
 import { seedChallengeTemplates } from "@/lib/seed/seed-challenges";
 import { vaultUpgrades } from "@/lib/seed/vault-upgrade-data";
 
@@ -24,6 +25,17 @@ async function seedAchievements() {
     });
   }
   console.log("Achievements seeded.");
+}
+
+async function seedArtifactTemplates() {
+  for (const template of Object.values(ARTIFACT_TEMPLATES)) {
+    await prisma.artifactTemplate.upsert({
+      where: { name: template.name },
+      update: template,
+      create: template,
+    });
+  }
+  console.log("Artifact templates seeded.");
 }
 
 async function seedVaultUpgrades() {
@@ -123,6 +135,7 @@ async function main() {
   await seedAchievements();
   await seedVaultUpgrades();
   await seedChallengeTemplates();
+  await seedArtifactTemplates();
   // await addNodeGenEvents();
   // if (process.env.NODE_ENV === "development") {
   //   await seedNodesAndTypes();

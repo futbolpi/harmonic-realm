@@ -1,0 +1,86 @@
+// ============================================
+// FEATURE 5: GUILD ARTIFACTS (Shared Buffs)
+// ============================================
+
+enum ArtifactRarity {
+    COMMON
+    RARE
+    EPIC
+    LEGENDARY
+}
+
+enum ArtifactEffectType {
+    SHAREPOINT_BONUS // +X% sharePoints for all members
+    TUNING_QUALITY // +X% perfect tune chance
+    MINING_SPEED // -X% mining cooldown
+    VAULT_EFFICIENCY // +X% vault rewards
+    PRESTIGE_GAIN // +X% prestige from all sources
+    TERRITORY_DEFENSE // +X% to defense scores in wars
+}
+
+model ArtifactTemplate {
+    id String @id @default(cuid())
+
+    // Identity
+    name        String         @unique
+    description String
+    rarity      ArtifactRarity
+
+    // Crafting cost (base level 1)
+    echoShardsCost Int
+    resonanceCost  Float
+
+    // Effects (per level scaling)
+    effectType    ArtifactEffectType
+    baseValue     Float // Level 1 value
+    valuePerLevel Float // Increment per upgrade (exponential in some cases)
+
+    // Requirements
+    minVaultLevel Int @default(3)
+
+    // Lore & Display
+    loreText String
+    icon     String @default("artifact") // Icon identifier
+
+    // Timestamps
+    createdAt DateTime @default(now())
+
+    // Active instances
+    artifacts GuildArtifact[]
+
+    @@index([rarity])
+}
+
+model GuildArtifact {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    guildId String
+    guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+    templateId String
+    template   ArtifactTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+
+    // Crafting & Upgrade State
+    // level: 0 = not crafted (members resonating shards), 1-10 = crafted & upgradeable
+    level Int @default(0)
+
+    // Shards Resonated (burnt) - tracks cumulative shards towards crafting/upgrading
+    // This increments as members resonate shards, resets after level upgrade
+    shardsBurnt Int @default(0)
+
+    // Contributor tracking for prestige/recognition
+    /// [MemberContributions] Format: {username: shards_contributed}
+    contributors Json? // {username: 50, username: 30, ...}
+
+    // Equip status
+    isEquipped Boolean   @default(false)
+    equippedAt DateTime?
+
+    @@unique([guildId, templateId]) // One instance per template type per guild
+    @@index([guildId, isEquipped])
+    @@index([guildId, level])
+    @@index([guildId, shardsBurnt]) // For crafting progress queries
+}

@@ -19,11 +19,12 @@ import {
   awardMemberSP,
   getMemberBonus,
 } from "@/lib/api-helpers/server/guilds/share-points-helpers";
+import { addEchoShards } from "@/lib/api-helpers/server/guilds/artifacts";
 import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
 import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
 
 export const completeMiningSession = async (
-  params: CompleteMiningRequest
+  params: CompleteMiningRequest,
 ): Promise<ApiResponse<CompleteMiningResponse>> => {
   try {
     const { success, data } = CompleteMiningSchema.safeParse(params);
@@ -84,6 +85,7 @@ export const completeMiningSession = async (
                 baseYieldPerMinute: true,
                 lockInMinutes: true,
                 maxMiners: true,
+                rarity: true,
               },
             },
             _count: {
@@ -171,28 +173,16 @@ export const completeMiningSession = async (
 
     const { latitudeBin, longitudeBin } = binLatLon(
       session.node.latitude,
-      session.node.longitude
+      session.node.longitude,
     );
 
     // Territory bonus: +15% sharePoints if node is in a territory controlled by the user's active guild
     let finalShares = sharesEarned;
-    try {
-      if (session.node.territory?.guildId) {
-        const member = await prisma.guildMember.findFirst({
-          where: {
-            username,
-            guildId: session.node.territory.guildId,
-            isActive: true,
-          },
-          select: { id: true },
-        });
-        if (member) {
-          const territoryBonus = parseFloat((sharesEarned * 0.15).toFixed(4));
-          finalShares = parseFloat((sharesEarned + territoryBonus).toFixed(4));
-        }
+    if (session.node.territory?.guildId) {
+      if (session.node.territory.guildId === guildBonus.member?.guild.id) {
+        const territoryBonus = parseFloat((sharesEarned * 0.15).toFixed(4));
+        finalShares = parseFloat((sharesEarned + territoryBonus).toFixed(4));
       }
-    } catch (e) {
-      console.warn("Failed to compute/apply territory bonus", e);
     }
 
     // 5. Persist all changes atomically
@@ -229,37 +219,31 @@ export const completeMiningSession = async (
       }),
     ]);
 
-    // 7. If territory is under challenge, contribute to it (best-effort)
+    if (guildBonus.member) {
+      //7a. Award echo shards based on node rarity and shares earned
+      addEchoShards(guildBonus.member.guild.id, username, "MINING", {
+        sharesEarned: finalShares,
+        nodeRarity: session.node.type.rarity,
+      });
+
+      //7b. Contributes to TOTAL_SHAREPOINTS and UNIQUE_NODES_MINED challenges
+      await updateChallengeProgress({
+        guildId: guildBonus.member.guild.id,
+        username,
+        updates: {
+          sharePoints: finalShares, // Contributes to TOTAL_SHAREPOINTS
+          nodesMined: 1, // Each mining session counts as 1 node
+        },
+      });
+    }
+
+    // 8. If territory is under challenge, contribute to it (best-effort)
     try {
       if (!!session.node.territory?.activeChallengeId) {
         await contributeToChallengeScore(session.nodeId, username, finalShares);
       }
     } catch (e) {
       console.warn("Failed to add territory contribution", e);
-    }
-
-    //n8. Contributes to TOTAL_SHAREPOINTS and UNIQUE_NODES_MINED challenges
-    try {
-      const member = await prisma.guildMember.findFirst({
-        where: {
-          username,
-          isActive: true,
-        },
-        select: { guildId: true },
-      });
-
-      if (member) {
-        await updateChallengeProgress({
-          guildId: member.guildId,
-          username,
-          updates: {
-            sharePoints: finalShares, // Contributes to TOTAL_SHAREPOINTS
-            nodesMined: 1, // Each mining session counts as 1 node
-          },
-        });
-      }
-    } catch (e) {
-      console.warn("Failed to update challenge progress for mining", e);
     }
 
     // 9. check if user is eligible for Surge Survivor achievement

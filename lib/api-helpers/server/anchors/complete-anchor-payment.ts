@@ -15,6 +15,7 @@ import {
 import { generateLore } from "@/lib/node-spawn/generate-lore";
 import { sendMockPayment } from "../mock-payments";
 import { awardPrestige } from "../guilds/prestige";
+import { addEchoShards } from "../guilds/artifacts";
 
 type Params = {
   paymentId: string;
@@ -113,7 +114,7 @@ export async function completeAnchorPayment({
     };
 
     // Create node, Update anchor record, and update phase progress in a transaction
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // create the node
       const createdNode = await tx.node.create({
         data: node,
@@ -140,7 +141,7 @@ export async function completeAnchorPayment({
       });
 
       // burns referral points
-
+      let guildMembership: { username: string; guildId: string } | null = null;
       if (anchor.referralPointsBurned > 0) {
         const updatedUser = await tx.user.update({
           where: { piId: anchor.userId },
@@ -151,11 +152,18 @@ export async function completeAnchorPayment({
           select: {
             resonanceFidelity: true,
             guildMembership: {
-              select: { guildId: true, id: true },
+              select: { guildId: true, id: true, username: true },
               where: { isActive: true },
             },
           },
         });
+
+        if (updatedUser.guildMembership) {
+          guildMembership = {
+            guildId: updatedUser.guildMembership.guildId,
+            username: updatedUser.guildMembership.username,
+          };
+        }
 
         if (
           !!updatedUser.guildMembership &&
@@ -169,7 +177,18 @@ export async function completeAnchorPayment({
           });
         }
       }
+
+      return guildMembership;
     });
+
+    // Award echo shards for anchoring (guaranteed reward based on referral points)
+    // Only if member is in a guild
+    if (result) {
+      await addEchoShards(result.guildId, result.username, "ANCHORING", {
+        referralPointsBurned: anchor.referralPointsBurned,
+        nodeRarity_anchor: selectedRarity,
+      });
+    }
 
     await sendMockPayment(anchor.userId);
 

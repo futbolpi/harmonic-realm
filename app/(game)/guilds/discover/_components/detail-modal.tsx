@@ -27,9 +27,10 @@ type DetailModalProps = {
     maxMembers: number;
     minRF: number;
     vaultLevel: number;
+    prestigeLevel: number;
     totalSharePoints: number;
     requireApproval: boolean;
-    _count: { members: number };
+    _count: { members: number; territories: number; challengesActive: number };
   };
 };
 
@@ -69,9 +70,9 @@ const DetailModal = ({
                   Members: {selected._count.members}/{selected.maxMembers}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Prestige Lv {selected.vaultLevel} • Vault{" "}
+                  Prestige Lv {selected.prestigeLevel} • Vault{" "}
                   {selected.vaultLevel} • Territories{" "}
-                  {/* {selected.territories.length} */}0
+                  {selected._count.territories}
                 </div>
               </div>
             </div>
@@ -79,7 +80,7 @@ const DetailModal = ({
             <div>
               <h4 className="font-semibold">🎯 Activity This Week</h4>
               <p className="text-sm text-muted-foreground">
-                {/* {selected.activeChallenges.length}  */}0 active challenges •{" "}
+                {selected._count.challengesActive} active challenges •{" "}
                 {selected.totalSharePoints} SP earned
               </p>
             </div>

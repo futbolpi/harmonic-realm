@@ -50,7 +50,7 @@ const Recommended = ({
                   </div>
                 </div>
                 <div className="mt-3 text-sm text-muted-foreground">
-                  Prestige: Lv {g.vaultLevel} • Vault: Lv {g.vaultLevel}
+                  Prestige: Lv {g.prestigeLevel} • Vault: Lv {g.vaultLevel}
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                   <Button onClick={() => openDetails(g)}>View Details</Button>

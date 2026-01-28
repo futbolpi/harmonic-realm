@@ -7,7 +7,7 @@ type MostActiveProps = {
     emblem: string;
     name: string;
     maxMembers: number;
-    vaultLevel: number;
+    prestigeLevel: number;
     _count: { members: number; territories: number };
   }[];
 };
@@ -32,7 +32,7 @@ const MostActive = ({ mostActive }: MostActiveProps) => {
                   <Badge variant="secondary">Active</Badge>
                 </div>
                 <div className="mt-3 text-sm text-muted-foreground">
-                  Prestige Lv {g.vaultLevel} • {g._count.territories} zones
+                  Prestige Lv {g.prestigeLevel} • {g._count.territories} zones
                 </div>
               </div>
             </div>

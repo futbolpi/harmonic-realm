@@ -128,13 +128,13 @@ export default function DiscoverClient({ guilds }: { guilds: Guild[] }) {
         mostActive={mostActive.map((g) => ({
           _count: {
             members: g._count.members,
-            territories: 0,
+            territories: g._count.territories,
           },
           emblem: g.emblem,
           id: g.id,
           maxMembers: g.maxMembers,
           name: g.name,
-          vaultLevel: g.vaultLevel,
+          prestigeLevel: g.prestigeLevel,
         }))}
       />
 
@@ -153,10 +153,11 @@ export default function DiscoverClient({ guilds }: { guilds: Guild[] }) {
       {selected && (
         <DetailModal
           selected={{
-            _count: { members: selected._count.members },
+            _count: selected._count,
             description: selected.description || "",
             emblem: selected.emblem,
             maxMembers: selected.maxMembers,
+            prestigeLevel: selected.prestigeLevel,
             minRF: selected.minRF,
             name: selected.name,
             requireApproval: selected.requireApproval,

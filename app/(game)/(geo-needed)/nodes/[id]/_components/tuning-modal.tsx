@@ -67,7 +67,7 @@ export function ResonanceTuningModal({
   // Generate a random interference factor (±10%) to vary target frequency per session
   // This prevents users from memorizing the exact frequency for each node
   const interferenceRef = useRef(
-    1 + (Math.random() - 0.5) * 0.2 // Range: 0.9 to 1.1 (±10%)
+    1 + (Math.random() - 0.5) * 0.2, // Range: 0.9 to 1.1 (±10%)
   ).current;
   const baseFrequency = 20 + nodeFrequencySeed * 60;
   const targetFrequency = useRef(baseFrequency * interferenceRef).current;
@@ -176,7 +176,7 @@ export function ResonanceTuningModal({
 
           // Build tax breakdown display (only show if tax was applied)
           const taxBreakdown =
-            landlordTax && landlordTax > 0
+            !!landlordTax && landlordTax > 0
               ? `Gross: ${grossShares} | Tax (${taxRate}%): ${landlordTax} | Net: ${shares}`
               : `${shares} Shares`;
 
@@ -202,7 +202,7 @@ export function ResonanceTuningModal({
                 )}
 
                 {/* Show tax breakdown if applicable */}
-                {landlordTax && landlordTax > 0 && (
+                {!!landlordTax && landlordTax > 0 && (
                   <div className="text-xs text-slate-400 bg-slate-900/50 p-2 rounded border border-slate-700">
                     <div>
                       Landlord Tax: -{landlordTax} π ({taxBreakdown})
@@ -231,7 +231,7 @@ export function ResonanceTuningModal({
           refreshSessionAssets();
         } else {
           toast.error(
-            res.error || "There was an error, please try again later"
+            res.error || "There was an error, please try again later",
           );
         }
       } catch (e) {
@@ -258,7 +258,7 @@ export function ResonanceTuningModal({
                   "uppercase tracking-wider px-3 py-1 text-sm font-medium",
                   nodeRarity === "Legendary" ? rarity.shadowColor : "",
                   rarity.textColor,
-                  rarity.borderColor
+                  rarity.borderColor,
                 )}
               >
                 {nodeRarity}
@@ -304,7 +304,7 @@ export function ResonanceTuningModal({
                   "flex-1 rounded-full transition-all",
                   i < streakProgress
                     ? "bg-primary shadow-primary/10"
-                    : "bg-background/90"
+                    : "bg-background/90",
                 )}
               />
             ))}
@@ -345,7 +345,7 @@ export function ResonanceTuningModal({
               "w-full font-bold text-white transition-all duration-500",
               Math.abs(userFreq - targetFrequency) < 5
                 ? "bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-                : "bg-slate-700 hover:bg-slate-600"
+                : "bg-slate-700 hover:bg-slate-600",
             )}
             onClick={handleStabilize}
             disabled={isPending}

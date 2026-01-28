@@ -12,7 +12,7 @@ export const getVaultPageData = async (guildId: string) => {
   return Promise.all([
     prisma.vaultTransaction.aggregate({
       where: {
-        type: "DEPOSIT",
+        type: { in: ["DEPOSIT", "REWARD"] },
         archivedAt: null,
         createdAt: {
           gte: start,

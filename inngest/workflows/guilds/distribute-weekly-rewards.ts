@@ -43,7 +43,7 @@ export const distributeWeeklyRewards = inngest.createFunction(
     const deposits = await step.run("fetch-deposits", async () => {
       return await prisma.vaultTransaction.findMany({
         where: {
-          type: "DEPOSIT",
+          type: { in: ["DEPOSIT", "REWARD"] },
           archivedAt: null,
           createdAt: { gte: prevWeekStart, lte: prevWeekEnd },
         },
@@ -118,7 +118,7 @@ export const distributeWeeklyRewards = inngest.createFunction(
 
           const totalActivity = members.reduce(
             (s, m) => s + (m.weeklySharePoints ?? 0),
-            0
+            0,
           );
 
           if (totalActivity <= 0) {
@@ -199,8 +199,9 @@ export const distributeWeeklyRewards = inngest.createFunction(
                 tx.user.update({
                   where: { username: d.username },
                   data: { sharePoints: { increment: d.amount } },
-                })
-              )
+                  select: { username: true },
+                }),
+              ),
             );
 
             // Update guild balance (do this once per guild)
@@ -209,6 +210,7 @@ export const distributeWeeklyRewards = inngest.createFunction(
               data: {
                 vaultBalance: runningBalance,
               },
+              select: { vaultBalance: true },
             });
           });
 
@@ -219,12 +221,12 @@ export const distributeWeeklyRewards = inngest.createFunction(
           const message = `<b>Weekly Guild Rewards Distributed!</b>\n\nGuild <b>${
             guild.name
           }</b> received a distribution of <b>${pool.toFixed(
-            2
+            2,
           )}</b> RES, allocated among ${distributions.length} members.`;
 
           await InngestEventDispatcher.sendHeraldAnnouncement(
             message,
-            "announcement"
+            "announcement",
           );
 
           logger.info("Successfully distributed rewards for guild", {
@@ -244,7 +246,7 @@ export const distributeWeeklyRewards = inngest.createFunction(
     // After processing all guilds, reset weeklySharePoints globally to mark new week
     await step.run("reset-weekly-sharepoints", async () => {
       logger.info(
-        "Resetting weeklySharePoints for all guild members (single DB call)"
+        "Resetting weeklySharePoints for all guild members (single DB call)",
       );
       const result = await prisma.guildMember.updateMany({
         where: {},
@@ -257,5 +259,5 @@ export const distributeWeeklyRewards = inngest.createFunction(
     });
 
     return { message: "Weekly reward distribution completed" };
-  }
+  },
 );

@@ -68,6 +68,7 @@ export async function upgradeArtifactAction(input: unknown): Promise<
       where: { id: artifactId },
       select: {
         guildId: true,
+        id: true,
         level: true,
         shardsBurnt: true,
         template: {
@@ -133,9 +134,23 @@ export async function upgradeArtifactAction(input: unknown): Promise<
     // Upgrade in transaction
     const upgraded = await prisma.$transaction(async (tx) => {
       // Burn resonance from vault
-      await tx.guild.update({
+      const updatedGuild = await tx.guild.update({
         where: { id: guildId },
         data: { vaultBalance: { decrement: cost.resonance } },
+        select: { vaultBalance: true },
+      });
+
+      // create vault tx
+      await tx.vaultTransaction.create({
+        data: {
+          amount: cost.resonance,
+          balanceAfter: updatedGuild.vaultBalance,
+          balanceBefore: updatedGuild.vaultBalance + cost.resonance,
+          type: "WITHDRAWAL",
+          memberUsername: username,
+          reason: "Artifact upgrade payment",
+          metadata: { artifactId: artifact.id },
+        },
         select: { id: true },
       });
 

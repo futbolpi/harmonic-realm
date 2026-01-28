@@ -203,9 +203,24 @@ export async function completeCraftArtifact(
     // Complete crafting in transaction
     const completed = await prisma.$transaction(async (tx) => {
       // Burn resonance
-      await tx.guild.update({
+      const updatedGuild = await tx.guild.update({
         where: { id: guildId },
         data: { vaultBalance: { decrement: artifact.template.resonanceCost } },
+        select: { vaultBalance: true, leaderUsername: true },
+      });
+
+      // create vault tx
+      await tx.vaultTransaction.create({
+        data: {
+          amount: artifact.template.resonanceCost,
+          balanceAfter: updatedGuild.vaultBalance,
+          balanceBefore:
+            updatedGuild.vaultBalance + artifact.template.resonanceCost,
+          type: "WITHDRAWAL",
+          memberUsername: updatedGuild.leaderUsername,
+          reason: "Artifact craft payment",
+          metadata: { artifactId: artifact.id },
+        },
         select: { id: true },
       });
 

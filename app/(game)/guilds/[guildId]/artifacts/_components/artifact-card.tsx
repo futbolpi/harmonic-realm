@@ -91,14 +91,11 @@ export default function ArtifactCard({
                   <Badge variant="outline" className={`text-xs ${rarityColor}`}>
                     {artifact.template.rarity}
                   </Badge>
-                  <Badge
-                    variant="secondary"
-                    className={`text-xs ${statusInfo.statusColor}`}
-                  >
+                  <Badge variant="secondary" className="text-xs">
                     {statusInfo.statusText}
                   </Badge>
                   {artifact.isEquipped && (
-                    <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
+                    <Badge className="text-xs">
                       <Sparkles className="h-3 w-3 mr-1" />
                       Equipped
                     </Badge>
@@ -147,7 +144,7 @@ export default function ArtifactCard({
           <div className="flex gap-2 pt-2">
             <button
               onClick={() => setShowResonate(true)}
-              className="flex-1 text-xs py-1.5 px-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors"
+              className="flex-1 text-xs py-1.5 px-3 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
             >
               Resonate
             </button>
@@ -175,7 +172,7 @@ export default function ArtifactCard({
                   )}
                 <button
                   onClick={() => setShowEquip(true)}
-                  className="flex-1 text-xs py-1.5 px-3 rounded-md bg-accent hover:bg-accent/80 transition-colors"
+                  className="flex-1 text-xs py-1.5 px-3 rounded-md bg-accent text-accent-foreground hover:bg-accent/80 transition-colors"
                 >
                   {artifact.isEquipped ? "Unequip" : "Equip"}
                 </button>

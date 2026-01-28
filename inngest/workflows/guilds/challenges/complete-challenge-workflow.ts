@@ -68,6 +68,7 @@ export const completeChallengeWorkflow = inngest.createFunction(
             completed: true,
             completedAt: new Date(),
           },
+          select: { completed: true },
         });
 
         // Award RESONANCE to vault
@@ -76,6 +77,7 @@ export const completeChallengeWorkflow = inngest.createFunction(
           data: {
             vaultBalance: { increment: progress.challenge.rewardResonance },
           },
+          select: { vaultBalance: true },
         });
 
         // Log vault transaction
@@ -90,6 +92,7 @@ export const completeChallengeWorkflow = inngest.createFunction(
             reason: "Challenge completed",
             metadata: { challengeId, progressId },
           },
+          select: { balanceAfter: true },
         });
       });
 
@@ -116,11 +119,11 @@ export const completeChallengeWorkflow = inngest.createFunction(
           progress.guild.name,
           progress.challenge.template.name,
           progress.challenge.rewardResonance,
-          progress.challenge.rewardPrestige
+          progress.challenge.rewardPrestige,
         );
         await InngestEventDispatcher.sendHeraldAnnouncement(
           message,
-          "announcement"
+          "announcement",
         );
       });
     } catch (e) {
@@ -132,5 +135,5 @@ export const completeChallengeWorkflow = inngest.createFunction(
       guildId,
       rewards: progress.challenge.rewardResonance,
     };
-  }
+  },
 );

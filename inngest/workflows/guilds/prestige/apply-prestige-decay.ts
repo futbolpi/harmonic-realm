@@ -46,7 +46,7 @@ export const applyPrestigeDecayWorkflow = inngest.createFunction(
             : PRESTIGE_DECAY_LOW_ACTIVITY;
         const decayAmount = calculatePrestigeDecay(
           guild.prestigePoints,
-          activeMemberCount
+          activeMemberCount,
         );
 
         if (decayAmount === 0) continue;
@@ -63,6 +63,7 @@ export const applyPrestigeDecayWorkflow = inngest.createFunction(
               prestigeLevel: Math.min(newLevel, 100),
               prestigeMultiplier: 1 + Math.min(newLevel, 100) * 0.005,
             },
+            select: { prestigePoints: true },
           });
 
           // Log decay
@@ -77,6 +78,7 @@ export const applyPrestigeDecayWorkflow = inngest.createFunction(
                 decayRate: decayRate * 100,
               },
             },
+            select: { id: true },
           });
         });
 
@@ -97,5 +99,5 @@ export const applyPrestigeDecayWorkflow = inngest.createFunction(
       success: true,
       data: result,
     };
-  }
+  },
 );

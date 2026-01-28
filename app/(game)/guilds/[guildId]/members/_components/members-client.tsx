@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import {
@@ -33,7 +34,7 @@ export default function MembersClient({ guild }: MembersClientProps) {
   const [filter, setFilter] = useState("ALL");
   const [sort, setSort] = useState("ACTIVITY");
   const [selectedMember, setSelectedMember] = useState<GuildMember | null>(
-    null
+    null,
   );
   const [showProfile, setShowProfile] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
@@ -49,7 +50,7 @@ export default function MembersClient({ guild }: MembersClientProps) {
 
     if (search.trim()) {
       list = list.filter((m) =>
-        m.username.toLowerCase().includes(search.toLowerCase())
+        m.username.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
@@ -71,7 +72,7 @@ export default function MembersClient({ guild }: MembersClientProps) {
     switch (sort) {
       case "CONTRIBUTIONS":
         list.sort(
-          (a, b) => (b.vaultContribution ?? 0) - (a.vaultContribution ?? 0)
+          (a, b) => (b.vaultContribution ?? 0) - (a.vaultContribution ?? 0),
         );
         break;
       case "JOIN_DATE":
@@ -83,7 +84,7 @@ export default function MembersClient({ guild }: MembersClientProps) {
       default:
         // ACTIVITY
         list.sort(
-          (a, b) => (b.weeklySharePoints ?? 0) - (a.weeklySharePoints ?? 0)
+          (a, b) => (b.weeklySharePoints ?? 0) - (a.weeklySharePoints ?? 0),
         );
         break;
     }
@@ -94,12 +95,12 @@ export default function MembersClient({ guild }: MembersClientProps) {
   const leader = members.find((m) => m.role === "LEADER");
   const officers = members.filter((m) => m.role === "OFFICER");
   const activeCount = members.filter(
-    (m) => (m.weeklySharePoints ?? 0) > 0
+    (m) => (m.weeklySharePoints ?? 0) > 0,
   ).length;
 
   const handleAction = (
     member: GuildMember,
-    type: "PROMOTE" | "REMOVE" | "DEMOTE"
+    type: "PROMOTE" | "REMOVE" | "DEMOTE",
   ) => {
     setConfirmAction({ type, member });
   };
@@ -110,16 +111,22 @@ export default function MembersClient({ guild }: MembersClientProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 w-full max-w-md">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Search & Filter Controls - Mobile First */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Find member..."
+            placeholder="Search members..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
           />
+        </div>
+
+        <div className="flex gap-2 sm:gap-1">
           <Select onValueChange={(v) => setFilter(v)} defaultValue="ALL">
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-24 sm:w-28">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -132,12 +139,12 @@ export default function MembersClient({ guild }: MembersClientProps) {
           </Select>
 
           <Select onValueChange={(v) => setSort(v)} defaultValue="ACTIVITY">
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-24 sm:w-28">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ACTIVITY">Activity</SelectItem>
-              <SelectItem value="CONTRIBUTIONS">Contributions</SelectItem>
+              <SelectItem value="CONTRIBUTIONS">Contrib.</SelectItem>
               <SelectItem value="JOIN_DATE">Join Date</SelectItem>
               <SelectItem value="NAME">Name</SelectItem>
             </SelectContent>

@@ -15,7 +15,7 @@ import {
  * Validates vault level, active members, and creates challenge progress tracker
  */
 export async function acceptChallenge(
-  params: AcceptChallengeParams
+  params: AcceptChallengeParams,
 ): Promise<ApiResponse<{ progressId: string }>> {
   try {
     const { success, data } = AcceptChallengeSchema.safeParse(params);
@@ -51,7 +51,9 @@ export async function acceptChallenge(
     const challenge = await prisma.guildChallenge.findUnique({
       where: { id: challengeId },
       select: {
-        template: { select: { minMembers: true, targetValue: true } },
+        template: {
+          select: { minMembers: true, targetValue: true, minVaultLevel: true },
+        },
         endDate: true,
       },
     });
@@ -66,10 +68,10 @@ export async function acceptChallenge(
     }
 
     // Validate vault level
-    if (member.guild.vaultLevel < challenge.template.targetValue) {
+    if (member.guild.vaultLevel < challenge.template.minVaultLevel) {
       return {
         success: false,
-        error: `Minimum vault level: ${challenge.template.targetValue}`,
+        error: `Minimum vault level: ${challenge.template.minVaultLevel}`,
       };
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,6 +8,7 @@ import {
   getPaginationRowModel,
   type SortingState,
   type ColumnDef,
+  type VisibilityState,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -36,46 +37,18 @@ type Member = {
   challengeCompletions: number;
 };
 
-type MetricType = "weekly" | "vault" | "total" | "challenges";
-
 type LeaderboardCardProps = {
   members: Member[];
 };
 
-const getMetricLabel = (metric: MetricType): string => {
-  switch (metric) {
-    case "weekly":
-      return "This Week SP";
-    case "vault":
-      return "Vault Contribution";
-    case "total":
-      return "Lifetime SP";
-    case "challenges":
-      return "Challenges";
-  }
-};
-
-const getMetricValue = (member: Member, metric: MetricType): number => {
-  switch (metric) {
-    case "weekly":
-      return member.weeklySharePoints;
-    case "vault":
-      return member.vaultContribution;
-    case "total":
-      return member.totalSharePoints;
-    case "challenges":
-      return member.challengeCompletions;
-  }
-};
-
 const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedMetric, setSelectedMetric] = useState<MetricType>("weekly");
-
-  // Reset sorting when metric changes to force table to re-evaluate with new data
-  useEffect(() => {
-    setSorting([]);
-  }, [selectedMetric]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    weekly: true,
+    vault: false,
+    total: false,
+    challenges: false,
+  });
 
   const columns: ColumnDef<Member>[] = useMemo(
     () => [
@@ -97,35 +70,87 @@ const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
         ),
       },
       {
-        id: "metric",
-        accessorFn: (row) => getMetricValue(row, selectedMetric),
+        id: "weekly",
+        accessorKey: "weeklySharePoints",
         header: ({ column }) => (
           <button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="flex items-center gap-2 hover:text-foreground transition-colors ml-auto"
           >
             <ArrowUpDown className="w-4 h-4" />
-            {getMetricLabel(selectedMetric)}
+            This Week SP
           </button>
         ),
-        cell: ({ row }) => {
-          const value = row.getValue("metric") as number;
-          return (
-            <div className="font-semibold text-right">
-              {value.toLocaleString()}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="font-semibold text-right">
+            {(row.getValue("weekly") as number).toLocaleString()}
+          </div>
+        ),
+      },
+      {
+        id: "vault",
+        accessorKey: "vaultContribution",
+        header: ({ column }) => (
+          <button
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-2 hover:text-foreground transition-colors ml-auto"
+          >
+            <ArrowUpDown className="w-4 h-4" />
+            Vault Contribution
+          </button>
+        ),
+        cell: ({ row }) => (
+          <div className="font-semibold text-right">
+            {(row.getValue("vault") as number).toLocaleString()}
+          </div>
+        ),
+      },
+      {
+        id: "total",
+        accessorKey: "totalSharePoints",
+        header: ({ column }) => (
+          <button
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-2 hover:text-foreground transition-colors ml-auto"
+          >
+            <ArrowUpDown className="w-4 h-4" />
+            Lifetime SP
+          </button>
+        ),
+        cell: ({ row }) => (
+          <div className="font-semibold text-right">
+            {(row.getValue("total") as number).toLocaleString()}
+          </div>
+        ),
+      },
+      {
+        id: "challenges",
+        accessorKey: "challengeCompletions",
+        header: ({ column }) => (
+          <button
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-2 hover:text-foreground transition-colors ml-auto"
+          >
+            <ArrowUpDown className="w-4 h-4" />
+            Challenges
+          </button>
+        ),
+        cell: ({ row }) => (
+          <div className="font-semibold text-right">
+            {(row.getValue("challenges") as number).toLocaleString()}
+          </div>
+        ),
       },
     ],
-    [selectedMetric],
+    [],
   );
 
   const table = useReactTable({
     data: members,
     columns,
-    state: { sorting },
+    state: { sorting, columnVisibility },
     onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -145,7 +170,16 @@ const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
             <CardTitle className="text-lg">Members Leaderboard</CardTitle>
           </div>
 
-          <Select onValueChange={(v) => setSelectedMetric(v as MetricType)}>
+          <Select
+            onValueChange={(v) => {
+              setColumnVisibility({
+                weekly: v === "weekly",
+                vault: v === "vault",
+                total: v === "total",
+                challenges: v === "challenges",
+              });
+            }}
+          >
             <SelectTrigger className="w-28 sm:w-32">
               <SelectValue defaultValue="weekly" />
             </SelectTrigger>
@@ -193,26 +227,34 @@ const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
                   key={row.id}
                   className="hover:bg-muted/40 transition-colors"
                 >
-                  <td className="px-2 sm:px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="w-6 h-6 flex items-center justify-center rounded-full p-0 text-xs font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                      >
-                        {pageIndex * 10 + idx + 1}
-                      </Badge>
-                      {flexRender(
-                        row.getVisibleCells()[0].column.columnDef.cell,
-                        row.getVisibleCells()[0].getContext(),
+                  {row.getVisibleCells().map((cell, cellIdx) => (
+                    <td
+                      key={cell.id}
+                      className={`px-2 sm:px-4 py-3 ${
+                        cellIdx === 0 ? "flex items-center gap-2" : ""
+                      }`}
+                    >
+                      {cellIdx === 0 ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <Badge
+                            variant="outline"
+                            className="w-6 h-6 flex items-center justify-center rounded-full p-0 text-xs font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 flex-shrink-0"
+                          >
+                            {pageIndex * 10 + idx + 1}
+                          </Badge>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </div>
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )
                       )}
-                    </div>
-                  </td>
-                  <td className="px-2 sm:px-4 py-3">
-                    {flexRender(
-                      row.getVisibleCells()[1].column.columnDef.cell,
-                      row.getVisibleCells()[1].getContext(),
-                    )}
-                  </td>
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>

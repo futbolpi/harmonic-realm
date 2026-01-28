@@ -44,19 +44,17 @@ const ProfileModal = ({
     <Credenza open={showProfile} onOpenChange={setShowProfile}>
       <CredenzaContent className="max-w-md p-0">
         {/* Header with gradient background */}
-        <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white">
+        <div className="bg-gradient-to-br from-background/75 to-background/90 p-6">
           <CredenzaHeader className="p-0 mb-4">
-            <CredenzaTitle className="text-white text-2xl">
+            <CredenzaTitle className="text-foreground text-2xl">
               {selectedMember?.username}
             </CredenzaTitle>
           </CredenzaHeader>
           <div className="flex items-center gap-4">
             <UserAvatar size={72} userId={selectedMember?.username || ""} />
             <div>
-              <Badge className="bg-white text-blue-600 mb-2">
-                {selectedMember?.role}
-              </Badge>
-              <p className="text-sm text-blue-100">
+              <Badge className="mb-2">{selectedMember?.role}</Badge>
+              <p className="text-sm text-muted-foreground">
                 Member for {daysSinceJoin} day{daysSinceJoin !== 1 ? "s" : ""}
               </p>
             </div>
@@ -101,7 +99,7 @@ const ProfileModal = ({
                   Activity
                 </h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between p-2 bg-slate-50 dark:bg-slate-900 rounded">
+                  <div className="flex justify-between p-2 bg-sidebar rounded">
                     <span className="text-muted-foreground">Joined</span>
                     <span className="font-medium">
                       {formatDistanceToNow(selectedMember.joinedAt, {
@@ -109,7 +107,7 @@ const ProfileModal = ({
                       })}
                     </span>
                   </div>
-                  <div className="flex justify-between p-2 bg-slate-50 dark:bg-slate-900 rounded">
+                  <div className="flex justify-between p-2 bg-sidebar rounded">
                     <span className="text-muted-foreground">Status</span>
                     <Badge
                       variant="outline"
@@ -136,7 +134,7 @@ const ProfileModal = ({
                   Performance
                 </h3>
                 <div className="text-sm space-y-2">
-                  <div className="flex justify-between p-2 bg-slate-50 dark:bg-slate-900 rounded">
+                  <div className="flex justify-between p-2 bg-sidebar rounded">
                     <span className="text-muted-foreground">Avg Weekly</span>
                     <span className="font-medium">
                       {daysSinceJoin > 0
@@ -149,7 +147,7 @@ const ProfileModal = ({
                       RES
                     </span>
                   </div>
-                  <div className="flex justify-between p-2 bg-slate-50 dark:bg-slate-900 rounded">
+                  <div className="flex justify-between p-2 bg-sidebar rounded">
                     <span className="text-muted-foreground">Member Since</span>
                     <span className="font-medium">Day {daysSinceJoin}</span>
                   </div>

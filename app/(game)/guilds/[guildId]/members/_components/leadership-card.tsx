@@ -49,7 +49,7 @@ const LeadershipCard = ({
       <CardContent className="space-y-4">
         {/* Guild Leader */}
         {leader && (
-          <div className="p-4 rounded-lg border-2 border-amber-300 dark:border-amber-600 bg-white dark:bg-slate-900 shadow-md hover:shadow-lg transition-shadow">
+          <div className="p-4 rounded-lg border-2 border-amber-300 dark:border-amber-600 bg-sidebar shadow-md hover:shadow-lg transition-shadow">
             <div className="flex items-start gap-4 mb-3">
               <div className="relative">
                 <UserAvatar size={56} userId={leader.username} />
@@ -93,7 +93,7 @@ const LeadershipCard = ({
               {officers.map((o) => (
                 <div
                   key={o.id}
-                  className="p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-900 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-md transition-all"
+                  className="p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-sidebar hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start gap-3 mb-2">
                     <div className="relative">

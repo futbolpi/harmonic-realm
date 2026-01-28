@@ -102,16 +102,16 @@ const ActiveMembers = ({
                         )}
                       </div>
                       <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded">
+                        <div className="bg-sidebar p-2 rounded">
                           <p className="text-muted-foreground">This Week</p>
                           <p className="font-semibold">
-                            {m.weeklySharePoints ?? 0} SP
+                            {(m.weeklySharePoints ?? 0).toFixed(2)} SP
                           </p>
                         </div>
-                        <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded">
+                        <div className="bg-sidebar p-2 rounded">
                           <p className="text-muted-foreground">Lifetime</p>
                           <p className="font-semibold">
-                            {m.vaultContribution ?? 0} RES
+                            {(m.vaultContribution ?? 0).toFixed(2)} RES
                           </p>
                         </div>
                       </div>

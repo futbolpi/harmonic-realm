@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -72,6 +72,11 @@ const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedMetric, setSelectedMetric] = useState<MetricType>("weekly");
 
+  // Reset sorting when metric changes to force table to re-evaluate with new data
+  useEffect(() => {
+    setSorting([]);
+  }, [selectedMetric]);
+
   const columns: ColumnDef<Member>[] = useMemo(
     () => [
       {
@@ -137,12 +142,12 @@ const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
         <div className="flex items-center justify-between gap-2 sm:flex-row flex-col">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-emerald-600" />
-            <CardTitle className="text-lg">Leaderboard</CardTitle>
+            <CardTitle className="text-lg">Members Leaderboard</CardTitle>
           </div>
 
           <Select onValueChange={(v) => setSelectedMetric(v as MetricType)}>
             <SelectTrigger className="w-28 sm:w-32">
-              <SelectValue />
+              <SelectValue defaultValue="weekly" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="weekly">This Week</SelectItem>

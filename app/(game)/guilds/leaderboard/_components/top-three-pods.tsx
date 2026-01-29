@@ -24,6 +24,7 @@ export function TopThreePods({ guilds, type }: TopThreePodsProps) {
       {second && (
         <Link
           href={`/guilds/${second.id}`}
+          prefetch={false}
           className="block order-2 md:order-1"
         >
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-2 border-gray-300 dark:border-gray-700">
@@ -61,7 +62,11 @@ export function TopThreePods({ guilds, type }: TopThreePodsProps) {
       )}
 
       {/* First Place */}
-      <Link href={`/guilds/${first.id}`} className="block order-1 md:order-2">
+      <Link
+        href={`/guilds/${first.id}`}
+        className="block order-1 md:order-2"
+        prefetch={false}
+      >
         <Card className="relative overflow-hidden hover:shadow-2xl transition-shadow border-2 border-yellow-400 dark:border-yellow-600 md:scale-110">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 animate-pulse" />
           <CardContent className="pt-8 pb-6 text-center">
@@ -95,7 +100,11 @@ export function TopThreePods({ guilds, type }: TopThreePodsProps) {
 
       {/* Third Place */}
       {third && (
-        <Link href={`/guilds/${third.id}`} className="block order-3">
+        <Link
+          href={`/guilds/${third.id}`}
+          className="block order-3"
+          prefetch={false}
+        >
           <Card className="relative overflow-hidden hover:shadow-lg transition-shadow border-2 border-amber-600 dark:border-amber-800">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-700 to-amber-500" />
             <CardContent className="pt-8 pb-6 text-center">

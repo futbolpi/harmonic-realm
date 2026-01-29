@@ -41,7 +41,12 @@ function createMetricColumn(
       const isUserGuild = row.original.id === userGuildId;
 
       return (
-        <div className={cn("text-sm font-semibold text-right", isUserGuild && "text-primary")}>
+        <div
+          className={cn(
+            "text-sm font-semibold text-right",
+            isUserGuild && "text-primary",
+          )}
+        >
           {value.toLocaleString()}
         </div>
       );
@@ -86,6 +91,7 @@ export function useLeaderboardColumns({
           return (
             <Link
               href={`/guilds/${row.original.id}`}
+              prefetch={false}
               className="flex items-center gap-2 hover:underline min-w-fit"
             >
               <div className="text-xl flex-shrink-0">{row.original.emblem}</div>

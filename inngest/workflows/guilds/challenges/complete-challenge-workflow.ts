@@ -2,12 +2,14 @@ import { inngest } from "@/inngest/client";
 import { prisma } from "@/lib/prisma";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
 import { awardPrestige } from "@/lib/api-helpers/server/guilds/prestige";
+import { GUILD_ACTIVITIES } from "@/config/guilds/constants";
 import { generateCompleteChallengeAnnouncement } from "./utils";
 
 /**
  * WORKFLOW: Handle challenge completion and reward distribution
  * Trigger: "guild/challenge.completed" event
- * Behavior: Awards RESONANCE to vault, logs prestige, creates vault transaction, sends notification
+ * Behavior: Awards RESONANCE to vault, increments guild.weeklyActivity,
+ * logs prestige, creates vault transaction, sends notification
  */
 export const completeChallengeWorkflow = inngest.createFunction(
   {
@@ -71,11 +73,14 @@ export const completeChallengeWorkflow = inngest.createFunction(
           select: { completed: true },
         });
 
-        // Award RESONANCE to vault
+        // Award RESONANCE and update weekly contibution to vault
         await tx.guild.update({
           where: { id: guildId },
           data: {
             vaultBalance: { increment: progress.challenge.rewardResonance },
+            weeklyActivity: {
+              increment: GUILD_ACTIVITIES.challenges.weeklyActivity,
+            },
           },
           select: { vaultBalance: true },
         });

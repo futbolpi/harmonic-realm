@@ -1,3 +1,4 @@
+import { GUILD_ACTIVITIES } from "@/config/guilds/constants";
 import prisma from "@/lib/prisma";
 
 type AwardSPParams = {
@@ -38,6 +39,9 @@ export const awardMemberSP = async ({
 
   const totalNodesMined = completedMining ? { increment: 1 } : undefined;
   const totalTunesPerfect = perfectTuning ? { increment: 1 } : undefined;
+  const weeklyActivity = completedMining
+    ? { increment: GUILD_ACTIVITIES.mining.weeklyActivity }
+    : { increment: GUILD_ACTIVITIES.tuning.weeklyActivity };
 
   await prisma.guildMember.update({
     where: { id: memberId, isActive: true },
@@ -49,7 +53,7 @@ export const awardMemberSP = async ({
           totalNodesMined,
           totalTunesPerfect,
           totalSharePoints: { increment },
-          //   weeklyActivity: { increment: 1 },
+          weeklyActivity,
         },
       },
     },

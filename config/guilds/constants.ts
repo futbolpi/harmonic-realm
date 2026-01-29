@@ -11,3 +11,10 @@ export const TERRITORY_CONTROL_DAYS = 7;
 export const TERRITORY_SP_MULTIPLIER = 1.15;
 
 export const TERRITORY_H3_RES = 7;
+
+export const GUILD_ACTIVITIES = {
+  mining: { weeklyActivity: 10 },
+  tuning: { weeklyActivity: 1 },
+  challenges: { weeklyActivity: 100 },
+  territoryVictory: { weeklyActivity: 50 },
+};

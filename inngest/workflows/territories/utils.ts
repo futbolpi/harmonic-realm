@@ -1,7 +1,10 @@
 import { addDays } from "date-fns";
 
 import type { DefaultArgs } from "@prisma/client/runtime/client";
-import { TERRITORY_CONTROL_DAYS } from "@/config/guilds/constants";
+import {
+  GUILD_ACTIVITIES,
+  TERRITORY_CONTROL_DAYS,
+} from "@/config/guilds/constants";
 import type { PrismaClient } from "@/lib/generated/prisma/client";
 
 /**
@@ -24,7 +27,7 @@ export async function resolveTerritoryChallenge(
     defenderStake: number;
     attackerScore: number | null;
     defenderScore: number | null;
-  }
+  },
 ) {
   // Determine winner (attacker must strictly exceed defender to win)
   const winnerId =
@@ -64,7 +67,12 @@ export async function resolveTerritoryChallenge(
     }),
     _tx.guild.update({
       where: { id: winnerId },
-      data: { vaultBalance: { increment: winnerReward } },
+      data: {
+        vaultBalance: { increment: winnerReward },
+        weeklyActivity: {
+          increment: GUILD_ACTIVITIES.territoryVictory.weeklyActivity,
+        },
+      },
       select: { id: true },
     }),
     _tx.territoryChallenge.update({

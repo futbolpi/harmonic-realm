@@ -15,6 +15,7 @@ import { InngestEventDispatcher } from "@/inngest/dispatcher";
  * - Increments each user's `sharePoints`
  * - Decrements guild vault by pool and increments guild.totalSharePoints
  * - Resets all guild members' weeklySharePoints to 0
+ * - Resets all guilds' weeklyActivity to 0
  */
 export const distributeWeeklyRewards = inngest.createFunction(
   {
@@ -246,16 +247,28 @@ export const distributeWeeklyRewards = inngest.createFunction(
     // After processing all guilds, reset weeklySharePoints globally to mark new week
     await step.run("reset-weekly-sharepoints", async () => {
       logger.info(
-        "Resetting weeklySharePoints for all guild members (single DB call)",
+        "Resetting weeklySharePoints for all guild members and guilds (single DB call)",
       );
-      const result = await prisma.guildMember.updateMany({
-        where: {},
-        data: { weeklySharePoints: 0 },
-      });
+
+      const [membersUpdated, guildsUpdated] = await prisma.$transaction([
+        prisma.guildMember.updateMany({
+          where: {},
+          data: { weeklySharePoints: 0 },
+        }),
+        prisma.guild.updateMany({
+          where: {},
+          data: { weeklyActivity: 0 },
+        }),
+      ]);
+
       logger.info("Weekly sharePoints reset completed", {
-        count: result.count,
+        members: membersUpdated.count,
+        guilds: guildsUpdated.count,
       });
-      return { resetCount: result.count };
+      return {
+        membersResetCount: membersUpdated.count,
+        guildsResetCount: guildsUpdated.count,
+      };
     });
 
     return { message: "Weekly reward distribution completed" };

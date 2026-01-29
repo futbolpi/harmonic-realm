@@ -146,3 +146,36 @@ export function calculateUserGuildRank(
     totalGuilds: guilds.length,
   };
 }
+
+export function getProgressTips(type: LeaderboardType): string[] {
+  switch (type) {
+    case "prestige":
+      return [
+        "Complete guild challenges",
+        "Win territory wars",
+        "Keep members active",
+        "Upgrade guild vault",
+      ];
+    case "activity":
+      return [
+        "Encourage daily tuning",
+        "Organize group mining sessions",
+        "Complete weekly challenges",
+        "Stay engaged with territories",
+      ];
+    case "vault":
+      return [
+        "Contribute to vault regularly",
+        "Complete lucrative challenges",
+        "Win territory rewards",
+        "Encourage member deposits",
+      ];
+    case "territories":
+      return [
+        "Stake new territories",
+        "Defend current holdings",
+        "Attack strategic zones",
+        "Coordinate territory wars",
+      ];
+  }
+}

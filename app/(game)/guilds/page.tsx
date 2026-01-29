@@ -18,11 +18,19 @@ export default async function GuildsPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h1 className="text-3xl font-bold">Guilds</h1>
-          <Button asChild>
-            <Link href="/guilds/create">Create Guild</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button asChild variant="outline" className="flex-1 sm:flex-none">
+              <Link href="/guilds/leaderboard">📊 Leaderboard</Link>
+            </Button>
+            <Button asChild variant="outline" className="flex-1 sm:flex-none">
+              <Link href="/territories">🗺️ Territories</Link>
+            </Button>
+            <Button asChild className="flex-1 sm:flex-none">
+              <Link href="/guilds/create">Create Guild</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

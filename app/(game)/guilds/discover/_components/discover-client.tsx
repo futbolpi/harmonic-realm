@@ -62,7 +62,7 @@ export default function DiscoverClient({ guilds }: { guilds: Guild[] }) {
       {/* Hero */}
       <Card>
         <CardContent>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold">
                 You&apos;re not in a guild yet
@@ -71,12 +71,19 @@ export default function DiscoverClient({ guilds }: { guilds: Guild[] }) {
                 Joining a guild unlocks bonuses, rewards, and social features.
               </p>
             </div>
-            <div className="flex gap-2">
-              <Link href="/guilds/create">
-                <Button>Create Guild</Button>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Link href="/guilds/create" className="flex-1 sm:flex-none">
+                <Button className="w-full">Create Guild</Button>
               </Link>
-              <Link href="/guilds">
-                <Button variant="outline">Browse Guilds</Button>
+              <Link href="/guilds/leaderboard" className="flex-1 sm:flex-none">
+                <Button variant="outline" className="w-full">
+                  📊 Leaderboard
+                </Button>
+              </Link>
+              <Link href="/territories" className="flex-1 sm:flex-none">
+                <Button variant="outline" className="w-full">
+                  🗺️ Territories
+                </Button>
               </Link>
             </div>
           </div>

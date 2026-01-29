@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 import Header from "./_components/header";
 import Stats from "./_components/stats";
@@ -38,6 +39,37 @@ export default async function GuildPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-5xl">
+        {/* Navigation Bar */}
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm">
+            <Link
+              href="/guilds/discover"
+              prefetch={false}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Guilds
+            </Link>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-foreground font-medium">{guild.name}</span>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              href="/guilds/leaderboard"
+              prefetch={false}
+              className="text-sm px-3 py-1 rounded border border-border hover:bg-muted transition-colors"
+            >
+              📊 Leaderboard
+            </Link>
+            <Link
+              href="/territories"
+              prefetch={false}
+              className="text-sm px-3 py-1 rounded border border-border hover:bg-muted transition-colors"
+            >
+              🗺️ Territories
+            </Link>
+          </div>
+        </div>
+
         {/* Header */}
         <Header
           guild={{

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { getSiteStats } from "@/lib/api-helpers/server/site";
 import { LeaderboardClient } from "./_components/leaderboard-client";
@@ -40,13 +41,32 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-neon-purple bg-clip-text text-transparent">
-          Pioneer Leaderboard
-        </h1>
-        <p className="text-muted-foreground">
-          Discover the most resonant Pioneers across the cosmic Lattice
-        </p>
+      {/* Navigation Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-neon-purple bg-clip-text text-transparent">
+            Pioneer Leaderboard
+          </h1>
+          <p className="text-muted-foreground">
+            Discover the most resonant Pioneers across the cosmic Lattice
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Link
+            href="/guilds/discover"
+            prefetch={false}
+            className="text-sm px-3 py-2 rounded border border-border hover:bg-muted transition-colors text-center"
+          >
+            Guilds
+          </Link>
+          <Link
+            href="/territories"
+            prefetch={false}
+            className="text-sm px-3 py-2 rounded border border-border hover:bg-muted transition-colors text-center"
+          >
+            🗺️ Territories
+          </Link>
+        </div>
       </div>
 
       <LeaderboardClient

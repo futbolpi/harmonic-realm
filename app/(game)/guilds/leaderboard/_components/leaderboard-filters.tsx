@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import type { LeaderboardType, TimeRange } from "../services";
 
 interface LeaderboardFiltersProps {
@@ -17,6 +18,13 @@ interface LeaderboardFiltersProps {
   onTimeRangeChange: (range: TimeRange) => void;
 }
 
+const METRIC_BUTTONS: { value: LeaderboardType; label: string }[] = [
+  { value: "prestige", label: "⭐ Prestige" },
+  { value: "activity", label: "⚡ Activity" },
+  { value: "vault", label: "💎 Vault" },
+  { value: "territories", label: "🗺️ Territories" },
+];
+
 export function LeaderboardFilters({
   activeTab,
   timeRange,
@@ -25,22 +33,26 @@ export function LeaderboardFilters({
 }: LeaderboardFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-      <Tabs
-        value={activeTab}
-        onValueChange={(v) => onTabChange(v as LeaderboardType)}
-      >
-        <TabsList>
-          <TabsTrigger value="prestige">⭐ Prestige</TabsTrigger>
-          <TabsTrigger value="activity">⚡ Activity</TabsTrigger>
-          <TabsTrigger value="vault">💎 Vault</TabsTrigger>
-          <TabsTrigger value="territories">🗺️ Territories</TabsTrigger>
-        </TabsList>
-        <TabsContent value="prestige" className="hidden"></TabsContent>
-        <TabsContent value="activity" className="hidden"></TabsContent>
-        <TabsContent value="vault" className="hidden"></TabsContent>
-        <TabsContent value="territories" className="hidden"></TabsContent>
-      </Tabs>
+      {/* Metric Selection Buttons */}
+      <div className="flex gap-1 bg-muted p-1 rounded-lg overflow-x-auto w-full sm:w-auto">
+        {METRIC_BUTTONS.map((btn) => (
+          <Button
+            key={btn.value}
+            variant="ghost"
+            onClick={() => onTabChange(btn.value)}
+            className={cn(
+              "whitespace-nowrap transition-colors",
+              activeTab === btn.value
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {btn.label}
+          </Button>
+        ))}
+      </div>
 
+      {/* Time Range Selection */}
       <Select
         value={timeRange}
         onValueChange={(v) => onTimeRangeChange(v as TimeRange)}

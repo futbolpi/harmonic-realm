@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -49,7 +49,17 @@ export function LeaderboardTable({
     rank: index + 1,
   }));
 
-  const columns = useLeaderboardColumns({ type, userGuildId });
+  const columns = useLeaderboardColumns({ userGuildId });
+
+  // Determine which metric column to show based on type
+  const visibilityState = useMemo(() => {
+    return {
+      "prestige-metric": type === "prestige",
+      "activity-metric": type === "activity",
+      "vault-metric": type === "vault",
+      "territories-metric": type === "territories",
+    };
+  }, [type]);
 
   const table = useReactTable({
     data: rankedGuilds,
@@ -66,6 +76,7 @@ export function LeaderboardTable({
       sorting,
       columnFilters,
       globalFilter,
+      columnVisibility: visibilityState,
     },
     initialState: {
       pagination: {

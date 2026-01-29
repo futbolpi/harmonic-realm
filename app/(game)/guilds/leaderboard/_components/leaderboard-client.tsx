@@ -57,7 +57,7 @@ export function LeaderboardClient({ allGuilds }: LeaderboardClientProps) {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Full Rankings Table */}
+        {/* Full Rankings Table - Column visibility controlled by activeTab */}
         <div className="lg:col-span-2">
           <LeaderboardTable
             guilds={processedGuilds}

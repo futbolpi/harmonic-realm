@@ -31,7 +31,7 @@ export default function AllWarsModal({ challenges }: AllWarsModalProps) {
             territories
           </CredenzaDescription>
         </CredenzaHeader>
-        <CredenzaBody className="overflow-y-auto max-h-96">
+        <CredenzaBody className="overflow-y-auto max-h-96 p-4">
           <ChallengesTable challenges={challenges} />
         </CredenzaBody>
       </CredenzaContent>

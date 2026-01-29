@@ -33,7 +33,7 @@ export default function AllTerritoriesModal({
             {territories.length !== 1 ? "s" : ""} managed by your guild
           </CredenzaDescription>
         </CredenzaHeader>
-        <CredenzaBody className="overflow-y-auto max-h-96">
+        <CredenzaBody className="overflow-y-auto max-h-96 p-4">
           <TerritoriesTable territories={territories} />
         </CredenzaBody>
       </CredenzaContent>

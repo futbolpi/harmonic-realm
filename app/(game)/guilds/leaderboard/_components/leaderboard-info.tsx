@@ -22,7 +22,7 @@ export function LeaderboardInfo() {
           Info
         </Button>
       </CredenzaTrigger>
-      <CredenzaContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <CredenzaContent className="max-w-2xl">
         <CredenzaHeader>
           <CredenzaTitle>Guild Leaderboard Guide</CredenzaTitle>
           <CredenzaDescription>
@@ -30,7 +30,7 @@ export function LeaderboardInfo() {
           </CredenzaDescription>
         </CredenzaHeader>
 
-        <CredenzaBody className="space-y-6 py-4">
+        <CredenzaBody className="space-y-6 py-4 max-h-[80vh] overflow-y-auto">
           {/* Prestige */}
           <div className="space-y-2">
             <h3 className="font-semibold flex items-center gap-2">

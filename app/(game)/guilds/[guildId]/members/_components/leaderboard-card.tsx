@@ -181,7 +181,7 @@ const LeaderboardCard = ({ members }: LeaderboardCardProps) => {
             }}
           >
             <SelectTrigger className="w-28 sm:w-32">
-              <SelectValue defaultValue="weekly" />
+              <SelectValue defaultValue="weekly" placeholder="Select metric" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="weekly">This Week</SelectItem>

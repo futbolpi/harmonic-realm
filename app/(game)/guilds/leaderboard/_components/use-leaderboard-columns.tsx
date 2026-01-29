@@ -8,16 +8,48 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getMetricValue, getMetricLabel } from "../utils";
-import type { LeaderboardGuild, LeaderboardType } from "../services";
+import type { LeaderboardGuild } from "../services";
 
 interface UseLeaderboardColumnsProps {
-  type: LeaderboardType;
   userGuildId?: string | null;
 }
 
+/**
+ * Helper function to create a metric column with consistent styling
+ */
+function createMetricColumn(
+  id: string,
+  label: string,
+  accessor: (guild: LeaderboardGuild) => number,
+  userGuildId?: string | null,
+): ColumnDef<LeaderboardGuild & { rank: number }> {
+  return {
+    id,
+    accessorFn: (row) => accessor(row),
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="h-auto p-0 hover:bg-transparent"
+      >
+        {label}
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const value = accessor(row.original);
+      const isUserGuild = row.original.id === userGuildId;
+
+      return (
+        <div className={cn("font-bold text-lg", isUserGuild && "text-primary")}>
+          {value.toLocaleString()}
+        </div>
+      );
+    },
+  };
+}
+
 export function useLeaderboardColumns({
-  type,
   userGuildId,
 }: UseLeaderboardColumnsProps) {
   return useMemo<ColumnDef<LeaderboardGuild & { rank: number }>[]>(() => {
@@ -78,32 +110,31 @@ export function useLeaderboardColumns({
           );
         },
       },
-      {
-        id: "metric",
-        accessorFn: (row) => getMetricValue(row, type),
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="h-auto p-0 hover:bg-transparent"
-          >
-            {getMetricLabel(type)}
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        ),
-        cell: ({ row }) => {
-          const value = getMetricValue(row.original, type);
-          const isUserGuild = row.original.id === userGuildId;
-
-          return (
-            <div
-              className={cn("font-bold text-lg", isUserGuild && "text-primary")}
-            >
-              {value.toLocaleString()}
-            </div>
-          );
-        },
-      },
+      // Individual metric columns for each leaderboard type
+      createMetricColumn(
+        "prestige-metric",
+        "Prestige Points",
+        (guild) => guild.prestigePoints,
+        userGuildId,
+      ),
+      createMetricColumn(
+        "activity-metric",
+        "Weekly Activity",
+        (guild) => guild.weeklyActivity,
+        userGuildId,
+      ),
+      createMetricColumn(
+        "vault-metric",
+        "Total RESONANCE",
+        (guild) => guild.totalContributed,
+        userGuildId,
+      ),
+      createMetricColumn(
+        "territories-metric",
+        "Territories",
+        (guild) => guild._count.territories,
+        userGuildId,
+      ),
       {
         id: "members",
         accessorFn: (row) => row._count.members,
@@ -125,7 +156,7 @@ export function useLeaderboardColumns({
         ),
       },
       {
-        id: "territories",
+        id: "zones",
         accessorFn: (row) => row._count.territories,
         header: ({ column }) => (
           <Button
@@ -145,5 +176,5 @@ export function useLeaderboardColumns({
         ),
       },
     ];
-  }, [type, userGuildId]);
+  }, [userGuildId]);
 }

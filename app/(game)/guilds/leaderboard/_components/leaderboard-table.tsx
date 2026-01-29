@@ -34,6 +34,14 @@ interface LeaderboardTableProps {
   userGuildId?: string | null;
 }
 
+// Metric column visibility mapping
+const METRIC_COLUMN_MAP: Record<LeaderboardType, string> = {
+  prestige: "prestige-metric",
+  activity: "activity-metric",
+  vault: "vault-metric",
+  territories: "territories-metric",
+};
+
 export function LeaderboardTable({
   guilds,
   type,
@@ -44,26 +52,34 @@ export function LeaderboardTable({
   const [globalFilter, setGlobalFilter] = useState("");
 
   // Add rank to each guild
-  const rankedGuilds = guilds.map((guild, index) => ({
-    ...guild,
-    rank: index + 1,
-  }));
+  const rankedGuilds = useMemo(
+    () => guilds.map((guild, index) => ({ ...guild, rank: index + 1 })),
+    [guilds],
+  );
 
   const columns = useLeaderboardColumns({ userGuildId });
 
-  // Determine which metric column to show based on type
-  const visibilityState = useMemo(() => {
-    return {
-      "prestige-metric": type === "prestige",
-      "activity-metric": type === "activity",
-      "vault-metric": type === "vault",
-      "territories-metric": type === "territories",
+  // Compute visibility state - STABLE and only changes when type changes
+  const columnVisibility = useMemo(() => {
+    const visibility: Record<string, boolean> = {
+      "prestige-metric": false,
+      "activity-metric": false,
+      "vault-metric": false,
+      "territories-metric": false,
     };
+    visibility[METRIC_COLUMN_MAP[type]] = true;
+    return visibility;
   }, [type]);
 
   const table = useReactTable({
     data: rankedGuilds,
     columns,
+    state: {
+      sorting,
+      columnFilters,
+      globalFilter,
+      columnVisibility,
+    },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -72,12 +88,6 @@ export function LeaderboardTable({
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: "includesString",
-    state: {
-      sorting,
-      columnFilters,
-      globalFilter,
-      columnVisibility: visibilityState,
-    },
     initialState: {
       pagination: {
         pageSize: 20,
@@ -86,10 +96,10 @@ export function LeaderboardTable({
   });
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-border/50">
+      <CardHeader className="pb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold">
             📊 Full Rankings
           </CardTitle>
           <div className="relative w-full sm:w-64">
@@ -98,19 +108,22 @@ export function LeaderboardTable({
               placeholder="Search guilds..."
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-9"
             />
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="rounded-lg border bg-card/50 backdrop-blur-sm">
+      <CardContent className="p-0">
+        <div className="rounded-lg border bg-card/50 backdrop-blur-sm overflow-hidden">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/40 sticky top-0 z-10">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-border/50">
+                <TableRow key={headerGroup.id} className="border-border/40 hover:bg-transparent">
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="text-game-accent">
+                    <TableHead
+                      key={header.id}
+                      className="text-xs font-semibold text-foreground/70 h-10 px-4 py-2"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -131,14 +144,16 @@ export function LeaderboardTable({
                     <TableRow
                       key={row.id}
                       className={cn(
-                        "border-border/30 hover:bg-muted/30 transition-colors",
+                        "border-border/20 hover:bg-muted/40 transition-colors h-14",
                         isUserGuild &&
-                          "bg-primary/10 hover:bg-primary/20 border-primary/30",
+                          "bg-primary/5 hover:bg-primary/10 border-primary/20",
                       )}
-                      data-state={row.getIsSelected() && "selected"}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell
+                          key={cell.id}
+                          className="px-4 py-3 text-sm align-middle"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),
@@ -152,7 +167,7 @@ export function LeaderboardTable({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="text-center py-8 text-muted-foreground"
+                    className="text-center py-12 text-muted-foreground text-sm"
                   >
                     No guilds found
                   </TableCell>
@@ -162,9 +177,15 @@ export function LeaderboardTable({
           </Table>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
-          <div className="text-sm text-muted-foreground">
-            Showing {table.getFilteredRowModel().rows.length} of {guilds.length}{" "}
+        {/* Pagination Footer */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 border-t border-border/20">
+          <div className="text-xs text-muted-foreground">
+            Showing{" "}
+            <span className="font-medium text-foreground">
+              {table.getFilteredRowModel().rows.length}
+            </span>{" "}
+            of{" "}
+            <span className="font-medium text-foreground">{guilds.length}</span>{" "}
             guilds
           </div>
           <div className="flex items-center gap-2">
@@ -177,9 +198,13 @@ export function LeaderboardTable({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
+            <div className="text-xs font-medium min-w-fit">
+              Page{" "}
+              <span className="text-foreground">
+                {table.getState().pagination.pageIndex + 1}
+              </span>{" "}
+              of{" "}
+              <span className="text-foreground">{table.getPageCount()}</span>
             </div>
             <Button
               variant="outline"

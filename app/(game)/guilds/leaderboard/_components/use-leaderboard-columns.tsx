@@ -30,10 +30,10 @@ function createMetricColumn(
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="h-auto p-0 hover:bg-transparent"
+        className="h-auto p-0 hover:bg-transparent whitespace-nowrap text-xs font-semibold"
       >
         {label}
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        <ArrowUpDown className="ml-2 h-3 w-3 opacity-50" />
       </Button>
     ),
     cell: ({ row }) => {
@@ -41,7 +41,7 @@ function createMetricColumn(
       const isUserGuild = row.original.id === userGuildId;
 
       return (
-        <div className={cn("font-bold text-lg", isUserGuild && "text-primary")}>
+        <div className={cn("text-sm font-semibold text-right", isUserGuild && "text-primary")}>
           {value.toLocaleString()}
         </div>
       );
@@ -57,6 +57,7 @@ export function useLeaderboardColumns({
       {
         accessorKey: "rank",
         header: "Rank",
+        size: 60,
         cell: ({ row }) => {
           const rank = row.getValue("rank") as number;
           const isUserGuild = row.original.id === userGuildId;
@@ -64,7 +65,7 @@ export function useLeaderboardColumns({
           return (
             <div
               className={cn(
-                "font-bold text-lg",
+                "font-bold text-sm",
                 rank === 1 && "text-yellow-500",
                 rank === 2 && "text-gray-500",
                 rank === 3 && "text-amber-600",
@@ -85,25 +86,25 @@ export function useLeaderboardColumns({
           return (
             <Link
               href={`/guilds/${row.original.id}`}
-              className="flex items-center gap-3 hover:underline"
+              className="flex items-center gap-2 hover:underline min-w-fit"
             >
-              <div className="text-2xl">{row.original.emblem}</div>
-              <div>
+              <div className="text-xl flex-shrink-0">{row.original.emblem}</div>
+              <div className="min-w-0">
                 <div
                   className={cn(
-                    "font-semibold flex items-center gap-2",
+                    "text-sm font-semibold flex items-center gap-2 truncate",
                     isUserGuild && "text-primary",
                   )}
                 >
                   {row.original.name}
                   {isUserGuild && (
-                    <Badge variant="default" className="text-xs">
-                      Your Guild
+                    <Badge variant="default" className="text-xs flex-shrink-0">
+                      You
                     </Badge>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {row.original.tag} • {row.original.leaderUsername}
+                <div className="text-xs text-muted-foreground truncate">
+                  {row.original.tag}
                 </div>
               </div>
             </Link>
@@ -142,15 +143,15 @@ export function useLeaderboardColumns({
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="h-auto p-0 hover:bg-transparent hidden sm:flex"
+            className="h-auto p-0 hover:bg-transparent whitespace-nowrap text-xs font-semibold hidden sm:flex"
           >
-            <Users className="h-4 w-4 mr-1" />
+            <Users className="h-3 w-3 mr-1 opacity-50" />
             Members
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="ml-2 h-3 w-3 opacity-50" />
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="text-sm text-muted-foreground hidden sm:block">
+          <div className="text-sm text-muted-foreground hidden sm:block text-right">
             {row.original._count.members}
           </div>
         ),
@@ -162,15 +163,15 @@ export function useLeaderboardColumns({
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="h-auto p-0 hover:bg-transparent hidden sm:flex"
+            className="h-auto p-0 hover:bg-transparent whitespace-nowrap text-xs font-semibold hidden sm:flex"
           >
-            <MapPin className="h-4 w-4 mr-1" />
+            <MapPin className="h-3 w-3 mr-1 opacity-50" />
             Zones
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="ml-2 h-3 w-3 opacity-50" />
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="text-sm text-muted-foreground hidden sm:block">
+          <div className="text-sm text-muted-foreground hidden sm:block text-right">
             {row.original._count.territories}
           </div>
         ),

@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -35,6 +35,10 @@ export function LeaderboardFilters({
           <TabsTrigger value="vault">💎 Vault</TabsTrigger>
           <TabsTrigger value="territories">🗺️ Territories</TabsTrigger>
         </TabsList>
+        <TabsContent value="prestige" className="hidden"></TabsContent>
+        <TabsContent value="activity" className="hidden"></TabsContent>
+        <TabsContent value="vault" className="hidden"></TabsContent>
+        <TabsContent value="territories" className="hidden"></TabsContent>
       </Tabs>
 
       <Select

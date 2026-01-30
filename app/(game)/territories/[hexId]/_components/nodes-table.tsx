@@ -48,10 +48,10 @@ interface Props {
 export default function TerritoryNodesTable({ nodes }: Props) {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(6);
-  const [rarityFilter, setRarityFilter] = useState<string | null>(null);
+  const [rarityFilter, setRarityFilter] = useState<string>("");
 
   const filtered = useMemo(() => {
-    if (!rarityFilter) return nodes;
+    if (rarityFilter === "") return nodes;
     return nodes.filter((n) => n.type.rarity === rarityFilter);
   }, [nodes, rarityFilter]);
 
@@ -68,7 +68,7 @@ export default function TerritoryNodesTable({ nodes }: Props) {
             className="font-medium hover:underline"
             prefetch={false}
           >
-            {info.getValue()}
+            {info.getValue()} 
           </Link>
         </div>
       ),
@@ -133,8 +133,8 @@ export default function TerritoryNodesTable({ nodes }: Props) {
         <div className="flex items-center gap-2">
           <label className="text-sm text-muted-foreground">Filter:</label>
           <Select
-            value={rarityFilter ?? ""}
-            onValueChange={(v) => setRarityFilter(v || null)}
+            value={rarityFilter}
+            onValueChange={setRarityFilter}
           >
             <SelectTrigger className="text-sm p-1 border rounded">
               <SelectValue placeholder="Select rarity" />

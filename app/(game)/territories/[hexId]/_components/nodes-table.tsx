@@ -22,13 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { getRarityInfo } from "@/app/(game)/map/utils";
 import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// Using native select to avoid client-side render/hydration issues with custom Select
 
 interface Node {
   id: string;
@@ -68,7 +62,7 @@ export default function TerritoryNodesTable({ nodes }: Props) {
             className="font-medium hover:underline"
             prefetch={false}
           >
-            {info.getValue()} 
+            {info.getValue()}
           </Link>
         </div>
       ),
@@ -132,22 +126,19 @@ export default function TerritoryNodesTable({ nodes }: Props) {
       <div className="p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <label className="text-sm text-muted-foreground">Filter:</label>
-          <Select
+          <select
             value={rarityFilter}
-            onValueChange={setRarityFilter}
+            onChange={(e) => setRarityFilter(e.target.value)}
+            className="text-sm p-1 border rounded bg-transparent text-foreground"
+            aria-label="Filter by rarity"
           >
-            <SelectTrigger className="text-sm p-1 border rounded">
-              <SelectValue placeholder="Select rarity" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All</SelectItem>
-              <SelectItem value="Common">Common</SelectItem>
-              <SelectItem value="Uncommon">Uncommon</SelectItem>
-              <SelectItem value="Rare">Rare</SelectItem>
-              <SelectItem value="Epic">Epic</SelectItem>
-              <SelectItem value="Legendary">Legendary</SelectItem>
-            </SelectContent>
-          </Select>
+            <option value="">All</option>
+            <option value="Common">Common</option>
+            <option value="Uncommon">Uncommon</option>
+            <option value="Rare">Rare</option>
+            <option value="Epic">Epic</option>
+            <option value="Legendary">Legendary</option>
+          </select>
         </div>
 
         <div className="text-sm text-muted-foreground">

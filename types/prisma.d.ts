@@ -43,6 +43,8 @@ declare global {
       decayReason?: "INACTIVITY" | "CHALLENGE_LOSS";
       previousLevel?: number;
       newLevel?: number;
+      activeMembersCount?: number;
+      decayRate?: number;
     };
   }
 }

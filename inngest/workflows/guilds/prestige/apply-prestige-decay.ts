@@ -73,7 +73,7 @@ export const applyPrestigeDecayWorkflow = inngest.createFunction(
               amount: -decayAmount,
               source: "WEEKLY_ACTIVITY",
               metadata: {
-                type: "decay",
+                decayReason: "INACTIVITY",
                 activeMembersCount: activeMemberCount,
                 decayRate: decayRate * 100,
               },

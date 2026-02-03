@@ -12,6 +12,8 @@ export const metadata = {
     "Compete for cosmic supremacy. View guild rankings by prestige, activity, vault wealth, and territorial dominance.",
 };
 
+export const revalidate = 3600;
+
 export default async function LeaderboardPage() {
   // Fetch all public guilds - filtering/sorting happens client-side
   const guilds = await getAllPublicGuilds();

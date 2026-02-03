@@ -41,6 +41,7 @@ model User {
     resonantAnchors        ResonantAnchor[] // Pi contribution for resonant anchors
     tuningSessions         TuningSession[]
     drifts                 NodeDrift[] // Relation to user's drifts
+    echoResonanceChambers  EchoResonanceChamber[] // Personal boost chambers
     // Guild membership
     guildMembership        GuildMember?
     guildLed               Guild?                  @relation("GuildLeader")

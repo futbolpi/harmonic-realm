@@ -22,6 +22,10 @@ import {
 import { addEchoShards } from "@/lib/api-helpers/server/guilds/artifacts";
 import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
 import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
+import {
+  applyChamberBoost,
+  getChamberBoostForLocation,
+} from "@/lib/api-helpers/server/chamber-helpers";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest,
@@ -139,7 +143,7 @@ export const completeMiningSession = async (
 
     // 3. Gather upgrade, guild, sponsor & mastery bonuses
 
-    const [mastery, guildBonus] = await Promise.all([
+    const [mastery, guildBonus, chamberBonus] = await Promise.all([
       prisma.userNodeMastery.findUnique({
         where: {
           user_node_mastery_unique: { userId, nodeTypeId },
@@ -147,6 +151,11 @@ export const completeMiningSession = async (
         select: { bonusPercent: true },
       }),
       getMemberBonus(username),
+      getChamberBoostForLocation({
+        userId,
+        latitude: session.node.latitude,
+        longitude: session.node.longitude,
+      }),
     ]);
 
     const masteryBonusPct = mastery ? mastery.bonusPercent : 0;
@@ -183,6 +192,13 @@ export const completeMiningSession = async (
         const territoryBonus = parseFloat((sharesEarned * 0.15).toFixed(4));
         finalShares = parseFloat((sharesEarned + territoryBonus).toFixed(4));
       }
+    }
+
+    if (chamberBonus.hasBoost) {
+      finalShares = applyChamberBoost(
+        finalShares,
+        chamberBonus.boostMultiplier,
+      );
     }
 
     // 5. Persist all changes atomically
@@ -279,7 +295,7 @@ export const completeMiningSession = async (
     revalidatePath("/");
     revalidatePath(`/nodes/${session.nodeId}`);
 
-    return { success: true, data: { sharesEarned, xpGained } };
+    return { success: true, data: { finalShares, xpGained, chamberBonus } };
   } catch (error) {
     console.error("Complete mining action error:", error);
     return {

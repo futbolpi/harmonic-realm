@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { MiningSessionAssets } from "@/lib/schema/mining-session";
 import { getMasteryInfo } from "@/lib/utils/mastery";
 import { getUserEchoTransmission } from "./echoes";
+import { getChamberBoostForLocation } from "./chamber-helpers";
 
 export async function getMiningSessionAssets({
   nodeId,
@@ -14,7 +15,7 @@ export async function getMiningSessionAssets({
 }): Promise<MiningSessionAssets> {
   const todayStart = startOfToday();
 
-  const [session, nodeTypeId, echoInfo, playCount, user] = await Promise.all([
+  const [session, node, echoInfo, playCount, user] = await Promise.all([
     prisma.miningSession.findUnique({
       where: { userId_nodeId: { nodeId, userId } },
       select: {
@@ -29,7 +30,10 @@ export async function getMiningSessionAssets({
         timeReductionPercent: true,
       },
     }),
-    prisma.node.findUnique({ where: { id: nodeId }, select: { typeId: true } }),
+    prisma.node.findUnique({
+      where: { id: nodeId },
+      select: { typeId: true, latitude: true, longitude: true },
+    }),
     getUserEchoTransmission(userId),
     prisma.tuningSession.count({
       where: {
@@ -44,12 +48,18 @@ export async function getMiningSessionAssets({
     }),
   ]);
 
-  const masteryInfo = await getMasteryInfo(userId, prisma, nodeTypeId?.typeId);
+  const masteryInfo = await getMasteryInfo(userId, prisma, node?.typeId);
+  const chamberBonus = await getChamberBoostForLocation({
+    userId,
+    latitude: node?.latitude,
+    longitude: node?.longitude,
+  });
 
   return {
     session,
     masteryInfo,
     echoInfo,
     tuningSession: { playCount, currentStreak: user?.dailyStreak ?? 0 },
+    chamberBonus,
   };
 }

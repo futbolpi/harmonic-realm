@@ -54,7 +54,7 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
     {
       units: "kilometers",
       steps: 64,
-    }
+    },
   );
 
   useEffect(() => {
@@ -147,7 +147,14 @@ export function NodeDetailMap({ node }: NodeDetailMapProps) {
       </Map>
 
       {/* Floating controls */}
-      <FloatingControls mapRef={mapRef} node={node} />
+      <FloatingControls
+        mapRef={mapRef}
+        node={{
+          id: node.id,
+          latitude: node.latitude,
+          longitude: node.longitude,
+        }}
+      />
 
       {/* Floating node info - Mobile: Drawer, Desktop: Sheet */}
 

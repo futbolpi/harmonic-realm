@@ -21,6 +21,10 @@ import { awardMemberSP } from "@/lib/api-helpers/server/guilds/share-points-help
 import { addEchoShards } from "@/lib/api-helpers/server/guilds/artifacts";
 import { contributeToChallengeScore } from "@/lib/api-helpers/server/guilds/territories";
 import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challenges";
+import {
+  applyChamberBoost,
+  getChamberBoostForLocation,
+} from "@/lib/api-helpers/server/chamber-helpers";
 
 type SucessResponse = {
   shares: number;
@@ -34,6 +38,13 @@ type SucessResponse = {
   competitiveBonusApplied?: boolean;
   competitiveMultiplier?: number;
   averageAccuracy?: number;
+  // echo chamber bonus
+  chamberBonus: {
+    hasBoost: boolean;
+    boostMultiplier: number;
+    chamberId?: string | undefined;
+    chamberLevel?: number | undefined;
+  };
 };
 
 /**
@@ -102,12 +113,32 @@ export async function submitTuningSession(
     // Efficient query: fetch only the last 5 tuning sessions (indexed by nodeId,timestamp)
     // from other players. Compute average accuracy in-memory. If current accuracy beats
     // the average, apply 1.5x multiplier. Lightweight localized competitive mechanic.
-    const recent = await prisma.tuningSession.findMany({
-      where: { nodeId, userId: { not: userId } },
-      orderBy: { timestamp: "desc" },
-      take: 5,
-      select: { score: true },
-    });
+    const [recent, chamberBonus, user] = await Promise.all([
+      prisma.tuningSession.findMany({
+        where: { nodeId, userId: { not: userId } },
+        orderBy: { timestamp: "desc" },
+        take: 5,
+        select: { score: true },
+        distinct: ["userId"],
+      }),
+      getChamberBoostForLocation({
+        userId,
+        latitude: validation.node.latitude,
+        longitude: validation.node.longitude,
+      }),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          dailyStreak: true,
+          lastTunedAt: true,
+          guildMembership: {
+            select: { id: true, guildId: true },
+            where: { isActive: true },
+          },
+        },
+      }),
+    ]);
 
     const recentScores = recent.map((r) => r.score || 0);
     const averageAccuracy =
@@ -118,8 +149,13 @@ export async function submitTuningSession(
       recentScores.length > 4 && accuracyScore > averageAccuracy;
     const competitiveMultiplier = competitiveBonusApplied ? 1.5 : 1;
 
+    // Apply chamber bonus
+    const chamberBonusReward = chamberBonus.hasBoost
+      ? applyChamberBoost(baseSharesReward, chamberBonus.boostMultiplier)
+      : baseSharesReward;
+
     // Apply multiplier BEFORE tax calculation so landlord tax scales with the rewarded amount
-    const sharesReward = baseSharesReward * competitiveMultiplier;
+    const sharesReward = chamberBonusReward * competitiveMultiplier;
 
     // --- 1.5. Calculate Landlord Tax (3% if node has a sponsor) ---
     // Efficiency: Only query node's sponsor if we have shares to tax.
@@ -145,15 +181,6 @@ export async function submitTuningSession(
     }
 
     // --- 2. Calculate Milestone Streak (Retention Logic) ---
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        dailyStreak: true,
-        lastTunedAt: true,
-        guildMembership: { select: { id: true, guildId: true } },
-      },
-    });
 
     if (!user) {
       return { success: false, error: "Invalid Request" };
@@ -161,33 +188,15 @@ export async function submitTuningSession(
 
     // Territory bonus: +15% SP if node is in territory controlled by user's active guild
     let finalNetShares = netShares;
-    let activeChallengeId: string | undefined | null;
-    try {
-      const nodeTerr = await prisma.node.findUnique({
-        where: { id: nodeId },
-        select: {
-          territory: { select: { guildId: true, activeChallengeId: true } },
-        },
-      });
-      activeChallengeId = nodeTerr?.territory?.activeChallengeId;
+    const activeChallengeId = validation.node?.territory?.activeChallengeId;
 
-      if (nodeTerr?.territory?.guildId) {
-        const member = await prisma.guildMember.findFirst({
-          where: {
-            username,
-            guildId: nodeTerr.territory.guildId,
-            isActive: true,
-          },
-          select: { id: true },
-        });
-        if (member) {
-          const territoryBonus = parseFloat((netShares * 0.15).toFixed(4));
-          finalNetShares = parseFloat((netShares + territoryBonus).toFixed(4));
-          netShares = finalNetShares; // update for transaction below
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to compute/apply territory tuning bonus", e);
+    if (
+      validation.node?.territory?.guildId &&
+      validation.node.territory.guildId === user.guildMembership?.guildId
+    ) {
+      const territoryBonus = parseFloat((netShares * 0.15).toFixed(4));
+      finalNetShares = parseFloat((netShares + territoryBonus).toFixed(4));
+      netShares = finalNetShares; // update for transaction below
     }
 
     let newStreak = user.dailyStreak;
@@ -323,6 +332,7 @@ export async function submitTuningSession(
         competitiveBonusApplied,
         competitiveMultiplier,
         averageAccuracy,
+        chamberBonus,
       },
     };
   } catch (error) {

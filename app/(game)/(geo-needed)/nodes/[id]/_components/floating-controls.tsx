@@ -8,14 +8,17 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/use-location";
 import { videoLinks } from "@/config/site";
 import VideoModal from "@/components/shared/video-modal";
+import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
+import { cn } from "@/lib/utils";
 
 type FloatingControlsProps = {
   mapRef: RefObject<MapRef | null>;
-  node: { latitude: number; longitude: number };
+  node: { latitude: number; longitude: number; id: string };
 };
 
 const FloatingControls = ({ mapRef, node }: FloatingControlsProps) => {
   const userLocation = useLocation();
+  const { data } = useMiningSessionAssets(node.id);
 
   const flyToNode = useCallback(() => {
     mapRef.current?.flyTo({
@@ -36,7 +39,12 @@ const FloatingControls = ({ mapRef, node }: FloatingControlsProps) => {
   }, [userLocation, mapRef]);
 
   return (
-    <div className="absolute top-12 right-4 flex flex-col gap-2">
+    <div
+      className={cn(
+        "absolute top-12 right-4 flex flex-col gap-2",
+        data?.chamberBonus?.hasBoost && "top-28",
+      )}
+    >
       <Button
         size="sm"
         variant="secondary"

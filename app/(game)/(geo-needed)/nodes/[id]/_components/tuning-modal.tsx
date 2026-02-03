@@ -172,6 +172,7 @@ export function ResonanceTuningModal({
             competitiveBonusApplied,
             competitiveMultiplier,
             averageAccuracy,
+            chamberBonus,
           } = res.data;
 
           // Build tax breakdown display (only show if tax was applied)
@@ -221,6 +222,18 @@ export function ResonanceTuningModal({
                     {TUNING_STREAK_REQ_DAYS -
                       (currentStreak % TUNING_STREAK_REQ_DAYS)}{" "}
                     days.
+                  </div>
+                )}
+
+                {/* Show chamber boost if applicable */}
+                {chamberBonus.hasBoost && (
+                  <div className="text-xs text-emerald-300 bg-emerald-950/10 p-2 rounded border border-emerald-700">
+                    <div className="font-semibold">Echo Chamber Bonus!</div>
+                    <div>
+                      Level {chamberBonus.chamberLevel} Chamber boosted your
+                      earnings by{" "}
+                      {(chamberBonus.boostMultiplier * 100).toFixed(0)}%
+                    </div>
                   </div>
                 )}
               </div>

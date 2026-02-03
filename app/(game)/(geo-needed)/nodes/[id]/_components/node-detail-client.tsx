@@ -2,18 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Crown } from "lucide-react";
 import { useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Node } from "@/lib/schema/node";
 import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
 import { MINING_RANGE_METERS } from "@/config/site";
+import { formatBoostPercentage } from "@/lib/utils/chambers";
 import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
 import { ActiveMiningDrawer } from "./active-mining-drawer";
 import { getFeedbackMessage } from "../_utils/feedback-message";
 import { ResonanceTuningModal } from "./tuning-modal";
+import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
 
 interface NodeDetailClientProps {
   node: Node;
@@ -21,6 +23,7 @@ interface NodeDetailClientProps {
 
 export function NodeDetailClient({ node }: NodeDetailClientProps) {
   const router = useRouter();
+  const { data } = useMiningSessionAssets(node.id);
 
   // Fetch mining session data with range validation
   const {
@@ -37,6 +40,8 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
     nodeLocation: { latitude: node.latitude, longitude: node.longitude },
     allowedDistanceMeters: MINING_RANGE_METERS,
   });
+
+  // Check for active chamber bonus
 
   const isInRange = distance !== null && distance <= MINING_RANGE_METERS;
   const feedback = getFeedbackMessage({
@@ -92,9 +97,10 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
         </Button>
       </div>
 
-      {/* Distance indicator */}
-      {distance !== null && (
-        <div className="absolute top-4 right-4 z-10">
+      {/* Distance & Chamber Bonus indicators */}
+      <div className="absolute top-4 right-4 z-10 flex flex-col gap-2 items-end">
+        {/* Distance indicator */}
+        {distance !== null && (
           <div
             className={`px-3 py-1 rounded-full text-xs font-medium shadow-lg ${
               isInRange
@@ -106,8 +112,24 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
               ? `${distance}m`
               : `${(distance / 1000).toFixed(1)}km`}
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Chamber bonus indicator */}
+        {isInRange && data?.chamberBonus?.hasBoost && (
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-2.5 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <Crown className="h-3.5 w-3.5 text-purple-400" />
+              <span className="text-xs font-semibold text-purple-400">
+                Echo Chamber Active
+              </span>
+            </div>
+            <p className="text-xs text-purple-300 mt-1">
+              Level {data.chamberBonus.chamberLevel} •{" "}
+              {formatBoostPercentage(data.chamberBonus.chamberLevel || 1)} Boost
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Main map component */}
       <NodeDetailMap node={node} />

@@ -10,6 +10,7 @@ import {
   LogOut,
   Compass,
   UserPlus,
+  Crown,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,11 +25,14 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/shared/auth/auth-context";
 import UserAvatar from "@/components/shared/user-avatar";
 import { siteConfig } from "@/config/site";
+import { useProfile } from "@/hooks/queries/use-profile";
 import GuildLink from "./guild-link";
 
 export function GameNavigation() {
-  const { user, logout } = useAuth();
   const pathname = usePathname();
+
+  const { user, logout } = useAuth();
+  const { data: profile } = useProfile();
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -80,6 +84,17 @@ export function GameNavigation() {
                   Invite
                 </Link>
               </DropdownMenuItem>
+              {profile?.id && (
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={`/${profile.id}/chambers`}
+                    className="cursor-pointer"
+                  >
+                    <Crown className="mr-2 h-4 w-4" />
+                    Chambers
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={logout}
@@ -104,7 +119,7 @@ export function GameNavigation() {
                 "flex flex-col items-center justify-center space-y-1 text-xs transition-colors",
                 pathname === item.href
                   ? "text-primary"
-                  : "text-muted-foreground hover:text-primary"
+                  : "text-muted-foreground hover:text-primary",
               )}
             >
               <item.icon className="h-5 w-5" />

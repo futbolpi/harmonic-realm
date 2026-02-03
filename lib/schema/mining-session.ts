@@ -36,9 +36,17 @@ export const StartMiningSchema = z.object({
     .max(180, "Longitude must be between -180 and 180"),
 });
 
+export const ChamberBonusSchema = z.object({
+  hasBoost: z.boolean(),
+  boostMultiplier: z.number(),
+  chamberId: z.string().optional(),
+  chamberLevel: z.number().optional(),
+});
+
 export const CompleteMiningResponseSchema = z.object({
-  sharesEarned: z.number(),
+  finalShares: z.number(),
   xpGained: z.number(),
+  chamberBonus: ChamberBonusSchema,
 });
 
 export const CompleteMiningSchema = z.object({
@@ -59,6 +67,7 @@ export const MiningSessionAssetsSchema = z.object({
   masteryInfo: MasteryInfoSchema,
   echoInfo: EchoTransmissionSchema,
   tuningSession: TuningSessionSchema,
+  chamberBonus: ChamberBonusSchema,
 });
 
 export type MiningSession = z.infer<typeof MiningSessionSchema>;

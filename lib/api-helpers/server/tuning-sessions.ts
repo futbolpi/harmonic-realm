@@ -28,6 +28,7 @@ export async function checkTuningEligibility({
       longitude: true,
       type: { select: { baseYieldPerMinute: true } },
       sponsor: true,
+      territory: { select: { guildId: true, activeChallengeId: true } },
     },
   });
 
@@ -38,7 +39,7 @@ export async function checkTuningEligibility({
     userLat,
     userLng,
     node.latitude,
-    node.longitude
+    node.longitude,
   );
 
   if (!withinRange) {
@@ -86,5 +87,6 @@ export async function checkTuningEligibility({
     eligible: true,
     baseYield: node.type.baseYieldPerMinute,
     sponsorPiId,
+    node,
   };
 }

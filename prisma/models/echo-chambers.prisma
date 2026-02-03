@@ -1,0 +1,83 @@
+// ===================================
+// ECHO RESONANCE CHAMBER SYSTEM
+// ===================================
+
+model EchoResonanceChamber {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Owner
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Location (similar to Node placement)
+    latitude  Float
+    longitude Float
+    // Removed geohash - H3 is sufficient for spatial queries
+    h3Index   String // H3 resolution 8 for ~0.7km² cells (~461m edge length)
+
+    // Chamber Progression
+    level                   Int   @default(1) // 1-10
+    totalResonanceInvested  Float @default(0) // Lifetime investment (creation + upgrades + maintenance)
+
+    // Durability & Maintenance
+    durability         Float    @default(100) // 0-100%
+    lastMaintenanceAt  DateTime @default(now())
+    maintenanceDueAt   DateTime // Calculated: lastMaintenanceAt + 7 days
+
+    // Boost Stats (derived from level, not stored redundantly)
+    // boostRadius = 5000m (constant)
+    // sharePointBoost = 0.05 + (level - 1) * 0.05 (calculated in utils)
+
+    // Cosmetics (optional monetization layer)
+    cosmeticTheme String? @default("default") // "crystal", "ethereal", "void", etc.
+    isPremium     Boolean @default(false) // If purchased via Pi for exclusive cosmetics
+
+    // Status
+    isActive Boolean @default(true)
+
+    // Relations
+    maintenanceLogs ChamberMaintenanceLog[]
+    upgradeLogs     ChamberUpgradeLog[]
+
+    // Indexes for efficient queries
+    @@index([userId, isActive]) // User's active chambers
+    @@index([h3Index, isActive]) // Spatial queries by hex
+    @@index([maintenanceDueAt]) // Decay cron job
+    @@index([latitude, longitude]) // Fallback bounding box queries
+    @@map("echo_resonance_chambers")
+}
+
+model ChamberMaintenanceLog {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    chamberId String
+    chamber   EchoResonanceChamber @relation(fields: [chamberId], references: [id], onDelete: Cascade)
+
+    // Maintenance Details
+    resonanceSpent     Float // Cost paid
+    durabilityRestored Float // Amount restored (can be partial if maintained early)
+    durabilityBefore   Float // Snapshot before maintenance
+    durabilityAfter    Float // Snapshot after maintenance (should be 100)
+
+    @@index([chamberId, createdAt(sort: Desc)]) // Chamber history
+    @@map("chamber_maintenance_logs")
+}
+
+model ChamberUpgradeLog {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    chamberId String
+    chamber   EchoResonanceChamber @relation(fields: [chamberId], references: [id], onDelete: Cascade)
+
+    // Upgrade Details
+    fromLevel     Int
+    toLevel       Int
+    resonanceCost Float
+
+    @@index([chamberId, createdAt(sort: Desc)]) // Chamber history
+    @@map("chamber_upgrade_logs")
+}

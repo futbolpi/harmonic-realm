@@ -41,7 +41,7 @@ export function ActiveMiningDrawer({
 }: ActiveMiningDrawerProps) {
   // remaining time in milliseconds
   const [remainingMs, setRemainingMs] = useState<number>(
-    node.lockInMinutes * 60 * 1000
+    node.lockInMinutes * 60 * 1000,
   );
   const remainingRef = useRef<number>(remainingMs);
   useEffect(() => {
@@ -60,7 +60,7 @@ export function ActiveMiningDrawer({
   const userLocation = useLocation();
   // session data for action and ui
   const { data: sessionAssets, refreshSessionAssets } = useMiningSessionAssets(
-    node.id
+    node.id,
   );
   const sessionData = sessionAssets?.session;
 
@@ -87,8 +87,32 @@ export function ActiveMiningDrawer({
         userLatitude: userLocation.latitude,
         userLongitude: userLocation.longitude,
       });
-      if (response.success) {
-        toast.success("Mining session completed!");
+      if (response.success && response.data) {
+        const { chamberBonus, finalShares } = response.data;
+        toast.success("Mining session completed!", {
+          description: (
+            <div className="space-y-1 mt-2">
+              <div className="flex justify-between text-sm">
+                <span>Shares Earned:</span>
+                <span className="text-cyan-400 font-bold">
+                  +{finalShares} Shares
+                </span>
+              </div>
+
+              {chamberBonus.hasBoost && (
+                <div className="text-xs text-emerald-300 bg-emerald-950/10 p-2 rounded border border-emerald-700">
+                  <div className="font-semibold">Echo Chamber Bonus!</div>
+                  <div>
+                    Level {chamberBonus.chamberLevel} Chamber boosted your
+                    earnings by{" "}
+                    {(chamberBonus.boostMultiplier * 100).toFixed(0)}%
+                  </div>
+                </div>
+              )}
+            </div>
+          ),
+          duration: 10000,
+        });
         refreshSessionAssets();
         onComplete?.();
       } else {
@@ -162,7 +186,7 @@ export function ActiveMiningDrawer({
   const progress = 1 - remainingMs / totalMs;
   const progressPercentage = Math.max(
     0,
-    Math.min(100, Math.floor(progress * 100))
+    Math.min(100, Math.floor(progress * 100)),
   );
 
   return (

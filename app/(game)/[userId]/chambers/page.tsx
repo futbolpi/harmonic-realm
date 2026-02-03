@@ -1,8 +1,6 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
 import { ChambersPageClient } from "./_components/chambers-page-client";
-import { ChambersPageLoading } from "./_components/chambers-page-loading";
 import { getUserChambersForPage } from "./service";
 
 type ChambersPageProps = {
@@ -51,9 +49,7 @@ export default async function ChambersPage({ params }: ChambersPageProps) {
 
   return (
     <div className="h-[calc(100vh-8rem)] md:h-screen bg-background">
-      <Suspense fallback={<ChambersPageLoading />}>
-        <ChambersPageClient userId={userId} initialChambers={chambers} />
-      </Suspense>
+      <ChambersPageClient userId={userId} initialChambers={chambers} />
     </div>
   );
 }

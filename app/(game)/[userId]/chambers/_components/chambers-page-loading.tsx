@@ -2,46 +2,48 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function ChambersPageLoading() {
   return (
-    <div className="h-full w-full relative bg-muted animate-pulse">
-      {/* Top Controls Skeleton */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
-        <div className="flex gap-2">
-          <Skeleton className="h-9 w-9 rounded-full" /> {/* User location */}
-          <Skeleton className="h-9 w-9 rounded-full" /> {/* Create chamber */}
-          <Skeleton className="h-9 w-9 rounded-full" /> {/* Map link */}
+    <div className="h-full w-full flex flex-col bg-background">
+      {/* Map Area Skeleton */}
+      <div className="flex-1 relative bg-muted/50 overflow-hidden">
+        {/* Top-left Controls */}
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
+          <Skeleton className="h-10 w-10 rounded-lg" /> {/* Navigate */}
+          <Skeleton className="h-10 w-10 rounded-lg" /> {/* Create */}
         </div>
-        <Skeleton className="h-6 w-16 rounded-full" /> {/* Chamber count */}
-      </div>
 
-      {/* Map Loading Area */}
-      <div className="absolute inset-0 bg-muted/50">
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <Skeleton className="h-16 w-16 rounded-full mx-auto" />
-            <Skeleton className="h-4 w-48 mx-auto" />
-            <Skeleton className="h-3 w-32 mx-auto" />
-          </div>
+        {/* Top-right Badge */}
+        <div className="absolute top-4 right-4 z-10">
+          <Skeleton className="h-8 w-20 rounded-full" />
+        </div>
+
+        {/* Map gradient background placeholder */}
+        <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted/60" />
+
+        {/* Animated Chamber Markers */}
+        <div className="absolute inset-0 pointer-events-none">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-pulse"
+              style={{
+                top: `${25 + (i % 2) * 40}%`,
+                left: `${20 + i * 25}%`,
+                animationDelay: `${i * 150}ms`,
+              }}
+            >
+              <Skeleton className="h-12 w-12 rounded-full" />
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Bottom Controls Skeleton */}
-      <div className="absolute bottom-4 left-4 right-4 z-10 flex gap-2">
-        <Skeleton className="flex-1 h-10 rounded-md" /> {/* Chambers list */}
-      </div>
-
-      {/* Floating chamber markers simulation */}
-      <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="absolute w-10 h-10 rounded-full"
-            style={{
-              top: `${20 + Math.random() * 60}%`,
-              left: `${10 + Math.random() * 80}%`,
-              animationDelay: `${i * 0.3}s`,
-            }}
-          />
-        ))}
+      <div className="border-t border-border bg-card/50 backdrop-blur-sm p-4 space-y-3">
+        <Skeleton className="h-9 w-32 rounded-md" />
+        <div className="flex gap-2">
+          <Skeleton className="flex-1 h-12 rounded-md" />
+          <Skeleton className="h-12 w-12 rounded-md" />
+        </div>
       </div>
     </div>
   );

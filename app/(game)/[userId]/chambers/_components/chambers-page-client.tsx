@@ -168,6 +168,7 @@ export function ChambersPageClient({
       {/* Map */}
       <Map
         ref={mapRef}
+        // workerUrl="/map/maplibre-gl-csp-worker.js"
         initialViewState={initialViewState}
         style={{ width: "100%", height: "100%" }}
         mapStyle={

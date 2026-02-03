@@ -59,7 +59,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
             className={cn(
               "text-sm font-medium",
               rarityColors.borderColor,
-              rarityColors.textColor
+              rarityColors.textColor,
             )}
           >
             {node.type.name}
@@ -109,9 +109,10 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                 const progress = isUnlocked
                   ? 100
                   : isNext
-                  ? (totalStaked / (level.totalRequired || level.piRequired)) *
-                    100
-                  : 0;
+                    ? (totalStaked /
+                        (level.totalRequired || level.piRequired)) *
+                      100
+                    : 0;
 
                 return (
                   <div key={i + 1} className="space-y-3">
@@ -123,8 +124,8 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                             isUnlocked
                               ? "bg-primary text-primary-foreground"
                               : isNext
-                              ? "bg-accent text-accent-foreground harmonic-pulse"
-                              : "bg-muted text-muted-foreground"
+                                ? "bg-accent text-accent-foreground harmonic-pulse"
+                                : "bg-muted text-muted-foreground",
                           )}
                         >
                           {i + 1}
@@ -152,7 +153,7 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                       className={cn(
                         "h-2",
                         isUnlocked && "bg-primary/20",
-                        isNext && "bg-accent/20"
+                        isNext && "bg-accent/20",
                       )}
                     />
 
@@ -160,16 +161,16 @@ export async function NodeLoreDetails({ nodeId }: NodeLoreDetailsProps) {
                       <div className="mt-3 p-4 bg-muted/50 rounded-lg">
                         <Response className="text-sm leading-relaxed">
                           {i + 1 === 1
-                            ? node.locationLore?.basicHistory
+                            ? node.locationLore?.basicHistory || ""
                             : i + 1 === 2
-                            ? node.locationLore?.culturalSignificance
-                            : i + 1 === 3
-                            ? node.locationLore?.mysticInterpretation
-                            : i + 1 === 4
-                            ? node.locationLore?.epicNarrative
-                            : i + 1 === 5
-                            ? node.locationLore?.legendaryTale
-                            : ""}
+                              ? node.locationLore?.culturalSignificance || ""
+                              : i + 1 === 3
+                                ? node.locationLore?.mysticInterpretation || ""
+                                : i + 1 === 4
+                                  ? node.locationLore?.epicNarrative || ""
+                                  : i + 1 === 5
+                                    ? node.locationLore?.legendaryTale || ""
+                                    : ""}
                         </Response>
                       </div>
                     )}

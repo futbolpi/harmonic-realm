@@ -9,13 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Node } from "@/lib/schema/node";
 import { useMiningLogic } from "@/hooks/queries/use-mining-logic";
 import { MINING_RANGE_METERS } from "@/config/site";
+import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
 import { formatBoostPercentage } from "@/lib/utils/chambers";
 import { NodeDetailMap } from "./node-detail-map";
 import { StartMiningDrawer } from "./start-mining-drawer";
 import { ActiveMiningDrawer } from "./active-mining-drawer";
 import { getFeedbackMessage } from "../_utils/feedback-message";
-import { ResonanceTuningModal } from "./tuning-modal";
-import { useMiningSessionAssets } from "@/hooks/queries/use-mining-session-assets";
+import { ResonanceSuite } from "./resonance-suite";
 
 interface NodeDetailClientProps {
   node: Node;
@@ -152,8 +152,9 @@ export function NodeDetailClient({ node }: NodeDetailClientProps) {
       {/* Start mining drawer - only shown when user can mine */}
 
       {showStartModal && <StartMiningDrawer node={node} />}
-      {/* Start tuning drawer - only shown when user can tune */}
-      <ResonanceTuningModal
+
+      {/* Resonance Suite - Replaces old tuning modal */}
+      <ResonanceSuite
         isOpen={isInRange && showTuningModal}
         nodeId={node.id}
         nodeFrequencySeed={node.echoIntensity ?? 1}

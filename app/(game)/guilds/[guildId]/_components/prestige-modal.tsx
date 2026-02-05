@@ -68,7 +68,7 @@ export default function PrestigeModal({
 
   return (
     <Credenza open={open} onOpenChange={onOpenChange}>
-      <CredenzaContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <CredenzaContent className="max-w-2xl">
         <CredenzaHeader>
           <CredenzaTitle className="flex items-center gap-2">
             <Award className="h-6 w-6 text-primary" />
@@ -79,7 +79,7 @@ export default function PrestigeModal({
           </CredenzaDescription>
         </CredenzaHeader>
 
-        <CredenzaBody className="space-y-6">
+        <CredenzaBody className="space-y-6 max-h-[90vh] overflow-y-auto">
           {/* Current Status */}
           <div
             className={`p-6 rounded-lg border-2 ${tierColors.border} ${tierColors.bg} shadow-lg ${tierColors.glow}`}

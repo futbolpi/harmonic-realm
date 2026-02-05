@@ -79,7 +79,7 @@ export default function PrestigeModal({
           </CredenzaDescription>
         </CredenzaHeader>
 
-        <CredenzaBody className="space-y-6 max-h-[90vh] overflow-y-auto">
+        <CredenzaBody className="space-y-6 max-h-[90vh] overflow-y-auto p-2">
           {/* Current Status */}
           <div
             className={`p-6 rounded-lg border-2 ${tierColors.border} ${tierColors.bg} shadow-lg ${tierColors.glow}`}

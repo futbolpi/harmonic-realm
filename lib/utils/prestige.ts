@@ -111,7 +111,7 @@ export function getPointsForNextLevel(currentLevel: number): number {
  */
 export function getPrestigeProgressPercentage(
   prestigePoints: number,
-  prestigeLevel: number
+  prestigeLevel: number,
 ): number {
   const currentLevelPoints = prestigeLevel * PRESTIGE_POINTS_PER_LEVEL;
   const nextLevelPoints = (prestigeLevel + 1) * PRESTIGE_POINTS_PER_LEVEL;
@@ -146,7 +146,7 @@ export function getTierRewards(tier: PrestigeTier) {
  */
 export function calculatePrestigeDecay(
   prestigePoints: number,
-  activeMemberCount: number
+  activeMemberCount: number,
 ): number {
   const decayRate =
     activeMemberCount >= PRESTIGE_ACTIVE_MEMBER_THRESHOLD
@@ -154,3 +154,59 @@ export function calculatePrestigeDecay(
       : PRESTIGE_DECAY_LOW_ACTIVITY;
   return Math.floor(prestigePoints * decayRate);
 }
+
+export const TIER_COLORS: Record<
+  PrestigeTier,
+  { bg: string; border: string; text: string; glow: string }
+> = {
+  Bronze: {
+    bg: "bg-amber-100 dark:bg-amber-950/30",
+    border: "border-amber-300 dark:border-amber-700",
+    text: "text-amber-900 dark:text-amber-100",
+    glow: "shadow-amber-500/20",
+  },
+  Silver: {
+    bg: "bg-slate-100 dark:bg-slate-950/30",
+    border: "border-slate-300 dark:border-slate-700",
+    text: "text-slate-900 dark:text-slate-100",
+    glow: "shadow-slate-500/20",
+  },
+  Gold: {
+    bg: "bg-yellow-100 dark:bg-yellow-950/30",
+    border: "border-yellow-400 dark:border-yellow-600",
+    text: "text-yellow-900 dark:text-yellow-100",
+    glow: "shadow-yellow-500/30",
+  },
+  Platinum: {
+    bg: "bg-cyan-100 dark:bg-cyan-950/30",
+    border: "border-cyan-400 dark:border-cyan-600",
+    text: "text-cyan-900 dark:text-cyan-100",
+    glow: "shadow-cyan-500/30",
+  },
+  Diamond: {
+    bg: "bg-purple-100 dark:bg-purple-950/30",
+    border: "border-purple-400 dark:border-purple-600",
+    text: "text-purple-900 dark:text-purple-100",
+    glow: "shadow-purple-500/30",
+  },
+};
+
+export const TIER_ICONS: Record<PrestigeTier, string> = {
+  Bronze: "🥉",
+  Silver: "🥈",
+  Gold: "🥇",
+  Platinum: "💎",
+  Diamond: "👑",
+};
+
+export const TIER_LEVELS: Array<{
+  tier: PrestigeTier;
+  minLevel: number;
+  maxLevel: number;
+}> = [
+  { tier: "Bronze", minLevel: 1, maxLevel: 19 },
+  { tier: "Silver", minLevel: 20, maxLevel: 39 },
+  { tier: "Gold", minLevel: 40, maxLevel: 59 },
+  { tier: "Platinum", minLevel: 60, maxLevel: 79 },
+  { tier: "Diamond", minLevel: 80, maxLevel: 100 },
+];

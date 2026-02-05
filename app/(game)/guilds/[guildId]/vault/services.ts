@@ -66,8 +66,9 @@ export const getRecentTransactions = async (guildId: string) => {
       createdAt: true,
       reason: true,
       type: true,
+      amount: true,
     },
-    take: 5,
+    take: 100, // Fetch up to 100 transactions for better filtering
     orderBy: { createdAt: "desc" },
   });
 };

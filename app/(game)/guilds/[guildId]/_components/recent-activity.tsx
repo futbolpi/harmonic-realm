@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
+import VaultTransactionsTable from "../vault/_components/vault-transactions-table";
 
 type RecentActivityProps = { guildId: string; piTransactionId: string | null };
 
@@ -13,7 +14,14 @@ const RecentActivity = async ({
     where: { guildMember: { guildId }, archivedAt: null },
     take: 5,
     orderBy: { createdAt: "desc" },
-    select: { id: true, reason: true, type: true },
+    select: {
+      id: true,
+      reason: true,
+      type: true,
+      balanceAfter: true,
+      balanceBefore: true,
+      createdAt: true,
+    },
   });
 
   return (
@@ -22,13 +30,8 @@ const RecentActivity = async ({
         <CardTitle>Recent Activity (Last 24h)</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-2 text-sm">
-          {recentActivity.map((a) => (
-            <li key={a.id} className="text-sm">
-              • {a.reason || a.type}
-            </li>
-          ))}
-        </ul>
+        <VaultTransactionsTable transactions={recentActivity} />
+
         {piTransactionId && (
           <div className="mt-3">
             <Link

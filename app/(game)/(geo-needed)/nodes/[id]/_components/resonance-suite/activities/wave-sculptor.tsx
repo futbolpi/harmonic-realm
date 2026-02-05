@@ -188,7 +188,7 @@ export default function WaveSculptor({
   // RENDER
   // =========================================================================
 
-  const currentAccuracy = calculateAccuracy(userFreq);
+  // const currentAccuracy = calculateAccuracy(userFreq);
   const isLocked = Math.abs(userFreq - targetFrequency) < 5;
 
   return (
@@ -220,7 +220,7 @@ export default function WaveSculptor({
             {userFreq.toFixed(1)} Hz
           </Badge>
 
-          {hasInteracted && (
+          {/* {hasInteracted && (
             <Badge
               variant={isLocked ? "default" : "secondary"}
               className={cn(
@@ -230,7 +230,7 @@ export default function WaveSculptor({
             >
               {currentAccuracy.toFixed(1)}% acc
             </Badge>
-          )}
+          )} */}
         </div>
 
         {/* Lock Indicator */}

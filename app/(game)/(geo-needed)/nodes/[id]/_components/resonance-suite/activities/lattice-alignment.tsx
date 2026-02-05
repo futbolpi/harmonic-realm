@@ -382,12 +382,12 @@ export default function LatticeAlignment({
 
               {/* Match Indicator */}
               <div className="flex items-center gap-2">
-                {gameActive && (
+                {/* {gameActive && (
                   <span className="text-xs text-muted-foreground">
                     Target: {getTargetSymbol(ring)}
                   </span>
-                )}
-                {ring.matched ? (
+                )} */}
+                {!hasSubmitted ? null : ring.matched ? (
                   <Check className="h-5 w-5 text-green-500" />
                 ) : (
                   <X className="h-5 w-5 text-muted-foreground" />

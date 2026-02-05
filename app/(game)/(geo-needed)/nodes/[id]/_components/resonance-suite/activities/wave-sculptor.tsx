@@ -54,15 +54,14 @@ export default function WaveSculptor({
   const { generateValue } = useProceduralGeneration(nodeFrequencySeed, 0.2);
 
   /**
-   * Generate target frequency with interference
-   * Base: 20-80 Hz range based on seed
-   * Interference: ±10% randomness to prevent memorization
+   * CRITICAL FIX: Use useState with lazy initialization instead of useRef
+   * This ensures the target frequency is calculated ONCE and never changes
    */
-  const targetFrequency = useRef(() => {
+  const [targetFrequency] = useState(() => {
     const baseFrequency = generateValue(20, 80, 0);
     const interference = 1 + (Math.random() - 0.5) * 0.2; // 0.9 to 1.1
     return baseFrequency * interference;
-  }).current();
+  });
 
   // =========================================================================
   // SCORING
@@ -75,16 +74,11 @@ export default function WaveSculptor({
 
   /**
    * Calculate accuracy based on frequency difference
-   * Formula: 100 - (difference * 4)
-   * - Perfect match (0Hz diff) = 100%
-   * - 5Hz diff = 80%
-   * - 10Hz diff = 60%
-   * - 25Hz diff = 0%
    */
   const calculateAccuracy = (userFrequency: number): number => {
     const diff = Math.abs(userFrequency - targetFrequency);
     const rawScore = Math.max(0, 100 - diff * 4);
-    return Math.round(rawScore * 10) / 10; // Round to 1 decimal
+    return Math.round(rawScore * 10) / 10;
   };
 
   // =========================================================================

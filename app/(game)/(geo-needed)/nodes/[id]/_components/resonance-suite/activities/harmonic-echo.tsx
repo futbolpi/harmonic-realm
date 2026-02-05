@@ -83,9 +83,10 @@ export default function HarmonicEcho({
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>(null);
+  const animationRef = useRef<number | null>(null);
   const gameStartTime = useRef<number>(0);
   const nextPulseId = useRef(0);
+  const pulsesSpawnedRef = useRef(0); // Track total pulses spawned
 
   // =========================================================================
   // PROCEDURAL GENERATION
@@ -196,35 +197,46 @@ export default function HarmonicEcho({
     setHits([]);
     setCombo(0);
     setMaxCombo(0);
+    setPulses([]); // CRITICAL: Clear old pulses
+    nextPulseId.current = 0;
+    pulsesSpawnedRef.current = 0; // CRITICAL: Reset spawn counter
     gameStartTime.current = Date.now();
 
-    // Spawn pulses at intervals
-    const interval = setInterval(
-      () => {
-        if (pulses.filter((p) => p.active).length < config.totalPulses) {
-          setPulses((prev) => [
-            ...prev,
-            {
-              id: nextPulseId.current++,
-              startTime: Date.now(),
-              radius: 0,
-              active: true,
-            },
-          ]);
-        }
-      },
-      generateValue(1500, 2500, nextPulseId.current),
-    );
+    // Recursive pulse spawner - ensures exact count
+    const spawnPulse = () => {
+      const currentCount = pulsesSpawnedRef.current;
 
-    // Auto-complete after all pulses
-    setTimeout(() => {
-      clearInterval(interval);
-      setTimeout(() => {
-        if (gameState === GameState.PLAYING) {
-          finishGame();
+      if (currentCount < config.totalPulses) {
+        setPulses((prev) => [
+          ...prev,
+          {
+            id: nextPulseId.current++,
+            startTime: Date.now(),
+            radius: 0,
+            active: true,
+          },
+        ]);
+
+        pulsesSpawnedRef.current++;
+
+        // Schedule next pulse if more are needed
+        if (pulsesSpawnedRef.current < config.totalPulses) {
+          const delay = generateValue(1500, 2500, pulsesSpawnedRef.current);
+          setTimeout(spawnPulse, delay);
+        } else {
+          // All pulses spawned - schedule game end
+          // Give enough time for last pulse to travel (3s) + reaction time (1s)
+          setTimeout(() => {
+            if (gameState === GameState.PLAYING) {
+              finishGame();
+            }
+          }, 4000);
         }
-      }, 3000);
-    }, config.totalPulses * 2000);
+      }
+    };
+
+    // Start the spawning chain
+    spawnPulse();
   };
 
   const handleTap = useCallback(() => {
@@ -335,6 +347,7 @@ export default function HarmonicEcho({
       setCombo(0);
       setMaxCombo(0);
       nextPulseId.current = 0;
+      pulsesSpawnedRef.current = 0;
     }, 500);
   };
 

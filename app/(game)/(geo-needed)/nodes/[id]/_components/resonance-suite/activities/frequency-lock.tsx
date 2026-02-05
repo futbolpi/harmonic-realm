@@ -30,11 +30,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Lock, Unlock, Zap, Loader2 } from "lucide-react";
+import { Lock, Unlock, Zap, Loader2, Clock, TrendingUp } from "lucide-react";
 
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { SuiteActivityProps, GameResult } from "@/lib/schema/resonance-suite";
 import {
@@ -105,7 +106,28 @@ export default function FrequencyLock({
   ]);
 
   const [startTime] = useState(Date.now());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [allLocked, setAllLocked] = useState(false);
+
+  // Time bonus thresholds (30 seconds max bonus)
+  const MAX_BONUS_TIME = 30; // seconds
+  const currentTimeBonus = Math.max(
+    0,
+    Math.min(20, (MAX_BONUS_TIME - elapsedSeconds) * 0.67),
+  );
+
+  // =========================================================================
+  // TIMER
+  // =========================================================================
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      setElapsedSeconds(Math.floor(elapsed));
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
 
   // =========================================================================
   // LOCK DETECTION
@@ -137,8 +159,6 @@ export default function FrequencyLock({
   };
 
   const handleSubmit = () => {
-    const elapsedSeconds = (Date.now() - startTime) / 1000;
-
     // Calculate accuracy based on average distance from targets
     const distances = channels.map((ch) => Math.abs(ch.value - ch.target));
     const avgDistance = distances.reduce((a, b) => a + b, 0) / channels.length;
@@ -147,10 +167,8 @@ export default function FrequencyLock({
     // Accuracy: closer = higher score
     const proximityScore = Math.max(0, 100 - (avgDistance / maxDistance) * 100);
 
-    // Time bonus (up to 20% bonus for completing under 30 seconds)
-    const timeBonus = Math.max(0, Math.min(20, (30 - elapsedSeconds) * 0.67));
-
-    const accuracy = Math.min(100, proximityScore + timeBonus);
+    // Time bonus
+    const accuracy = Math.min(100, proximityScore + currentTimeBonus);
     const score = scoreFromAccuracy(accuracy);
 
     const result: GameResult = {
@@ -162,7 +180,8 @@ export default function FrequencyLock({
       timestamp: new Date(),
       metadata: {
         avgDistance,
-        elapsedSeconds: Math.round(elapsedSeconds),
+        elapsedSeconds,
+        timeBonus: currentTimeBonus,
       },
     };
 
@@ -217,13 +236,13 @@ export default function FrequencyLock({
     const distance = Math.abs(channel.value - channel.target);
 
     if (distance <= channel.tolerance) {
-      return "text-green-400"; // Locked
+      return "text-green-400";
     } else if (distance <= channel.tolerance * 2) {
-      return "text-yellow-400"; // Warm
+      return "text-yellow-400";
     } else if (distance <= channel.tolerance * 4) {
-      return "text-orange-400"; // Getting warmer
+      return "text-orange-400";
     } else {
-      return "text-blue-400"; // Cold
+      return "text-blue-400";
     }
   };
 
@@ -236,11 +255,25 @@ export default function FrequencyLock({
     return "Cold";
   };
 
+  // Time urgency color
+  const getTimeColor = (): string => {
+    if (elapsedSeconds < 15) return "text-green-400";
+    if (elapsedSeconds < 25) return "text-yellow-400";
+    return "text-red-400";
+  };
+
+  const getTimeBgColor = (): string => {
+    if (elapsedSeconds < 15) return "bg-green-500/10 border-green-500/30";
+    if (elapsedSeconds < 25) return "bg-yellow-500/10 border-yellow-500/30";
+    return "bg-red-500/10 border-red-500/30";
+  };
+
   // =========================================================================
   // RENDER
   // =========================================================================
 
   const lockedCount = channels.filter((ch) => ch.locked).length;
+  const bonusActive = currentTimeBonus > 0;
 
   return (
     <div className="space-y-6 p-4">
@@ -258,6 +291,49 @@ export default function FrequencyLock({
         <p className="text-sm text-muted-foreground">
           Align all frequency channels to achieve harmonic resonance
         </p>
+      </div>
+
+      {/* TIME BONUS DISPLAY - FOMO INDUCING */}
+      <div
+        className={cn(
+          "p-3 rounded-lg border-2 transition-all",
+          getTimeBgColor(),
+          elapsedSeconds > 25 && "animate-pulse",
+        )}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Clock className={cn("h-4 w-4", getTimeColor())} />
+            <span className="text-sm font-semibold">Time Bonus</span>
+          </div>
+          <span className={cn("text-xl font-bold font-mono", getTimeColor())}>
+            +{currentTimeBonus.toFixed(1)}%
+          </span>
+        </div>
+
+        {/* Bonus progress bar */}
+        <Progress value={(currentTimeBonus / 20) * 100} className="h-2 mb-2" />
+
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">
+            {elapsedSeconds}s elapsed
+          </span>
+          {bonusActive ? (
+            <span
+              className={cn(
+                "flex items-center gap-1 font-semibold",
+                elapsedSeconds > 25 && "animate-pulse",
+              )}
+            >
+              <TrendingUp className="h-3 w-3" />
+              {elapsedSeconds > 25
+                ? "Bonus fading fast!"
+                : "Finish quick for max bonus!"}
+            </span>
+          ) : (
+            <span className="text-red-400">No time bonus</span>
+          )}
+        </div>
       </div>
 
       {/* Channels */}
@@ -320,9 +396,11 @@ export default function FrequencyLock({
           <p className="text-sm font-medium text-green-400">
             Perfect Harmonic Resonance Achieved!
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Submit to lock in your score
-          </p>
+          {bonusActive && (
+            <p className="text-xs text-yellow-400 mt-1 font-semibold">
+              ⚡ {currentTimeBonus.toFixed(1)}% time bonus active - Submit now!
+            </p>
+          )}
         </div>
       )}
 
@@ -344,7 +422,9 @@ export default function FrequencyLock({
         ) : (
           <>
             <Zap className="mr-2 h-4 w-4" />
-            {allLocked ? "Lock In Resonance" : "Submit Attempt"}
+            {allLocked
+              ? `Lock In (+${currentTimeBonus.toFixed(1)}% bonus)`
+              : "Submit Attempt"}
           </>
         )}
       </Button>
@@ -369,7 +449,9 @@ export default function FrequencyLock({
               <li>Adjust each slider to find the target frequency</li>
               <li>Color changes show proximity (cold → warm → hot)</li>
               <li>Lock all 3 channels for maximum score</li>
-              <li>Faster completion earns time bonus!</li>
+              <li>
+                <strong>Faster completion = bigger time bonus!</strong>
+              </li>
             </ol>
           </div>
         </div>

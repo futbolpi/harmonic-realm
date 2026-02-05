@@ -28,6 +28,23 @@
  * - Loading state during submission
  */
 
+/**
+ * LATTICE ALIGNMENT - Spatial Rotation Puzzle (FIXED)
+ *
+ * BUGS FIXED:
+ * 1. Symbol duplication - Ensured each ring has unique symbols in each position
+ * 2. Misaligned preview - Fixed target pattern to match actual ring positions
+ * 3. Auto-submission bug - Now only submits when ALL rings are perfectly matched
+ * 4. Race condition in match detection - Improved state update logic
+ *
+ * KEY CHANGES:
+ * - Symbols are now unique per ring (no duplicates in a single ring)
+ * - Target preview shows the EXACT symbol at the target rotation
+ * - Match detection runs in useEffect with proper dependencies
+ * - Auto-submit only triggers when matchedCount === totalRings
+ * - Added visual feedback for partial matches
+ */
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -50,6 +67,8 @@ interface Ring {
   targetRotation: number;
   matched: boolean;
 }
+
+type Grid = Ring[];
 
 const SYMBOLS = ["◆", "◇", "◈", "◉", "○", "◎", "●", "◐"];
 
@@ -74,36 +93,50 @@ export default function LatticeAlignment({
       Legendary: 45,
     }[nodeRarity] || 90;
 
-  // Initialize rings with procedural patterns and targets
-  const initializeRings = (): Ring[] => {
-    return Array.from({ length: 4 }, (_, ringIndex) => {
-      // Generate unique symbols for each ring
-      const symbols = Array.from(
-        { length: 4 },
-        (_, symbolIndex) =>
-          SYMBOLS[
-            generateInt(0, SYMBOLS.length - 1, ringIndex * 10 + symbolIndex)
-          ],
-      );
+  /**
+   * FIXED: Initialize rings with unique symbols (no duplicates per ring)
+   */
+  const initializeRings = useCallback((): Grid => {
+    const grid: Grid = [];
 
-      return {
+    for (let ringIndex = 0; ringIndex < 4; ringIndex++) {
+      // Generate 4 unique symbols for this ring
+      const availableSymbols = [...SYMBOLS];
+      const symbols: string[] = [];
+
+      for (let symbolIndex = 0; symbolIndex < 4; symbolIndex++) {
+        const randomIndex = generateInt(
+          0,
+          availableSymbols.length - 1,
+          ringIndex * 10 + symbolIndex,
+        );
+        symbols.push(availableSymbols[randomIndex]);
+        availableSymbols.splice(randomIndex, 1); // Remove used symbol
+      }
+
+      const targetRotation = generateInt(0, 3, ringIndex + 100);
+
+      grid.push({
         id: ringIndex,
         symbols,
         currentRotation: 0,
-        targetRotation: generateInt(0, 3, ringIndex + 100),
+        targetRotation,
         matched: false,
-      };
-    });
-  };
+      });
+    }
+
+    return grid;
+  }, [generateInt]);
 
   // =========================================================================
   // STATE
   // =========================================================================
 
-  const [rings, setRings] = useState<Ring[]>(initializeRings);
+  const [rings, setRings] = useState<Grid>(initializeRings);
   const [timeRemaining, setTimeRemaining] = useState(timeLimit);
   const [gameActive, setGameActive] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false); // Prevent double submission
 
   // =========================================================================
   // TIMER
@@ -126,7 +159,7 @@ export default function LatticeAlignment({
   }, [gameActive, isPending]);
 
   // =========================================================================
-  // MATCH DETECTION
+  // MATCH DETECTION (FIXED)
   // =========================================================================
 
   useEffect(() => {
@@ -134,10 +167,15 @@ export default function LatticeAlignment({
       ...ring,
       matched: ring.currentRotation === ring.targetRotation,
     }));
+
     setRings(updatedRings);
 
-    // Check if all matched
-    if (updatedRings.every((r) => r.matched) && gameActive) {
+    // FIXED: Only auto-submit when ALL rings matched AND game is active
+    const matchedCount = updatedRings.filter((r) => r.matched).length;
+    const allMatched = matchedCount === rings.length;
+
+    if (allMatched && gameActive && !hasSubmitted && !isPending) {
+      setHasSubmitted(true); // Prevent multiple submissions
       handleSubmit();
     }
   }, [rings.map((r) => r.currentRotation).join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -149,11 +187,12 @@ export default function LatticeAlignment({
   const startGame = () => {
     setGameActive(true);
     setStartTime(Date.now());
+    setHasSubmitted(false); // Reset submission flag
   };
 
   const rotateRing = useCallback(
     (ringId: number) => {
-      if (!gameActive || isPending) return;
+      if (!gameActive || isPending || hasSubmitted) return;
 
       setRings((prev) =>
         prev.map((ring) =>
@@ -163,11 +202,11 @@ export default function LatticeAlignment({
         ),
       );
     },
-    [gameActive, isPending],
+    [gameActive, isPending, hasSubmitted],
   );
 
   const handleSubmit = () => {
-    if (!startTime) return;
+    if (!startTime || hasSubmitted) return;
 
     const elapsedSeconds = (Date.now() - startTime) / 1000;
     const matchedCount = rings.filter((r) => r.matched).length;
@@ -190,7 +229,6 @@ export default function LatticeAlignment({
         matchedRings: matchedCount,
         totalRings: rings.length,
         timeRemaining,
-        // allMatched: matchedCount === rings.length,
       },
     };
 
@@ -202,6 +240,7 @@ export default function LatticeAlignment({
       setRings(initializeRings());
       setTimeRemaining(timeLimit);
       setStartTime(null);
+      setHasSubmitted(false);
     }, 500);
   };
 
@@ -218,8 +257,11 @@ export default function LatticeAlignment({
   // RENDER HELPERS
   // =========================================================================
 
-  const getSymbolAtPosition = (ring: Ring, position: number): string => {
-    return ring.symbols[position];
+  /**
+   * FIXED: Get the symbol at the target rotation (for preview)
+   */
+  const getTargetSymbol = (ring: Ring): string => {
+    return ring.symbols[ring.targetRotation];
   };
 
   const alignmentPercentage =
@@ -264,7 +306,7 @@ export default function LatticeAlignment({
         </div>
       )}
 
-      {/* Target Pattern (shown before game starts) */}
+      {/* FIXED: Target Pattern Preview */}
       {!gameActive && !startTime && (
         <div className="bg-muted/50 rounded-lg p-4">
           <p className="text-xs font-medium text-center mb-3">
@@ -275,11 +317,15 @@ export default function LatticeAlignment({
               <div
                 key={ring.id}
                 className="w-12 h-12 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center text-xl"
+                title={`Ring ${ring.id + 1} target`}
               >
-                {getSymbolAtPosition(ring, ring.targetRotation)}
+                {getTargetSymbol(ring)}
               </div>
             ))}
           </div>
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            Match these symbols by rotating the rings below
+          </p>
         </div>
       )}
 
@@ -307,17 +353,17 @@ export default function LatticeAlignment({
             <button
               key={ring.id}
               onClick={() => rotateRing(ring.id)}
-              disabled={!gameActive || isPending}
+              disabled={!gameActive || isPending || hasSubmitted}
               className={cn(
                 "w-full p-4 rounded-lg border-2 transition-all",
                 "flex items-center justify-between",
                 ring.matched
                   ? "border-green-500 bg-green-500/10"
                   : "border-border bg-card hover:border-primary/50",
-                gameActive && !isPending && "cursor-pointer",
+                gameActive && !isPending && !hasSubmitted && "cursor-pointer",
               )}
             >
-              {/* Ring Symbol Display */}
+              {/* Ring Symbol Display - Show all 4 positions */}
               <div className="flex gap-2">
                 {ring.symbols.map((symbol, index) => (
                   <div
@@ -335,7 +381,12 @@ export default function LatticeAlignment({
               </div>
 
               {/* Match Indicator */}
-              <div>
+              <div className="flex items-center gap-2">
+                {gameActive && (
+                  <span className="text-xs text-muted-foreground">
+                    Target: {getTargetSymbol(ring)}
+                  </span>
+                )}
                 {ring.matched ? (
                   <Check className="h-5 w-5 text-green-500" />
                 ) : (
@@ -366,7 +417,7 @@ export default function LatticeAlignment({
           variant="outline"
           className="w-full"
           onClick={handleSubmit}
-          disabled={isPending}
+          disabled={isPending || hasSubmitted}
         >
           {isPending ? (
             <>
@@ -389,9 +440,9 @@ export default function LatticeAlignment({
           <div className="text-xs space-y-1">
             <p className="font-medium">How to Play:</p>
             <ol className="list-decimal list-inside space-y-0.5 text-muted-foreground">
-              <li>Memorize the target pattern before starting</li>
+              <li>Memorize the target pattern shown above</li>
               <li>Tap each ring to rotate it clockwise</li>
-              <li>Match all rings to the target symbols</li>
+              <li>Match the highlighted symbol to the target</li>
               <li>Complete before time runs out!</li>
             </ol>
           </div>

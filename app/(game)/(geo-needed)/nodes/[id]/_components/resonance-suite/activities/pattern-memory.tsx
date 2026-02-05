@@ -22,7 +22,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Brain, Zap, Loader2 } from "lucide-react";
+import { Brain, Zap, Loader2, Eye } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -36,6 +36,7 @@ import {
 
 // Game states
 enum GameState {
+  COUNTDOWN = "COUNTDOWN", // NEW: Pre-sequence countdown
   MEMORIZE = "MEMORIZE",
   REPLAY = "REPLAY",
   RESULT = "RESULT",
@@ -51,11 +52,13 @@ export default function PatternMemory({
   // STATE
   // =========================================================================
 
-  const [gameState, setGameState] = useState<GameState>(GameState.MEMORIZE);
+  const [gameState, setGameState] = useState<GameState>(GameState.COUNTDOWN);
+  const [countdown, setCountdown] = useState(3); // 3, 2, 1
   const [sequence, setSequence] = useState<number[]>([]);
   const [userSequence, setUserSequence] = useState<number[]>([]);
   const [activeNode, setActiveNode] = useState<number | null>(null);
   const [showingSequence, setShowingSequence] = useState(false);
+  const [sequenceProgress, setSequenceProgress] = useState(0); // Track which step we're showing
 
   // =========================================================================
   // PROCEDURAL GENERATION
@@ -65,7 +68,6 @@ export default function PatternMemory({
 
   /**
    * Generate sequence based on node rarity
-   * Common: 4 steps, Uncommon: 5, Rare: 6, Epic: 7, Legendary: 8
    */
   const sequenceLength =
     {
@@ -86,6 +88,24 @@ export default function PatternMemory({
   }, [sequenceLength, generateInt]);
 
   // =========================================================================
+  // COUNTDOWN LOGIC (NEW)
+  // =========================================================================
+
+  useEffect(() => {
+    if (gameState === GameState.COUNTDOWN) {
+      if (countdown > 0) {
+        const timer = setTimeout(() => {
+          setCountdown(countdown - 1);
+        }, 1000);
+        return () => clearTimeout(timer);
+      } else {
+        // Countdown finished, start showing sequence
+        setGameState(GameState.MEMORIZE);
+      }
+    }
+  }, [gameState, countdown]);
+
+  // =========================================================================
   // TIMER
   // =========================================================================
 
@@ -100,12 +120,14 @@ export default function PatternMemory({
   // =========================================================================
 
   /**
-   * Show sequence to player
+   * Show sequence to player with progress tracking
    */
   const showSequence = useCallback(async () => {
     setShowingSequence(true);
+    setSequenceProgress(0);
 
     for (let i = 0; i < sequence.length; i++) {
+      setSequenceProgress(i + 1);
       setActiveNode(sequence[i]);
       await new Promise((resolve) => setTimeout(resolve, 600));
       setActiveNode(null);
@@ -113,6 +135,7 @@ export default function PatternMemory({
     }
 
     setShowingSequence(false);
+    setSequenceProgress(0);
     start(); // Start timer after showing
   }, [sequence, start]);
 
@@ -181,14 +204,15 @@ export default function PatternMemory({
       onComplete(result);
       // Reset state for potential replay
       setTimeout(() => {
-        setGameState(GameState.MEMORIZE);
+        setGameState(GameState.COUNTDOWN);
+        setCountdown(3);
         setUserSequence([]);
         setActiveNode(null);
         setShowingSequence(false);
+        setSequenceProgress(0);
         reset();
       }, 500);
-    }, 1500); // Brief delay to show result
-    setTimeout(() => onComplete(result), 1500); // Brief delay to show result
+    }, 1500);
   };
 
   // =========================================================================
@@ -208,18 +232,52 @@ export default function PatternMemory({
             Pattern Memory
           </h3>
           <Badge variant="secondary">
+            {gameState === GameState.COUNTDOWN && "Get Ready"}
             {gameState === GameState.MEMORIZE && "Memorize"}
             {gameState === GameState.REPLAY && "Your Turn"}
             {gameState === GameState.RESULT && "Complete!"}
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          {gameState === GameState.MEMORIZE &&
-            "Watch the sequence carefully..."}
+          {gameState === GameState.COUNTDOWN && `Starting in ${countdown}...`}
+          {gameState === GameState.MEMORIZE && "Watch the sequence carefully!"}
           {gameState === GameState.REPLAY && "Repeat the pattern you saw"}
           {gameState === GameState.RESULT && "Calculating results..."}
         </p>
       </div>
+
+      {/* COUNTDOWN VISUAL (NEW) */}
+      {gameState === GameState.COUNTDOWN && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <div className="text-8xl font-bold text-primary animate-pulse">
+              {countdown}
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Eye className="h-5 w-5" />
+              <span>Prepare to memorize {sequenceLength} steps</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MEMORIZATION PROGRESS (NEW) */}
+      {gameState === GameState.MEMORIZE && showingSequence && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-primary animate-pulse" />
+              <span className="text-sm font-semibold">
+                Memorize this sequence!
+              </span>
+            </div>
+            <Badge variant="outline" className="animate-pulse">
+              Step {sequenceProgress}/{sequenceLength}
+            </Badge>
+          </div>
+          <Progress value={(sequenceProgress / sequenceLength) * 100} />
+        </div>
+      )}
 
       {/* Timer (during replay) */}
       {gameState === GameState.REPLAY && (
@@ -246,53 +304,60 @@ export default function PatternMemory({
       )}
 
       {/* Node Grid */}
-      <div className="relative">
-        {/* Loading Overlay */}
-        {isPending && (
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
-            <div className="text-center space-y-3">
-              <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-primary">
-                  Submitting Result
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Calculating rewards and bonuses...
-                </p>
+      {gameState !== GameState.COUNTDOWN && (
+        <div className="relative">
+          {/* Loading Overlay */}
+          {isPending && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
+              <div className="text-center space-y-3">
+                <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-primary">
+                    Submitting Result
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Calculating rewards and bonuses...
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        <div
-          className={cn(
-            "grid grid-cols-3 gap-3 transition-opacity",
-            isPending && "opacity-50",
           )}
-        >
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((nodeIndex) => (
-            <button
-              key={nodeIndex}
-              onClick={() => handleNodeClick(nodeIndex)}
-              disabled={
-                gameState !== GameState.REPLAY || showingSequence || isPending
-              }
-              className={cn(
-                "aspect-square rounded-lg border-2 transition-all",
-                "flex items-center justify-center text-2xl font-bold",
-                activeNode === nodeIndex
-                  ? "bg-primary border-primary text-primary-foreground scale-110 shadow-lg"
-                  : "bg-card border-border hover:border-primary/50",
-                gameState === GameState.REPLAY && !showingSequence && !isPending
-                  ? "cursor-pointer"
-                  : "cursor-not-allowed opacity-60",
-              )}
-            >
-              {nodeIndex + 1}
-            </button>
-          ))}
+
+          <div
+            className={cn(
+              "grid grid-cols-3 gap-3 transition-opacity",
+              isPending && "opacity-50",
+              gameState === GameState.MEMORIZE &&
+                showingSequence &&
+                "pointer-events-none",
+            )}
+          >
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((nodeIndex) => (
+              <button
+                key={nodeIndex}
+                onClick={() => handleNodeClick(nodeIndex)}
+                disabled={
+                  gameState !== GameState.REPLAY || showingSequence || isPending
+                }
+                className={cn(
+                  "aspect-square rounded-lg border-2 transition-all",
+                  "flex items-center justify-center text-2xl font-bold",
+                  activeNode === nodeIndex
+                    ? "bg-primary border-primary text-primary-foreground scale-110 shadow-lg"
+                    : "bg-card border-border hover:border-primary/50",
+                  gameState === GameState.REPLAY &&
+                    !showingSequence &&
+                    !isPending
+                    ? "cursor-pointer"
+                    : "cursor-not-allowed opacity-60",
+                )}
+              >
+                {nodeIndex + 1}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Instructions */}
       <div className="bg-muted/50 rounded-lg p-3">
@@ -301,7 +366,8 @@ export default function PatternMemory({
           <div className="text-xs space-y-1">
             <p className="font-medium">How to Play:</p>
             <ol className="list-decimal list-inside space-y-0.5 text-muted-foreground">
-              <li>Watch the nodes light up in sequence</li>
+              <li>Wait for countdown to finish</li>
+              <li>Watch carefully as nodes light up in sequence</li>
               <li>Memorize the pattern</li>
               <li>Tap the nodes in the same order</li>
               <li>Perfect recall = maximum rewards!</li>

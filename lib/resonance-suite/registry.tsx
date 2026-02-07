@@ -50,10 +50,10 @@ const PatternMemoryGame = lazy(
  * Harmonic Echo - Rhythm timing game
  * Players sync with node's harmonic pulses
  */
-const HarmonicEchoGame = lazy(
-  () =>
-    import("@/app/(game)/(geo-needed)/nodes/[id]/_components/resonance-suite/activities/harmonic-echo"),
-);
+// const HarmonicEchoGame = lazy(
+//   () =>
+//     import("@/app/(game)/(geo-needed)/nodes/[id]/_components/resonance-suite/activities/harmonic-echo"),
+// );
 
 /**
  * Frequency Lock - Multi-dimensional slider puzzle
@@ -157,32 +157,32 @@ const ACTIVITY_REGISTRY = new Map<string, SuiteActivityRegistration>([
     },
   ],
 
-  [
-    "harmonic-echo",
-    {
-      config: {
-        id: "harmonic-echo",
-        type: SuiteActivityType.GAME,
-        name: "Harmonic Echo",
-        description:
-          "Synchronize with the node's harmonic pulses by tapping at the perfect moment",
-        difficulty: ActivityDifficulty.MEDIUM,
-        baseRewardMultiplier: 1.0,
-        nodeRarityMultiplier: {
-          Common: 1.0,
-          Uncommon: 1.15,
-          Rare: 1.3,
-          Epic: 1.5,
-          Legendary: 2.0,
-        },
-        icon: "📡",
-        color: "purple",
-      },
-      component: HarmonicEchoGame,
-      selectionWeight: 1.0,
-      isAvailable: () => true,
-    },
-  ],
+  // [
+  //   "harmonic-echo",
+  //   {
+  //     config: {
+  //       id: "harmonic-echo",
+  //       type: SuiteActivityType.GAME,
+  //       name: "Harmonic Echo",
+  //       description:
+  //         "Synchronize with the node's harmonic pulses by tapping at the perfect moment",
+  //       difficulty: ActivityDifficulty.MEDIUM,
+  //       baseRewardMultiplier: 1.0,
+  //       nodeRarityMultiplier: {
+  //         Common: 1.0,
+  //         Uncommon: 1.15,
+  //         Rare: 1.3,
+  //         Epic: 1.5,
+  //         Legendary: 2.0,
+  //       },
+  //       icon: "📡",
+  //       color: "purple",
+  //     },
+  //     component: HarmonicEchoGame,
+  //     selectionWeight: 1.0,
+  //     isAvailable: () => true,
+  //   },
+  // ],
 
   [
     "frequency-lock",

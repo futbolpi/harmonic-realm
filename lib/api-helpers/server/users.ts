@@ -16,7 +16,7 @@ export async function verifyTokenAndGetUser(accessToken: string) {
 
   const dbUser = await prisma.user.findUnique({
     where: { accessToken },
-    select: { id: true, piId: true, username: true },
+    select: { id: true, piId: true, username: true, archivedAt: true },
   });
 
   if (!dbUser) {

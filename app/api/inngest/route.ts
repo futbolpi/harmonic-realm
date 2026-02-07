@@ -22,6 +22,7 @@ import {
 import { spawnWeeklyChallenges } from "@/inngest/workflows/guilds/challenges/spawn-weekly-challenges";
 import { completeChallengeWorkflow } from "@/inngest/workflows/guilds/challenges/complete-challenge-workflow";
 import { applyPrestigeDecayWorkflow } from "@/inngest/workflows/guilds/prestige/apply-prestige-decay";
+import { spawnDailyResonanceSurgesWorkflow } from "@/inngest/workflows/resonance-surge/daily-spawn-workflow";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -55,5 +56,6 @@ export const { GET, POST, PUT } = serve({
     completeChallengeWorkflow,
 
     applyPrestigeDecayWorkflow,
+    spawnDailyResonanceSurgesWorkflow,
   ],
 });

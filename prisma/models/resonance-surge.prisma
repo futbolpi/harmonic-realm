@@ -1,0 +1,81 @@
+model ResonanceSurge {
+    id     String @id @default(cuid())
+    nodeId String @unique
+    node   Node   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+    // Spatial indexing (H3)
+    h3Index String // Resolution 7 (~5km² hexes)
+
+    // Spawn metadata
+    spawnCycle String // Format: "2026-02-06" (daily cycle identifier)
+    spawnedAt  DateTime @default(now())
+    expiresAt  DateTime // 24 hours from spawn
+
+    // Activity scoring (why this hex was chosen)
+    activityScore Int // Sum of weighted activities in hex (last 7 days)
+    hexRank       Int // 1-N ranking among all hexes (1 = highest activity)
+
+    // Stabilization tracking
+    isStabilized Boolean   @default(false)
+    stabilizedAt DateTime?
+    stabilizedBy String? // Username of first miner
+
+    // Yield bonuses
+    baseMultiplier Float @default(2.0) // 2.0× for Surge nodes
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([spawnCycle, expiresAt])
+    @@index([h3Index, spawnCycle])
+    @@index([isStabilized])
+    @@map("resonance_surges")
+}
+
+model SurgeActivitySnapshot {
+    id String @id @default(cuid())
+
+    // Spatial bin
+    h3Index String
+
+    // Time window (rolling 7-day window)
+    windowStart DateTime
+    windowEnd   DateTime
+
+    // Activity breakdowns
+    miningCount        Int     @default(0)
+    tuningCount        Int     @default(0)
+    anchoringCount     Int     @default(0)
+    calibrationPi      Decimal @default(0) @db.Decimal(10, 4)
+    loreStakingPi      Decimal @default(0) @db.Decimal(10, 4)
+    chamberMaintenance Int     @default(0)
+
+    // Composite score (calculated from above + weights)
+    totalScore Int @default(0)
+
+    // Metadata
+    snapshotDate String // Format: "2026-02-06"
+    createdAt    DateTime @default(now())
+
+    @@unique([h3Index, snapshotDate])
+    @@index([snapshotDate, totalScore])
+    @@index([h3Index])
+    @@map("surge_activity_snapshots")
+}
+
+model SurgeSpawnLog {
+    id String @id @default(cuid())
+
+    spawnCycle           String // "2026-02-06"
+    totalNodesSpawned    Int
+    totalHexesConsidered Int
+
+    // Top 10 hexes for transparency
+    /// [TopHexes]
+    topHexes Json[] // [{ h3Index, score, rank, nodesSpawned }]
+
+    createdAt DateTime @default(now())
+
+    @@unique([spawnCycle])
+    @@map("surge_spawn_logs")
+}

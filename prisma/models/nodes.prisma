@@ -34,6 +34,7 @@ model Node {
     genEvent      NodeGenEvent @default(Awakening)
 
     // Relations
+    resonanceSurge ResonanceSurge?
     type           NodeType        @relation(fields: [typeId], references: [id])
     sessions       MiningSession[]
     locationLore   LocationLore? // New: One-to-one with location lore
@@ -83,4 +84,6 @@ enum NodeGenEvent {
     Awakening
     Calibration
     Anchoring
+    ResonanceSurge // NEW: Temporary daily spawn
+    SurgeStabilized // NEW: Surge node that was mined (now permanent)
 }

@@ -26,6 +26,7 @@ import {
   applyChamberBoost,
   getChamberBoostForLocation,
 } from "@/lib/api-helpers/server/chamber-helpers";
+import { stabilizeSurgeNode } from "@/lib/api-helpers/server/resonance-surge/stabilize-node";
 
 export const completeMiningSession = async (
   params: CompleteMiningRequest,
@@ -39,7 +40,11 @@ export const completeMiningSession = async (
 
     const { accessToken, sessionId, userLatitude, userLongitude } = data;
 
-    const { id: userId, username } = await verifyTokenAndGetUser(accessToken);
+    const {
+      id: userId,
+      username,
+      archivedAt,
+    } = await verifyTokenAndGetUser(accessToken);
 
     // Validate against spoofing
     const isValid = await validateGeolocation({
@@ -49,7 +54,7 @@ export const completeMiningSession = async (
       userId,
     });
 
-    if (!isValid) {
+    if (!isValid || !!archivedAt) {
       return {
         success: false,
         error: "Forbidden: Location verification failed",
@@ -76,6 +81,7 @@ export const completeMiningSession = async (
             typeId: true,
             latitude: true,
             longitude: true,
+            genEvent: true,
             territory: {
               select: {
                 id: true,
@@ -285,13 +291,18 @@ export const completeMiningSession = async (
       }
     }
 
-    // 10. call the achievement unlock workflow
+    // 10. Stabilize Surge node on first mine
+    if (session.node.genEvent === "ResonanceSurge") {
+      await stabilizeSurgeNode(session.nodeId, username);
+    }
+
+    // 11. call the achievement unlock workflow
     await inngest.send({
       name: "game.achievement.check",
       data: { eventType: "miningCompleted", userId },
     });
 
-    // 11. Revalidate pages showing balances & levels
+    // 12. Revalidate pages showing balances & levels
     revalidatePath("/");
     revalidatePath(`/nodes/${session.nodeId}`);
 

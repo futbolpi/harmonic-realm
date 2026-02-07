@@ -67,6 +67,7 @@ export async function submitTuningSession(
       id: userId,
       username,
       piId,
+      archivedAt,
     } = await verifyTokenAndGetUser(accessToken);
 
     // Validate against spoofing with user context for velocity tracking
@@ -77,7 +78,7 @@ export async function submitTuningSession(
       avoidRapidFire: false,
     });
 
-    if (!isValid) {
+    if (!isValid || !!archivedAt) {
       return {
         success: false,
         error: "Forbidden: Location verification failed",

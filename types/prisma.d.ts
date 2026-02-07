@@ -46,6 +46,13 @@ declare global {
       activeMembersCount?: number;
       decayRate?: number;
     };
+
+    type TopHexes = {
+      h3Index: string;
+      score: number;
+      rank: number;
+      nodesSpawned: number;
+    };
   }
 }
 

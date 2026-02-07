@@ -15,7 +15,7 @@ import { MINING_RANGE_METERS } from "@/config/site";
 import { validateGeolocation } from "@/lib/api-helpers/server/utils/validate-geolocation";
 
 export async function startMiningAction(
-  params: StartMiningRequest
+  params: StartMiningRequest,
 ): Promise<ApiResponse<MiningSession>> {
   try {
     // Validate input
@@ -27,7 +27,7 @@ export async function startMiningAction(
 
     const { accessToken, nodeId, userLatitude, userLongitude } = data;
 
-    const { id: userId } = await verifyTokenAndGetUser(accessToken);
+    const { id: userId, archivedAt } = await verifyTokenAndGetUser(accessToken);
 
     // Validate against spoofing
     const isValid = await validateGeolocation({
@@ -37,7 +37,7 @@ export async function startMiningAction(
       userId,
     });
 
-    if (!isValid) {
+    if (!isValid || !!archivedAt) {
       return {
         success: false,
         error: "Forbidden: Location verification failed",
@@ -89,7 +89,7 @@ export async function startMiningAction(
         userLatitude,
         userLongitude,
         node.latitude,
-        node.longitude
+        node.longitude,
       ) * 1000; // Convert to meters
 
     if (distance > MINING_RANGE_METERS) {
@@ -97,7 +97,7 @@ export async function startMiningAction(
       return {
         success: false,
         error: `You are too far from the node (${distance.toFixed(
-          0
+          0,
         )}m away, max 100m)`,
       };
     }

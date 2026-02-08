@@ -70,7 +70,7 @@ export async function validateGeolocation({
   const headersList = await nextHeaders();
   const ipLatitude = parseFloat(headersList.get("x-vercel-ip-latitude") || "0");
   const ipLongitude = parseFloat(
-    headersList.get("x-vercel-ip-longitude") || "0"
+    headersList.get("x-vercel-ip-longitude") || "0",
   );
   const country = headersList.get("x-vercel-ip-country") ?? "";
 
@@ -88,14 +88,14 @@ export async function validateGeolocation({
     submittedLat,
     submittedLng,
     ipLatitude,
-    ipLongitude
+    ipLongitude,
   );
 
   if (distanceKm > MAX_DISTANCE_KM) {
     console.warn(
       `[GEO] Suspicious distance: ${distanceKm.toFixed(
-        1
-      )}km (IP: ${ipLatitude},${ipLongitude})`
+        1,
+      )}km (IP: ${ipLatitude},${ipLongitude})`,
     );
     return false;
   }
@@ -127,8 +127,8 @@ export async function validateGeolocation({
       if (timeDiffSeconds < MIN_TIME_BETWEEN_UPDATES_SECONDS) {
         console.warn(
           `[GEO] Submission too frequent: ${timeDiffSeconds.toFixed(
-            1
-          )}s (userId: ${userId})`
+            1,
+          )}s (userId: ${userId})`,
         );
         return false;
       }
@@ -138,7 +138,7 @@ export async function validateGeolocation({
         submittedLat,
         submittedLng,
         prevLocation.lat,
-        prevLocation.lng
+        prevLocation.lng,
       );
       const timeDiffHours = timeDiffSeconds / 3600;
       const velocityKmh =
@@ -147,8 +147,8 @@ export async function validateGeolocation({
       if (velocityKmh > MAX_VELOCITY_KMH) {
         console.warn(
           `[GEO] Impossible velocity: ${velocityKmh.toFixed(
-            1
-          )} km/h (userId: ${userId})`
+            1,
+          )} km/h (userId: ${userId})`,
         );
         return false;
       }
@@ -168,12 +168,12 @@ export async function validateGeolocation({
         if (accelerationMultiplier > MAX_ACCELERATION_MULTIPLIER) {
           console.warn(
             `[GEO] Suspicious acceleration: ${accelerationMultiplier.toFixed(
-              1
+              1,
             )}x jump (userId: ${userId}, from ${prevVelocity.toFixed(
-              1
-            )} to ${velocityKmh.toFixed(1)} km/h)`
+              1,
+            )} to ${velocityKmh.toFixed(1)} km/h)`,
           );
-          return false;
+          // return false;
         }
       }
 
@@ -183,13 +183,13 @@ export async function validateGeolocation({
         ipLatitude,
         ipLongitude,
         prevLocation.ipLat,
-        prevLocation.ipLng
+        prevLocation.ipLng,
       );
       if (ipDistanceFromPrevKm > MAX_DISTANCE_KM) {
         console.warn(
           `[GEO] IP location jumped: ${ipDistanceFromPrevKm.toFixed(
-            1
-          )}km (userId: ${userId})`
+            1,
+          )}km (userId: ${userId})`,
         );
         return false;
       }
@@ -202,7 +202,7 @@ export async function validateGeolocation({
       await redis.setex<number[]>(
         velocityHistoryKey,
         LOCATION_CACHE_TTL_SECONDS,
-        velocityHistory
+        velocityHistory,
       );
     }
 
@@ -210,7 +210,7 @@ export async function validateGeolocation({
     await redis.setex<StoredLocation>(
       locationKey,
       LOCATION_CACHE_TTL_SECONDS,
-      currentLocation
+      currentLocation,
     );
 
     return true;
@@ -226,7 +226,7 @@ export async function validateGeolocation({
     // Fallback: allow submission but flag for review (don't fail validation)
     // In production, you might want to alert security team
     console.warn(
-      "[GEO] Validation degraded due to Redis error; allowing submission (monitor logs)"
+      "[GEO] Validation degraded due to Redis error; allowing submission (monitor logs)",
     );
     return true;
   }

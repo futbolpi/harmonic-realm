@@ -6,6 +6,7 @@ export interface ActivityData {
   h3Index: string;
   miningCount: number;
   tuningCount: number;
+  driftCount: number;
   anchoringCount: number;
   calibrationPi: Decimal;
   loreStakingPi: Decimal;
@@ -36,6 +37,7 @@ export function calculateHexScore(data: ActivityData): number {
     "CHAMBER_MAINTENANCE",
     data.chamberMaintenance,
   );
+  const driftScore = calculateActivityScore("DRIFTING", data.driftCount);
 
   return (
     miningScore +
@@ -43,13 +45,20 @@ export function calculateHexScore(data: ActivityData): number {
     anchoringScore +
     calibrationScore +
     loreScore +
-    chamberScore
+    chamberScore +
+    driftScore
   );
 }
 
 /**
- * Weighted random selection of hexes for spawning
+ * ENHANCED: Weighted random selection of hexes for spawning
+ *
  * Uses cumulative distribution function for probability
+ * Allows replacement (same hex can receive multiple nodes up to diversity cap)
+ *
+ * @param hexScores - Map of h3Index to activity score
+ * @param targetNodeCount - Total nodes to spawn
+ * @returns Map of h3Index to allocated node count
  */
 export function selectSpawnHexes(
   hexScores: Map<string, number>,

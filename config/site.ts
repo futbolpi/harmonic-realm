@@ -38,7 +38,7 @@ export const siteConfig: SiteConfig = {
     ? "testnet"
     : "mainnet",
   links: {
-    twitter: "https://x.com/HarmonicRealmPi",
+    twitter: "https://x.com/RESonPI",
     github: "https://github.com/futbolpi/harmonic-realm",
     telegram: "https://t.me/HarmonicRealm",
   },

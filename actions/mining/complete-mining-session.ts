@@ -207,6 +207,10 @@ export const completeMiningSession = async (
       );
     }
 
+    if (session.node.genEvent === "ResonanceSurge") {
+      finalShares = finalShares * 2;
+    }
+
     // 5. Persist all changes atomically
     await prisma.$transaction([
       prisma.miningSession.update({

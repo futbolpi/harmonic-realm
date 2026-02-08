@@ -84,7 +84,15 @@ export async function generateActivitySnapshot(snapshotDate: string) {
     select: { latitude: true, longitude: true },
   });
 
-  // 7. Group by H3 index
+  // 7. Aggregate node drifts (last 7 days)
+  const nodeDrifts = await prisma.nodeDrift.findMany({
+    where: {
+      timestamp: { gte: windowStart, lte: windowEnd },
+    },
+    select: { originalLatitude: true, originalLongitude: true },
+  });
+
+  // 8. Group by H3 index
   const hexMap = new Map<
     string,
     {
@@ -94,20 +102,24 @@ export async function generateActivitySnapshot(snapshotDate: string) {
       calibrationPi: number;
       loreStakingPi: number;
       chamberMaintenance: number;
+      driftCount: number;
     }
   >();
+
+  const defaultHex = {
+    miningCount: 0,
+    tuningCount: 0,
+    anchoringCount: 0,
+    calibrationPi: 0,
+    loreStakingPi: 0,
+    chamberMaintenance: 0,
+    driftCount: 0,
+  };
 
   // Mining
   miningSessions.forEach((session) => {
     const h3Index = getH3Index(session.node.latitude, session.node.longitude);
-    const hex = hexMap.get(h3Index) || {
-      miningCount: 0,
-      tuningCount: 0,
-      anchoringCount: 0,
-      calibrationPi: 0,
-      loreStakingPi: 0,
-      chamberMaintenance: 0,
-    };
+    const hex = hexMap.get(h3Index) || defaultHex;
     hex.miningCount++;
     hexMap.set(h3Index, hex);
   });
@@ -115,14 +127,7 @@ export async function generateActivitySnapshot(snapshotDate: string) {
   // Tuning
   tuningSessions.forEach((session) => {
     const h3Index = getH3Index(session.node.latitude, session.node.longitude);
-    const hex = hexMap.get(h3Index) || {
-      miningCount: 0,
-      tuningCount: 0,
-      anchoringCount: 0,
-      calibrationPi: 0,
-      loreStakingPi: 0,
-      chamberMaintenance: 0,
-    };
+    const hex = hexMap.get(h3Index) || defaultHex;
     hex.tuningCount++;
     hexMap.set(h3Index, hex);
   });
@@ -130,14 +135,7 @@ export async function generateActivitySnapshot(snapshotDate: string) {
   // Anchoring
   resonantAnchors.forEach((anchor) => {
     const h3Index = getH3Index(anchor.locationLat, anchor.locationLon);
-    const hex = hexMap.get(h3Index) || {
-      miningCount: 0,
-      tuningCount: 0,
-      anchoringCount: 0,
-      calibrationPi: 0,
-      loreStakingPi: 0,
-      chamberMaintenance: 0,
-    };
+    const hex = hexMap.get(h3Index) || defaultHex;
     hex.anchoringCount++;
     hexMap.set(h3Index, hex);
   });
@@ -145,14 +143,7 @@ export async function generateActivitySnapshot(snapshotDate: string) {
   // Calibration (use binned locations)
   calibrationContributions.forEach((contrib) => {
     const h3Index = getH3Index(contrib.latitudeBin, contrib.longitudeBin);
-    const hex = hexMap.get(h3Index) || {
-      miningCount: 0,
-      tuningCount: 0,
-      anchoringCount: 0,
-      calibrationPi: 0,
-      loreStakingPi: 0,
-      chamberMaintenance: 0,
-    };
+    const hex = hexMap.get(h3Index) || defaultHex;
     hex.calibrationPi += contrib.piContributed.toNumber();
     hexMap.set(h3Index, hex);
   });
@@ -163,14 +154,7 @@ export async function generateActivitySnapshot(snapshotDate: string) {
       stake.locationLore.node.latitude,
       stake.locationLore.node.longitude,
     );
-    const hex = hexMap.get(h3Index) || {
-      miningCount: 0,
-      tuningCount: 0,
-      anchoringCount: 0,
-      calibrationPi: 0,
-      loreStakingPi: 0,
-      chamberMaintenance: 0,
-    };
+    const hex = hexMap.get(h3Index) || defaultHex;
     hex.loreStakingPi += stake.piAmount.toNumber();
     hexMap.set(h3Index, hex);
   });
@@ -178,19 +162,20 @@ export async function generateActivitySnapshot(snapshotDate: string) {
   // Chambers
   maintainedChambers.forEach((chamber) => {
     const h3Index = getH3Index(chamber.latitude, chamber.longitude);
-    const hex = hexMap.get(h3Index) || {
-      miningCount: 0,
-      tuningCount: 0,
-      anchoringCount: 0,
-      calibrationPi: 0,
-      loreStakingPi: 0,
-      chamberMaintenance: 0,
-    };
+    const hex = hexMap.get(h3Index) || defaultHex;
     hex.chamberMaintenance++;
     hexMap.set(h3Index, hex);
   });
 
-  // 8. Calculate scores and store snapshots
+  // Drifts
+  nodeDrifts.forEach((drift) => {
+    const h3Index = getH3Index(drift.originalLatitude, drift.originalLongitude);
+    const hex = hexMap.get(h3Index) || defaultHex;
+    hex.driftCount++;
+    hexMap.set(h3Index, hex);
+  });
+
+  // 9. Calculate scores and store snapshots
   const snapshots = Array.from(hexMap.entries()).map(([h3Index, data]) => {
     const totalScore = calculateHexScore({
       h3Index,
@@ -200,6 +185,7 @@ export async function generateActivitySnapshot(snapshotDate: string) {
       calibrationPi: new Decimal(data.calibrationPi),
       loreStakingPi: new Decimal(data.loreStakingPi),
       chamberMaintenance: data.chamberMaintenance,
+      driftCount: data.driftCount,
     });
 
     return {
@@ -217,7 +203,7 @@ export async function generateActivitySnapshot(snapshotDate: string) {
     };
   });
 
-  // 9. Upsert snapshots (replace existing for date)
+  // 10. Upsert snapshots (replace existing for date)
   await prisma.$transaction(
     snapshots.map((snapshot) =>
       prisma.surgeActivitySnapshot.upsert({

@@ -18,12 +18,13 @@ import {
 } from "@/config/guilds/constants";
 import { InngestEventDispatcher } from "@/inngest/dispatcher";
 import { getNodesToClaim } from "@/lib/api-helpers/server/guilds/territories";
+import { isOnLand, loadLandGeoJson } from "@/lib/node-spawn/node-generator";
 
 /**
  * ACTION: Claims a territory (only leader/office)
  */
 export async function stakeTerritory(
-  params: StakeTerritoryParams
+  params: StakeTerritoryParams,
 ): Promise<ApiResponse<{ hexId: string }>> {
   try {
     const { success, data } = StakeTerritorySchema.safeParse(params);
@@ -36,6 +37,18 @@ export async function stakeTerritory(
 
     // Verify user authentication
     const { username } = await verifyTokenAndGetUser(accessToken);
+
+    // ensure hex is on land
+
+    // Load land GeoJSON once (cached internally)
+    const landGeoJSON = await loadLandGeoJson();
+    const [centerLat, centerLon] = cellToLatLng(hexId);
+
+    const onLand = isOnLand(centerLon, centerLat, landGeoJSON);
+
+    if (!onLand) {
+      return { success: false, error: "Territory Center not on land" };
+    }
 
     // Verify guild membership and role
     const member = await prisma.guildMember.findFirst({
@@ -88,7 +101,6 @@ export async function stakeTerritory(
     }
 
     // Create/update territory
-    const [centerLat, centerLon] = cellToLatLng(hexId);
 
     const nodesToClaim = await getNodesToClaim(hexId);
 
@@ -162,7 +174,7 @@ export async function stakeTerritory(
 
     await InngestEventDispatcher.territoryClaimed(
       territoryStaked.id,
-      controlEndsAt
+      controlEndsAt,
     );
 
     revalidatePath(`/territories/${hexId}`);

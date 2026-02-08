@@ -7,6 +7,7 @@ export const ACTIVITY_WEIGHTS = {
   // Medium-commitment (session-based)
   MINING: 50, // 1 completed mining session = 50 points
   CHAMBER_MAINTENANCE: 25, // 1 chamber upkeep = 25 points (RES sink)
+  DRIFTING: 25, // 1 Node relocation = 25 points (RES sink) for original location
 
   // Low-commitment (daily engagement)
   TUNING: 10, // 1 tuning session = 10 points

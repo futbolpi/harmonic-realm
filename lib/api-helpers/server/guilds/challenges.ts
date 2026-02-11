@@ -1,3 +1,5 @@
+import { revalidatePath } from "next/cache";
+
 import {
   UpdateChallengeProgressSchema,
   type UpdateChallengeProgressParams,
@@ -17,7 +19,7 @@ import { ChallengeGoalType } from "@/lib/generated/prisma/enums";
  * - Failures are silent (best-effort) to avoid interrupting main workflows
  */
 export async function updateChallengeProgress(
-  params: UpdateChallengeProgressParams
+  params: UpdateChallengeProgressParams,
 ): Promise<void> {
   try {
     const { success, data } = UpdateChallengeProgressSchema.safeParse(params);
@@ -100,7 +102,7 @@ export async function updateChallengeProgress(
 
         default:
           console.warn(
-            `[updateChallengeProgress] Unknown goal type: ${template.goalType}`
+            `[updateChallengeProgress] Unknown goal type: ${template.goalType}`,
           );
           break;
       }
@@ -124,6 +126,9 @@ export async function updateChallengeProgress(
         select: { id: true, currentValue: true, targetValue: true },
       });
 
+      revalidatePath(`/guilds/${guildId}`);
+      revalidatePath(`/guilds/${guildId}/challenges`);
+
       // Check if challenge is now complete (reached target)
       if (
         updatedProgress.currentValue >= updatedProgress.targetValue &&
@@ -132,7 +137,7 @@ export async function updateChallengeProgress(
         await InngestEventDispatcher.completeChallengeForGuild(
           progress.id,
           guildId,
-          progress.challengeId
+          progress.challengeId,
         );
       }
     }

@@ -10,7 +10,7 @@ import type { NodeCreateManyInput } from "@/lib/generated/prisma/models";
 import {
   chooseWeighted,
   generateNodeName,
-  // getTerritoryHexId,
+  getTerritoryHexId,
 } from "@/lib/node-spawn/node-generator";
 import { generateLore } from "@/lib/node-spawn/generate-lore";
 import { sendMockPayment } from "../mock-payments";
@@ -61,13 +61,20 @@ export async function completeAnchorPayment({
       };
     }
 
-    const [offset, nodeTypes] = await Promise.all([
+    // check if anchor is in a territory with battle
+    const hexId = getTerritoryHexId(anchor.locationLat, anchor.locationLon);
+
+    const [offset, nodeTypes, territory] = await Promise.all([
       prisma.resonantAnchor.count({
         where: { phaseId: anchor.phaseId, paymentStatus: "COMPLETED" },
       }),
       prisma.nodeType.findMany({
         where: { phase: anchor.phase.phaseNumber },
         select: { id: true, rarity: true },
+      }),
+      prisma.territory.findUnique({
+        where: { guildId: { not: null }, hexId },
+        select: { hexId: true },
       }),
     ]);
 
@@ -110,7 +117,7 @@ export async function completeAnchorPayment({
       lore,
       sponsor: anchorId,
       genEvent: NodeGenEvent.Anchoring,
-      // territoryHexId: getTerritoryHexId(anchor.locationLat, anchor.locationLon),
+      territoryHexId: territory?.hexId || null,
     };
 
     // Create node, Update anchor record, and update phase progress in a transaction

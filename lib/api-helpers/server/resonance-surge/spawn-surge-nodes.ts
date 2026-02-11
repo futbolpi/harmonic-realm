@@ -49,7 +49,7 @@ const MAJOR_CITY_SEED_HEXES = [
   "872a107287fffff", // Baltimore
   // International Major Cities
   "871fb46757fffff", // London
-  "871fb4674ffffff", // Paris
+  "871fb46747fffff", // Paris
   "871fb28507fffff", // Tokyo
   "87194906d7fffff", // Beijing
   "871ea6936ffffff", // Moscow
@@ -255,12 +255,26 @@ function applyDiversityPenalty(
 }
 
 /**
+ * Generate lore snippet for surge nodes
+ */
+function generateSurgeLore(activityScore: number, rank: number): string {
+  const templates = [
+    `A resonance surge of magnitude ${activityScore.toFixed(1)} detected. The Lattice pulses with unstable energy.`,
+    `Harmonic anomaly #${rank}: This node emerged from collective Pioneer activity in the region.`,
+    `The frequency grid trembles here. Mine quickly before this surge dissipates into the void.`,
+    `A temporary rift in the Lattice. Anchor this node to make it permanent.`,
+  ];
+  return templates[rank % templates.length];
+}
+
+/**
  * MAIN FUNCTION: Spawn Surge Nodes with Edge Case Handling
  *
  * ENHANCEMENTS:
  * 1. Zero Activity Fallback: Uses seed hexes (territories > cities)
  * 2. Diversity Penalty: Prevents single-hex oversaturation
  * 3. Efficient DB Queries: Single transaction for all node creation
+ * 4. Territory Association: Attaches nodes to controlled territories via single lookup
  *
  * @param spawnCycle - Date string (yyyy-MM-dd)
  * @returns Spawn result with edge case metadata
@@ -347,12 +361,39 @@ export async function spawnSurgeNodes(spawnCycle: string) {
   }
 
   // =====================================================================
+  // STEP 3B: FETCH CONTROLLED TERRITORIES (EFFICIENT SINGLE QUERY)
+  // =====================================================================
+  /**
+   * OPTIMIZATION STRATEGY:
+   * Instead of querying territories for each node individually, we fetch ALL
+   * controlled territories once and build an in-memory Map for O(1) lookups.
+   * This converts N database queries into 1 query + N hash lookups.
+   */
+  const controlledTerritories = await prisma.territory.findMany({
+    where: {
+      guildId: { not: null }, // Only territories under guild control
+    },
+    select: {
+      hexId: true,
+    },
+  });
+
+  // Build a Set for O(1) lookup: controlled territory hex IDs
+  const controlledTerritoryHexIds = new Set(
+    controlledTerritories.map((t) => t.hexId),
+  );
+
+  console.log(
+    `Loaded ${controlledTerritoryHexIds.size} controlled territories for efficient node attachment`,
+  );
+
+  // =====================================================================
   // STEP 4: PRE-FETCH NODE TYPES (Performance Optimization)
   // =====================================================================
   const nodeTypesCache = await getNodeTypesForSurge();
 
   // =====================================================================
-  // STEP 5: GENERATE NODE DATA (with land validation)
+  // STEP 5: GENERATE NODE DATA (with land validation + territory check)
   // =====================================================================
   const nodesToSpawn = [];
   let rank = 1;
@@ -362,6 +403,13 @@ export async function spawnSurgeNodes(spawnCycle: string) {
 
   for (const [h3Index, nodeCount] of hexAllocations) {
     const hexSnapshot = snapshots.find((s) => s.h3Index === h3Index);
+
+    /**
+     * TERRITORY ATTACHMENT LOGIC:
+     * Check if this hex is in the controlled territories Set.
+     * If yes, attach territoryHexId; if no, leave it null.
+     */
+    const isControlledTerritory = controlledTerritoryHexIds.has(h3Index);
 
     for (let i = 0; i < nodeCount; i++) {
       const location = generateRandomPointInHex(h3Index, landGeoJSON);
@@ -377,6 +425,9 @@ export async function spawnSurgeNodes(spawnCycle: string) {
         phase: null,
         echoIntensity: 0.8 + (rank / targetNodeCount) * 0.4, // 0.8-1.2 range
         openForMining: true,
+
+        // Territory association: only set if hex is under guild control
+        territoryHexId: isControlledTerritory ? h3Index : null,
 
         // Surge metadata
         h3Index,
@@ -421,13 +472,22 @@ export async function spawnSurgeNodes(spawnCycle: string) {
             },
           },
         },
-        select: { id: true },
+        select: { id: true, territoryHexId: true },
       });
     }),
   );
 
+  // Count how many nodes were attached to territories
+  const nodesAttachedToTerritories = createdNodes.filter(
+    (node) => node.territoryHexId !== null,
+  ).length;
+
+  console.log(
+    `✓ Attached ${nodesAttachedToTerritories}/${createdNodes.length} nodes to controlled territories`,
+  );
+
   // =====================================================================
-  // STEP 7: LOG SPAWN METADATA
+  // STEP 7: CREATE SPAWN LOG
   // =====================================================================
   const topHexes = Array.from(hexAllocations.entries())
     .slice(0, 10)
@@ -445,40 +505,35 @@ export async function spawnSurgeNodes(spawnCycle: string) {
     data: {
       spawnCycle,
       totalNodesSpawned: createdNodes.length,
-      totalHexesConsidered: snapshots.length || seedHexesUsed.length,
+      totalHexesConsidered: hexAllocations.size,
+      totalActivityScore,
+      zeroActivityFallback,
       topHexes,
+      metadata: {
+        diversityPenaltyApplied: penalizedHexCount > 0,
+        penalizedHexCount,
+        seedHexesUsed: zeroActivityFallback ? seedHexesUsed : [],
+        territorySeedCount,
+        citySeedCount,
+        nodesAttachedToTerritories,
+        controlledTerritoryCount: controlledTerritoryHexIds.size,
+      },
     },
-    select: { id: true },
   });
 
   // =====================================================================
-  // RETURN RESULTS WITH EDGE CASE METADATA
+  // RETURN RESULTS
   // =====================================================================
   return {
     nodesSpawned: createdNodes.length,
     hexesUsed: hexAllocations.size,
-    topHexes,
-    // Edge case metadata
     zeroActivityFallback,
-    seedHexesUsed: seedHexesUsed.length,
-    territorySeedCount,
-    citySeedCount,
     diversityPenaltyApplied: penalizedHexCount > 0,
     penalizedHexCount,
+    seedHexesUsed: zeroActivityFallback ? seedHexesUsed.length : 0,
+    territorySeedCount,
+    citySeedCount,
+    nodesAttachedToTerritories,
+    controlledTerritoryCount: controlledTerritoryHexIds.size,
   };
-}
-
-/**
- * Generate contextual lore based on activity score and rank
- */
-function generateSurgeLore(activityScore: number, rank: number): string {
-  if (activityScore > 100000) {
-    return `Born from intense harmonic convergence. This Surge node pulses with cosmic energy, ranking #${rank} in today's resonance wave. Mine it to anchor this frequency forever.`;
-  } else if (activityScore > 50000) {
-    return `A strong resonance echo manifests here. Rank #${rank} among today's Surge nodes. Claim it before the 24-hour window closes.`;
-  } else if (activityScore === 0) {
-    return `A seed frequency from the Lattice's memory. Rank #${rank} in the awakening cycle. First nodes of a new harmonic era.`;
-  } else {
-    return `A moderate frequency disturbance. Rank #${rank} in the daily Surge cycle. Mine to stabilize it into the Lattice permanently.`;
-  }
 }

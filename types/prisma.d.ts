@@ -53,6 +53,16 @@ declare global {
       rank: number;
       nodesSpawned: number;
     };
+
+    type SurgeLogMetadata = {
+      diversityPenaltyApplied: boolean;
+      penalizedHexCount: number;
+      seedHexesUsed: string[];
+      territorySeedCount: number;
+      citySeedCount: number;
+      nodesAttachedToTerritories: number;
+      controlledTerritoryCount: number;
+    };
   }
 }
 

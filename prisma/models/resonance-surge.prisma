@@ -69,10 +69,14 @@ model SurgeSpawnLog {
     spawnCycle           String // "2026-02-06"
     totalNodesSpawned    Int
     totalHexesConsidered Int
+    totalActivityScore   Int     @default(0)
+    zeroActivityFallback Boolean @default(false)
 
     // Top 10 hexes for transparency
     /// [TopHexes]
     topHexes Json[] // [{ h3Index, score, rank, nodesSpawned }]
+    /// [SurgeLogMetadata]
+    metadata Json?
 
     createdAt DateTime @default(now())
 

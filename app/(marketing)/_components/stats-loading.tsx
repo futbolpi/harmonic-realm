@@ -1,26 +1,33 @@
-const StatsLoading = () => {
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export default function StatsLoading() {
   return (
-    <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
-      <div className="text-center group">
-        <div className="text-2xl md:text-3xl font-bold h-8 md:h-9 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 bg-clip-text text-transparent animate-pulse">
-          <div className="w-16 h-8 md:h-9 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded mx-auto"></div>
-        </div>
-        <p className="text-sm text-muted-foreground mt-1">Active Pioneers</p>
+    <div className="w-full max-w-5xl mx-auto pt-8 md:pt-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Card
+            key={index}
+            className="border-border/40 bg-card/50 backdrop-blur-sm"
+          >
+            <div className="p-3 md:p-4 lg:p-6 text-center space-y-2 md:space-y-3">
+              {/* Icon skeleton */}
+              <Skeleton className="w-8 h-8 md:w-10 md:h-10 rounded-full mx-auto" />
+
+              {/* Value skeleton */}
+              <Skeleton className="h-8 sm:h-10 md:h-12 lg:h-14 w-20 sm:w-24 md:w-28 mx-auto" />
+
+              {/* Label skeleton */}
+              <Skeleton className="h-3 md:h-4 w-16 sm:w-20 md:w-24 mx-auto" />
+            </div>
+          </Card>
+        ))}
       </div>
-      <div className="text-center group">
-        <div className="text-2xl md:text-3xl font-bold h-8 md:h-9 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 bg-clip-text text-transparent animate-pulse">
-          <div className="w-16 h-8 md:h-9 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded mx-auto"></div>
-        </div>
-        <p className="text-sm text-muted-foreground mt-1">Echo Guardians</p>
-      </div>
-      <div className="text-center group">
-        <div className="text-2xl md:text-3xl font-bold h-8 md:h-9 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 bg-clip-text text-transparent animate-pulse">
-          <div className="w-20 h-8 md:h-9 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded mx-auto"></div>
-        </div>
-        <p className="text-sm text-muted-foreground mt-1">Shares Awakened</p>
+
+      {/* Additional context skeleton */}
+      <div className="text-center pt-4 md:pt-6">
+        <Skeleton className="h-3 md:h-4 w-48 md:w-56 mx-auto" />
       </div>
     </div>
   );
-};
-
-export default StatsLoading;
+}

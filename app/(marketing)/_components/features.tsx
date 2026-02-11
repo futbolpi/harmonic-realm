@@ -1,145 +1,161 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Compass,
-  Waves,
+  Zap,
   Users,
-  Crown,
-  Shield,
-  Smartphone,
-  Globe,
+  Trophy,
+  Map,
   Sparkles,
+  Crown,
+  Target,
 } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function Features() {
   const features = [
     {
       icon: Compass,
-      title: "Echo Guardian Discovery",
+      title: "Explore the Lattice",
       description:
-        "Discover geo-anchored Echo Guardians using harmonic resonance and GPS verification",
-      color: "text-violet-400",
-      bgColor: "bg-violet-500/20",
-      borderColor: "border-violet-400/50",
+        "Discover geo-anchored Echo Guardians in your city, across continents, or in hidden corners of the world.",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+      borderColor: "border-primary/30",
     },
     {
-      icon: Waves,
-      title: "Harmonic Resonance",
+      icon: Zap,
+      title: "Mine Pi Shares",
       description:
-        "Mine Shares by resonating with the cosmic Lattice frequencies at each node",
-      color: "text-cyan-400",
-      bgColor: "bg-cyan-500/20",
-      borderColor: "border-cyan-400/50",
+        "Resonate with Guardians to mine Shares derived from Pi's infinite digits. Convert to RESONANCE tokens instantly.",
+      color: "text-secondary",
+      bgColor: "bg-secondary/10",
+      borderColor: "border-secondary/30",
+    },
+    {
+      icon: Target,
+      title: "Skill-Based Tuning",
+      description:
+        "Complete harmonic mini-games to accelerate progression. Master frequency patterns, memory challenges, and more.",
+      color: "text-accent",
+      bgColor: "bg-accent/10",
+      borderColor: "border-accent/30",
+    },
+    {
+      icon: Map,
+      title: "Node Mastery",
+      description:
+        "Gain mastery over different Guardian types. Unlock up to 300% bonus multipliers through dedicated exploration.",
+      color: "text-chart-1",
+      bgColor: "bg-chart-1/10",
+      borderColor: "border-chart-1/30",
     },
     {
       icon: Users,
-      title: "Pioneer Community",
+      title: "Form Guilds",
       description:
-        "Join thousands of Pioneers exploring the infinite mysteries of Pi's digits",
-      color: "text-emerald-400",
-      bgColor: "bg-emerald-500/20",
-      borderColor: "border-emerald-400/50",
+        "Unite with fellow Pioneers. Control territories, complete challenges, and share in guild vault rewards.",
+      color: "text-chart-2",
+      bgColor: "bg-chart-2/10",
+      borderColor: "border-chart-2/30",
     },
     {
       icon: Crown,
-      title: "Mastery & Achievements",
+      title: "Echo Chambers",
       description:
-        "Unlock node mastery, collect lore fragments, and earn your place in history",
-      color: "text-amber-400",
-      bgColor: "bg-amber-500/20",
-      borderColor: "border-amber-400/50",
+        "Anchor personal chambers at strategic locations. Boost all mining within 5km and strengthen your Lattice presence.",
+      color: "text-chart-3",
+      bgColor: "bg-chart-3/10",
+      borderColor: "border-chart-3/30",
     },
     {
-      icon: Shield,
-      title: "Lattice Security",
+      icon: Trophy,
+      title: "Compete Globally",
       description:
-        "Protected by Pi SDK authentication and cosmic encryption protocols",
-      color: "text-violet-400",
-      bgColor: "bg-violet-500/20",
-      borderColor: "border-violet-400/50",
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile Harmonizer",
-      description:
-        "Your device becomes a Harmonizer, attuned to detect Echo Guardian frequencies",
-      color: "text-cyan-400",
-      bgColor: "bg-cyan-500/20",
-      borderColor: "border-cyan-400/50",
-    },
-    {
-      icon: Globe,
-      title: "Global Lattice Network",
-      description:
-        "Echo Guardians span the globe, each holding unique fragments of cosmic knowledge",
-      color: "text-emerald-400",
-      bgColor: "bg-emerald-500/20",
-      borderColor: "border-emerald-400/50",
+        "Climb leaderboards across mining, tuning, and guild rankings. Earn achievements and exclusive recognition.",
+      color: "text-chart-4",
+      bgColor: "bg-chart-4/10",
+      borderColor: "border-chart-4/30",
     },
     {
       icon: Sparkles,
-      title: "Harmonic Awakenings",
+      title: "Collect Lore",
       description:
-        "Experience phase transitions that unlock new realms and double your resonance power",
-      color: "text-amber-400",
-      bgColor: "bg-amber-500/20",
-      borderColor: "border-amber-400/50",
+        "Uncover the mysteries of the Lattice through Lore Fragments. Each resonance reveals deeper cosmic secrets.",
+      color: "text-chart-5",
+      bgColor: "bg-chart-5/10",
+      borderColor: "border-chart-5/30",
     },
   ];
 
   return (
-    <section className="py-20 md:py-32">
-      <div className="container mx-auto px-4">
-        <div className="text-center space-y-6 mb-16">
-          <Badge
-            variant="outline"
-            className="text-violet-400 border-violet-400/50 bg-violet-500/10"
-          >
-            Cosmic Features
-          </Badge>
-          <h2 className="text-3xl md:text-5xl font-bold">
-            Why Join the{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">
-              HarmonicRealm
-            </span>
-            ?
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Experience the convergence of reality and cosmic frequencies through
-            innovative gameplay that bridges the physical and digital realms.
-          </p>
-        </div>
+    <section className="py-12 md:py-20 lg:py-32 relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/5 to-transparent" />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
-            <Card
-              key={index}
-              className="bg-card/50 backdrop-blur-sm border-muted/50 hover:scale-105 hover:shadow-xl transition-all duration-300 group"
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="space-y-8 md:space-y-12">
+          {/* Section header */}
+          <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto">
+            <Badge
+              variant="outline"
+              className="text-primary border-primary/50 bg-primary/5 text-sm md:text-base"
             >
-              <CardHeader className="text-center space-y-4">
-                <div
-                  className={`w-16 h-16 rounded-full ${feature.bgColor} border ${feature.borderColor} flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}
-                  style={{
-                    boxShadow: `0 0 20px ${feature.color
-                      .replace("text-", "")
-                      .replace("-400", "")}40`,
-                  }}
-                >
-                  <feature.icon
-                    className={`h-8 w-8 ${feature.color} transition-transform duration-300 group-hover:rotate-12`}
-                  />
-                </div>
-                <CardTitle className="text-lg group-hover:text-violet-400 transition-colors duration-300">
-                  {feature.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-center text-sm">
-                  {feature.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+              <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2" />
+              Core Mechanics
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
+              A Living{" "}
+              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                Mathematical Universe
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
+              Harmonic Realm combines real-world exploration, skill-based
+              progression, and community dynamics into a seamless experience
+              powered by Pi Network.
+            </p>
+          </div>
+
+          {/* Features grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {features.map((feature, index) => (
+              <Card
+                key={index}
+                className={`${feature.borderColor} border bg-card/50 backdrop-blur-sm hover:scale-105 hover:shadow-lg transition-all duration-300 group`}
+              >
+                <CardContent className="p-4 md:p-6 space-y-3 md:space-y-4 text-center">
+                  {/* Icon */}
+                  <div
+                    className={`w-12 h-12 md:w-16 md:h-16 rounded-full ${feature.bgColor} border ${feature.borderColor} flex items-center justify-center mx-auto group-hover:scale-110 transition-transform`}
+                  >
+                    <feature.icon
+                      className={`w-6 h-6 md:w-8 md:h-8 ${feature.color}`}
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="space-y-2">
+                    <h3 className="text-base md:text-lg font-bold group-hover:text-primary transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Value proposition */}
+          <div className="text-center space-y-3 md:space-y-4 pt-4 md:pt-8">
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
+              Every feature is designed to reward exploration, skill, and
+              dedication. Your journey through the Lattice is unique, and so are
+              your rewards.
+            </p>
+          </div>
         </div>
       </div>
     </section>

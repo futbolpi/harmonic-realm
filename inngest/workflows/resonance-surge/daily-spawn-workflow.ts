@@ -37,6 +37,13 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
         where: {
           spawnCycle: { lt: today }, // Older than today
           isStabilized: false, // Not mined/stabilized
+          node: {
+            locationLore: {
+              stakes: {
+                none: { paymentStatus: { in: ["PROCESSING", "COMPLETED"] } },
+              },
+            },
+          },
         },
         select: { nodeId: true },
       });

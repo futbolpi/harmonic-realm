@@ -17,7 +17,7 @@ import { calculateContributionTier } from "@/lib/utils/location-lore";
  * ACTION: Initiate Location Lore Staking (creates payment intent)
  */
 export async function initiateLocationLoreStaking(
-  params: InitiateLoreStakingParams
+  params: InitiateLoreStakingParams,
 ): Promise<ApiResponse<InitiateLoreStakingResponse>> {
   try {
     const { success, data } = InitiateLoreStakingSchema.safeParse(params);
@@ -59,8 +59,8 @@ export async function initiateLocationLoreStaking(
     // Check if node exists
     const node = await prisma.node.findUnique({
       where: { id: nodeId },
-      include: {
-        locationLore: true,
+      select: {
+        locationLore: { select: { currentLevel: true, totalPiStaked: true } },
       },
     });
 
@@ -90,7 +90,7 @@ export async function initiateLocationLoreStaking(
     // Calculate total Pi required for target level
     const currentStaked = node.locationLore?.totalPiStaked || new Decimal(0);
     const requiredTotal = new Decimal(
-      levelConfig.totalRequired || levelConfig.piRequired
+      levelConfig.totalRequired || levelConfig.piRequired,
     );
     const stillNeeded = requiredTotal.minus(currentStaked);
 
@@ -131,7 +131,7 @@ export async function initiateLocationLoreStaking(
         contributionTier: stake.contributionTier,
         memo: `HarmonicRealm: Level ${targetLevel} Lore for Node ${nodeId.slice(
           0,
-          8
+          8,
         )}...`,
       },
     };

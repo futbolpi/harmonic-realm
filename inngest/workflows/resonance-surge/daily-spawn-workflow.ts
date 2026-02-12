@@ -35,15 +35,8 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
       // 1a. Delete expired unstabilized Surge nodes (cascade deletes ResonanceSurge records)
       const expiredSurges = await prisma.resonanceSurge.findMany({
         where: {
-          spawnCycle: { lt: today }, // Older than today
+          expiresAt: { lt: new Date() }, // Older than today
           isStabilized: false, // Not mined/stabilized
-          node: {
-            locationLore: {
-              stakes: {
-                none: { paymentStatus: { in: ["PROCESSING", "COMPLETED"] } },
-              },
-            },
-          },
         },
         select: { nodeId: true },
       });
@@ -57,6 +50,18 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
         const result = await prisma.node.deleteMany({
           where: {
             id: { in: expiredSurges.map((s) => s.nodeId) },
+            OR: [
+              {
+                locationLore: {
+                  stakes: {
+                    none: {
+                      paymentStatus: { in: ["PROCESSING", "COMPLETED"] },
+                    },
+                  },
+                },
+              },
+              { locationLore: null },
+            ],
           },
         });
         nodesDeleted = result.count;

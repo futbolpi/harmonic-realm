@@ -1,97 +1,99 @@
 "use client";
 
-import React, {
-  type Dispatch,
-  type SetStateAction,
-  useMemo,
-  useState,
-} from "react";
+import { useState } from "react";
+import { Calculator } from "lucide-react";
 
 import {
   Credenza,
   CredenzaBody,
   CredenzaContent,
+  CredenzaDescription,
   CredenzaHeader,
   CredenzaTitle,
+  CredenzaTrigger,
 } from "@/components/credenza";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 import {
   Select,
+  SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectContent,
 } from "@/components/ui/select";
-import { NodeTypeRarity } from "@/lib/generated/prisma/enums";
-import { Slider } from "@/components/ui/slider";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import type { UserLocation } from "@/lib/schema/drift";
-import { getDriftCost } from "@/lib/drift/drift-cost";
-import { useProfile } from "@/hooks/queries/use-profile";
-import { rarityMultipliers } from "@/config/drift";
+import { Separator } from "@/components/ui/separator";
+import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
+import { getDriftCost, formatCostBreakdown } from "@/lib/drift/drift-cost";
+import { getRemainingDiscounts } from "@/config/drift";
 
-type Props = {
-  showCalculatorModal: boolean;
-  setShowCalculatorModal: Dispatch<SetStateAction<boolean>>;
-  userLocation: UserLocation | null;
-  noOfNodesToRender: number;
-};
+interface CostCalculatorModalProps {
+  driftCount: number;
+  nodeCountWithin10km: number;
+}
 
-const CostCalculatorModal = ({
-  showCalculatorModal,
-  setShowCalculatorModal,
-  noOfNodesToRender,
-  userLocation,
-}: Props) => {
-  // Cost calculator state
-  const [calcRarity, setCalcRarity] = useState<NodeTypeRarity>("Common");
-  const [calcDistance, setCalcDistance] = useState<number>(50);
+export default function CostCalculatorModal({
+  driftCount,
+  nodeCountWithin10km,
+}: CostCalculatorModalProps) {
+  const [calcRarity, setCalcRarity] = useState<NodeTypeRarity>("Rare");
+  const [calcDistance, setCalcDistance] = useState(50);
 
-  const { data } = useProfile();
+  const costResult = getDriftCost({
+    driftCount,
+    distance: calcDistance,
+    rarity: calcRarity,
+    nodeCountWithin10km,
+  });
 
-  const noLocation = !userLocation;
-  const noNodes = noOfNodesToRender === 0;
-  const firstDrift = data?.driftCount === 0;
-
-  // Calculate cost in real-time
-  const calculatedCost = useMemo(() => {
-    if (!userLocation || noOfNodesToRender === 0) return 0;
-    return getDriftCost({
-      driftCount: data?.driftCount || 0,
-      distance: calcDistance,
-      rarity: calcRarity,
-    });
-  }, [
-    calcDistance,
-    calcRarity,
-    noOfNodesToRender,
-    userLocation,
-    data?.driftCount,
-  ]);
+  const breakdown = formatCostBreakdown(costResult.breakdown);
+  const remainingDiscounts = getRemainingDiscounts(driftCount);
 
   return (
-    <Credenza open={showCalculatorModal} onOpenChange={setShowCalculatorModal}>
-      <CredenzaContent className="p-4">
+    <Credenza>
+      <CredenzaTrigger asChild>
+        <Button
+          size="icon"
+          variant="secondary"
+          className="rounded-full shadow-lg"
+          title="Cost Calculator"
+        >
+          <Calculator className="h-4 w-4" />
+        </Button>
+      </CredenzaTrigger>
+
+      <CredenzaContent className="max-w-md">
         <CredenzaHeader>
-          <div className="flex items-center justify-between w-full">
-            <CredenzaTitle>Drift Cost Calculator</CredenzaTitle>
+          <CredenzaTitle className="flex items-center gap-2">
+            <Calculator className="h-5 w-5 text-primary" />
+            Drift Cost Calculator
+          </CredenzaTitle>
+          <CredenzaDescription>
+            Estimate costs for different scenarios
+          </CredenzaDescription>
+        </CredenzaHeader>
+
+        <CredenzaBody className="space-y-6 max-h-[80vh] p-2 overflow-y-auto">
+          {/* Current status */}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Your drift count:</span>
             <div className="flex items-center gap-2">
-              {noLocation ? (
-                <Badge variant="destructive">No location</Badge>
-              ) : noNodes ? (
-                <Badge variant="secondary">No nodes</Badge>
-              ) : firstDrift ? (
-                <Badge variant="outline">First-drift discount</Badge>
-              ) : (
-                <Badge variant="default">Standard Pricing</Badge>
+              <Badge variant="outline">{driftCount} drifts</Badge>
+              {remainingDiscounts > 0 && (
+                <Badge variant="secondary">
+                  {remainingDiscounts} discount
+                  {remainingDiscounts > 1 ? "s" : ""} left
+                </Badge>
               )}
             </div>
           </div>
-        </CredenzaHeader>
 
-        <CredenzaBody className="space-y-6">
+          <Separator />
+
+          {/* Rarity selector */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Rarity</label>
+            <label className="text-sm font-medium">Node Rarity</label>
             <Select
               value={calcRarity}
               onValueChange={(v) => setCalcRarity(v as NodeTypeRarity)}
@@ -100,69 +102,104 @@ const CostCalculatorModal = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Common">Common</SelectItem>
-                <SelectItem value="Uncommon">Uncommon</SelectItem>
-                <SelectItem value="Rare">Rare</SelectItem>
-                <SelectItem value="Epic">Epic</SelectItem>
-                <SelectItem value="Legendary">Legendary</SelectItem>
+                <SelectItem value="Common">Common (1.0×)</SelectItem>
+                <SelectItem value="Uncommon">Uncommon (1.5×)</SelectItem>
+                <SelectItem value="Rare">Rare (2.0×)</SelectItem>
+                <SelectItem value="Epic">Epic (3.0×)</SelectItem>
+                <SelectItem value="Legendary">Legendary (5.0×)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
+          {/* Distance slider */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
               Distance: {calcDistance}km
             </label>
-            <div className={noLocation || noNodes ? "opacity-60 pointer-events-none" : ""}>
-              <Slider
-                value={[calcDistance]}
-                onValueChange={(v) => setCalcDistance(v[0])}
-                min={10}
-                max={100}
-                step={1}
-              />
+            <Slider
+              value={[calcDistance]}
+              onValueChange={(v) => setCalcDistance(v[0])}
+              min={10}
+              max={100}
+              step={5}
+              className="py-4"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>10km (min)</span>
+              <span>100km (max)</span>
             </div>
-            {noLocation ? (
-              <p className="text-xs text-muted-foreground mt-1">Enable location to estimate accurate distance-based costs.</p>
-            ) : noNodes ? (
-              <p className="text-xs text-muted-foreground mt-1">No eligible nodes found to simulate distance cost.</p>
-            ) : null}
           </div>
 
-          {/* Cost Breakdown Card */}
+          {/* Cost breakdown */}
           <Card className="p-4 bg-muted/50">
-            <div className="text-xs text-muted-foreground mb-2">
-              <strong>Pricing:</strong> Base(200 SP) × Rarity × DistanceFactor, then usage penalty. First-drift reduces base to 75 SP.
-            </div>
+            <h4 className="font-semibold text-sm mb-3">Cost Breakdown</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>Base Cost:</span>
-                <span className="font-semibold">200 SP</span>
+                <span className="text-muted-foreground">Base Cost:</span>
+                <span>{breakdown.baseCost}</span>
+              </div>
+              {costResult.breakdown.firstTimeDiscount > 0 && (
+                <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <span>Discount Applied:</span>
+                  <span className="font-semibold">
+                    {breakdown.firstTimeDiscount}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Rarity:</span>
+                <span>{breakdown.rarityMultiplier}</span>
               </div>
               <div className="flex justify-between">
-                <span>Rarity (Multiplier):</span>
-                <span className="font-semibold">
-                  x{rarityMultipliers[calcRarity]}
-                </span>
+                <span className="text-muted-foreground">Distance:</span>
+                <span>{breakdown.distanceFactor}</span>
               </div>
               <div className="flex justify-between">
-                <span>Distance (Multiplier):</span>
-                <span className="font-semibold">
-                  x{(1 + (calcDistance / 100) * 0.5).toFixed(2)}
-                </span>
+                <span className="text-muted-foreground">Usage Penalty:</span>
+                <span>{breakdown.usagePenalty}</span>
               </div>
-              <div className="border-t pt-2 flex justify-between font-bold">
-                <span>Total Estimated Cost:</span>
-                <span className="text-lg">
-                  {calculatedCost.toLocaleString()} SP
+              {(costResult.breakdown.densityMultiplier ?? 0) > 1 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Density Premium:
+                  </span>
+                  <span>{breakdown.densityMultiplier}</span>
+                </div>
+              )}
+
+              <Separator />
+
+              <div className="flex justify-between font-bold text-base">
+                <span>Estimated Cost:</span>
+                <span className="text-primary">
+                  {costResult.cost.toLocaleString()} SP
                 </span>
               </div>
             </div>
           </Card>
+
+          {/* Density tier info */}
+          {nodeCountWithin10km > 0 && (
+            <div className="p-3 bg-muted/30 rounded-lg text-sm">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-muted-foreground">Current Zone:</span>
+                <Badge variant="outline">{breakdown.densityTier}</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {nodeCountWithin10km} node{nodeCountWithin10km > 1 ? "s" : ""}{" "}
+                within 10km
+              </p>
+            </div>
+          )}
+
+          {/* Formula reminder */}
+          <div className="text-xs text-muted-foreground">
+            <p className="font-mono bg-muted/30 p-2 rounded">
+              Cost = Base × (1 - Discount) × Rarity × Distance × Usage × Density
+            </p>
+          </div>
         </CredenzaBody>
       </CredenzaContent>
     </Credenza>
   );
-};
-
-export default CostCalculatorModal;
+}

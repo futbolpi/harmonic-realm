@@ -128,7 +128,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
       : baseCostDecimal;
   const pointsBurned = calculatePointsBurned(
     userFidelity,
-    selectedDiscountLevels
+    selectedDiscountLevels,
   );
 
   const selectedLocation =
@@ -153,7 +153,7 @@ export default function AnchoringForm({ anchorCost }: AnchoringFormProps) {
       </div>
 
       {/* Desktop Side Panel - Hidden on mobile */}
-      <div className="hidden md:flex md:w-[400px] md:flex-col md:gap-4 md:overflow-y-auto">
+      <div className="hidden md:flex md:w-100 md:flex-col md:gap-4 md:overflow-y-auto">
         {selectedLocation && (
           <>
             <CostBreakdownCard

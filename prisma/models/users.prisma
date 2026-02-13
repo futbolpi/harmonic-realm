@@ -26,8 +26,10 @@ model User {
     updatedAt  DateTime  @updatedAt
     archivedAt DateTime?
 
-    lastDriftAt DateTime? // Cooldown tracking
-    driftCount  Int       @default(0) // Tracks number of drifts performed (0 = new player eligibility)
+    lastDriftAt     DateTime? // Cooldown tracking
+    driftCount      Int       @default(0) // Tracks number of drifts performed (0 = new player eligibility)
+    lastDriftNodeId String? // Tracks which node was last drifted
+    lastDriftNode   Node?     @relation("UserLastDrift", fields: [lastDriftNodeId], references: [id], onDelete: SetNull)
 
     // Relations
     echoTransmission       EchoTransmission? // One-to-one relationship

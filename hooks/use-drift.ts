@@ -6,7 +6,6 @@ import { addDays, isFuture } from "date-fns";
 import { calculateDistance, formatCooldown } from "@/lib/utils";
 import { getDriftCost } from "@/lib/drift/drift-cost";
 import {
-  DriftNodeWithCost,
   DriftQueryResponse,
   DriftStatus,
   StatusInfo,
@@ -16,11 +15,23 @@ import {
   DRIFT_COOL_DOWN_DAYS,
   MAX_DRIFT_DISTANCE_KM,
   VOID_ZONE_RADIUS_KM,
+  getDensityTier,
+  getRemainingDiscounts,
 } from "@/config/drift";
 import { useProfile } from "./queries/use-profile";
 
+// ============================================================================
+// USE DRIFT HOOK V2.0
+// ============================================================================
+
 /**
- * useDrift Hook - Manages drift state and node filtering
+ * Hook for managing drift state and node filtering with v2.0 enhancements
+ *
+ * V2.0 Changes:
+ * - Density-based eligibility (0-5 nodes instead of binary 0)
+ * - Updated cost calculation with new formula
+ * - Graduated discount tracking
+ * - Reduced cooldown (2 days)
  *
  * @param initialNodes - Available drift opportunity nodes
  * @param userLocation - Current user location {lat, lng} or null
@@ -28,47 +39,64 @@ import { useProfile } from "./queries/use-profile";
  */
 export function useDrift(
   initialNodes: DriftQueryResponse[],
-  userLocation: { lat: number; lng: number } | null
+  userLocation: { lat: number; lng: number } | null,
 ): UseDriftResult {
   const { data: profile } = useProfile();
 
-  // Memoize drift status calculation
+  // ==========================================================================
+  // CALCULATE NODE COUNT WITHIN VOID ZONE (V2.0: FOR DENSITY TIERS)
+  // ==========================================================================
+
+  const nodeCountWithin10km = useMemo(() => {
+    if (!userLocation) return 0;
+
+    return initialNodes.filter((node) => {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        node.latitude,
+        node.longitude,
+      );
+      return distance <= VOID_ZONE_RADIUS_KM;
+    }).length;
+  }, [userLocation, initialNodes]);
+
+  // ==========================================================================
+  // CALCULATE DRIFT STATUS
+  // ==========================================================================
+
   const driftStatus = useMemo(() => {
     // Check 1: Location required
     if (!userLocation) return DriftStatus.NO_LOCATION;
 
-    // Check 2: Cooldown (72 hours)
+    // Check 2: Cooldown (v2.0: 2 days instead of 3)
     if (profile?.lastDriftAt) {
       const cooldownEnd = addDays(
         new Date(profile.lastDriftAt),
-        DRIFT_COOL_DOWN_DAYS
+        DRIFT_COOL_DOWN_DAYS,
       );
 
       if (isFuture(cooldownEnd)) return DriftStatus.ON_COOLDOWN;
     }
 
-    // Check 3: Content abundance (has nodes within voiid zone)
-    const nearbyNodes = initialNodes.filter((node) => {
-      const distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        node.latitude,
-        node.longitude
-      );
-      return distance <= VOID_ZONE_RADIUS_KM;
-    });
-    if (nearbyNodes.length > 0) return DriftStatus.CONTENT_ABUNDANT;
+    // Check 3: Density-based eligibility (v2.0: graduated instead of binary)
+    const densityTier = getDensityTier(nodeCountWithin10km);
+
+    if (densityTier.multiplier === null) {
+      // 6+ nodes = not eligible
+      return DriftStatus.CONTENT_ABUNDANT;
+    }
 
     // Check 4: No eligible nodes
     if (initialNodes.length === 0) return DriftStatus.NO_ELIGIBLE_NODES;
 
-    // Check 5: Can afford at least one node (deferred to nodesToRender calculation)
-    // Return READY provisionally; will validate in statusInfo if needed
-
     return DriftStatus.READY;
-  }, [userLocation, profile?.lastDriftAt, initialNodes]);
+  }, [userLocation, profile?.lastDriftAt, nodeCountWithin10km, initialNodes]);
 
-  // Memoize processed nodes with distance and cost calculations
+  // ==========================================================================
+  // PROCESS NODES WITH DISTANCE AND COST CALCULATIONS (V2.0)
+  // ==========================================================================
+
   const nodesToRender = useMemo(() => {
     if (!userLocation) return [];
     if (driftStatus !== DriftStatus.READY) return [];
@@ -79,157 +107,137 @@ export function useDrift(
           userLocation.lat,
           userLocation.lng,
           node.latitude,
-          node.longitude
+          node.longitude,
         );
 
         // Only calculate cost if node is in valid drift range (10-100km)
         let cost = 0;
+        let canDrift = false;
+
         if (
           distance > VOID_ZONE_RADIUS_KM &&
           distance <= MAX_DRIFT_DISTANCE_KM
         ) {
-          cost = getDriftCost({
+          // V2.0: Use new cost calculation with density
+          const costResult = getDriftCost({
             driftCount: profile?.driftCount ?? 0,
             distance,
             rarity: node.rarity,
+            nodeCountWithin10km,
           });
-        }
 
-        const canDrift =
-          distance > VOID_ZONE_RADIUS_KM &&
-          distance <= MAX_DRIFT_DISTANCE_KM &&
-          (profile?.sharePoints ?? 0) >= cost;
+          cost = costResult.cost;
+          canDrift = costResult.eligible && (profile?.sharePoints ?? 0) >= cost;
+        }
 
         return {
           ...node,
           distance,
           cost,
           canDrift,
-        } as DriftNodeWithCost;
-      })
-      .filter(
-        (node) =>
-          node.distance > VOID_ZONE_RADIUS_KM &&
-          node.distance <= MAX_DRIFT_DISTANCE_KM
-      )
-      .sort((a, b) => a.distance - b.distance);
-
-    // Check affordability: if no nodes can be drifted, update status to insufficient funds
-    const hasAffordableNode = processedNodes.some((n) => n.canDrift);
-    if (processedNodes.length > 0 && !hasAffordableNode) {
-      // This will be caught in statusInfo calculation
-      return [];
-    }
-
-    const firstTwenty = processedNodes.slice(0, 20);
-
-    return firstTwenty;
-  }, [
-    userLocation,
-    driftStatus,
-    initialNodes,
-    profile?.sharePoints,
-    profile?.driftCount,
-  ]);
-
-  // Determine if we should show INSUFFICIENT_FUNDS status
-  const actualStatus = useMemo(() => {
-    if (driftStatus !== DriftStatus.READY) return driftStatus;
-
-    // If no processed nodes and initial nodes exist, it's insufficient funds
-    if (nodesToRender.length === 0 && initialNodes.length > 0) {
-      const validDistanceNodes = initialNodes.filter((node) => {
-        if (!userLocation) return false;
-        const distance = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          node.latitude,
-          node.longitude
-        );
-        return (
-          distance > VOID_ZONE_RADIUS_KM && distance <= MAX_DRIFT_DISTANCE_KM
-        );
-      });
-
-      if (validDistanceNodes.length > 0) {
-        return DriftStatus.INSUFFICIENT_FUNDS;
-      }
-    }
-
-    return driftStatus;
-  }, [driftStatus, nodesToRender, initialNodes, userLocation]);
-
-  // Memoize status metadata
-  const statusInfo = useMemo((): StatusInfo => {
-    switch (actualStatus) {
-      case DriftStatus.READY:
-        return {
-          icon: "✅",
-          text: "Ready to Drift",
-          variant: "default",
         };
+      })
+      .filter((node) => node.canDrift) // Exclude nodes that can't be drifted
+      .sort((a, b) => a.cost - b.cost); // Sort by cost (cheapest first)
+
+    return processedNodes;
+  }, [userLocation, driftStatus, initialNodes, profile, nodeCountWithin10km]);
+
+  // ==========================================================================
+  // BUILD STATUS INFO FOR UI
+  // ==========================================================================
+
+  const statusInfo = useMemo<StatusInfo>(() => {
+    const densityTier = getDensityTier(nodeCountWithin10km);
+    const remainingDiscounts = getRemainingDiscounts(profile?.driftCount ?? 0);
+
+    switch (driftStatus) {
       case DriftStatus.NO_LOCATION:
         return {
-          icon: "📍",
-          text: "Enable Location",
-          variant: "outline",
+          status: DriftStatus.NO_LOCATION,
+          title: "Location Required",
+          description: "Enable location access to use Resonant Drift",
+          canDrift: false,
         };
-      case DriftStatus.ON_COOLDOWN: {
-        if (!profile?.lastDriftAt) {
+
+      case DriftStatus.ON_COOLDOWN:
+        if (profile?.lastDriftAt) {
+          const cooldownEnd = addDays(
+            new Date(profile.lastDriftAt),
+            DRIFT_COOL_DOWN_DAYS,
+          );
+          const remaining = formatCooldown(cooldownEnd);
+
           return {
-            icon: "⏳",
-            text: "Cooldown Active",
-            variant: "default",
+            status: DriftStatus.ON_COOLDOWN,
+            title: "Drift Cooldown Active",
+            description: `Next drift available in ${remaining}`,
+            canDrift: false,
+            cooldownEnd,
           };
         }
-        const cooldownEnd = addDays(
-          new Date(profile.lastDriftAt),
-          DRIFT_COOL_DOWN_DAYS
-        );
-        const timeLeft = formatCooldown(cooldownEnd);
+        break;
 
-        return {
-          icon: "⏳",
-          text: `Cooldown: ${timeLeft}`,
-          variant: "secondary",
-        };
-      }
-      case DriftStatus.NO_ELIGIBLE_NODES:
-        return {
-          icon: "❌",
-          text: "No Dormant Nodes",
-          variant: "destructive",
-        };
-      case DriftStatus.INSUFFICIENT_FUNDS:
-        return {
-          icon: "💰",
-          text: "Insufficient SharePoints",
-          variant: "destructive",
-        };
       case DriftStatus.CONTENT_ABUNDANT:
         return {
-          icon: "🌟",
-          text: "Nodes Nearby",
-          variant: "secondary",
+          status: DriftStatus.CONTENT_ABUNDANT,
+          title: densityTier.label,
+          description: `${nodeCountWithin10km} nodes within 10km. Drift only available in sparse areas (0-5 nodes).`,
+          canDrift: false,
+          nodeCount: nodeCountWithin10km,
+          densityTier: densityTier.label,
+        };
+
+      case DriftStatus.NO_ELIGIBLE_NODES:
+        return {
+          status: DriftStatus.NO_ELIGIBLE_NODES,
+          title: "No Dormant Nodes",
+          description:
+            "No eligible nodes found within 100km. Nodes must be inactive for 7+ days.",
+          canDrift: false,
+        };
+
+      case DriftStatus.READY:
+        const cheapestNode = nodesToRender[0];
+        const affordableCount = nodesToRender.filter((n) => n.canDrift).length;
+
+        return {
+          status: DriftStatus.READY,
+          title: densityTier.label,
+          description:
+            remainingDiscounts > 0
+              ? `${affordableCount} nodes available. ${remainingDiscounts} discounted drifts remaining!`
+              : `${affordableCount} nodes available. Standard pricing applies.`,
+          canDrift: affordableCount > 0,
+          nodeCount: nodeCountWithin10km,
+          densityTier: densityTier.label,
+          cheapestCost: cheapestNode?.cost,
+          affordableCount,
+          remainingDiscounts,
+        };
+
+      default:
+        return {
+          status: DriftStatus.NO_LOCATION,
+          title: "Unknown Status",
+          description: "Unable to determine drift status",
+          canDrift: false,
         };
     }
-  }, [actualStatus, profile?.lastDriftAt]);
 
-  // Calculate cooldown end time
-  const cooldownEndsAt = useMemo(() => {
-    if (!profile?.lastDriftAt) return null;
-    const cooldownEnd = addDays(
-      new Date(profile.lastDriftAt),
-      DRIFT_COOL_DOWN_DAYS
-    );
-
-    return cooldownEnd;
-  }, [profile?.lastDriftAt]);
+    return {
+      status: DriftStatus.NO_LOCATION,
+      title: "Unknown Status",
+      description: "Unable to determine drift status",
+      canDrift: false,
+    };
+  }, [driftStatus, profile, nodesToRender, nodeCountWithin10km]);
 
   return {
-    driftStatus: actualStatus,
+    driftStatus,
     statusInfo,
     nodesToRender,
-    cooldownEndsAt,
+    nodeCountWithin10km,
+    densityTier: getDensityTier(nodeCountWithin10km),
   };
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { DensityTier } from "@/config/drift";
 import { NodeTypeRarity } from "../generated/prisma/enums";
 
 export const LocationSchema = z.object({
@@ -48,16 +49,24 @@ export interface DriftNodeWithCost extends DriftQueryResponse {
 }
 
 export interface StatusInfo {
-  icon: string;
-  text: string;
-  variant: "default" | "secondary" | "destructive" | "outline";
+  status: DriftStatus;
+  title: string;
+  description: string;
+  canDrift: boolean;
+  cooldownEnd?: Date;
+  densityTier?: string;
+  nodeCount?: number;
+  cheapestCost?: number;
+  affordableCount?: number;
+  remainingDiscounts?: number;
 }
 
 export interface UseDriftResult {
   driftStatus: DriftStatus;
   statusInfo: StatusInfo;
   nodesToRender: DriftNodeWithCost[];
-  cooldownEndsAt: Date | null;
+  nodeCountWithin10km: number;
+  densityTier: DensityTier;
 }
 
 export interface UserLocation {

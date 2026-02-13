@@ -85,11 +85,11 @@ export const getEligibleNodeForDrift = async ({
       AND (SELECT COUNT(*) FROM "mining_sessions" ms WHERE ms."nodeId" = n.id) < nt."maxMiners"
        AND (ts.lastTune IS NULL OR ts.lastTune < ${subDays(
          new Date(),
-         ALLOWED_INACTIVITY_DAYS
+         ALLOWED_INACTIVITY_DAYS,
        )})  
       AND (nd.lastDrift IS NULL OR nd.lastDrift < ${subDays(
         new Date(),
-        DRIFT_COOL_DOWN_DAYS
+        DRIFT_COOL_DOWN_DAYS,
       )}) 
       AND (6371 * acos(cos(radians(${userLat})) * cos(radians(n.latitude)) * cos(radians(n.longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(n.latitude)))) <= ${MAX_DRIFT_DISTANCE_KM}
     ORDER BY distance ASC
@@ -130,11 +130,11 @@ export const getDriftOpportunities = async () => {
       AND (SELECT COUNT(*) FROM "mining_sessions" ms WHERE ms."nodeId" = n.id) < nt."maxMiners"
       AND (ts.lastTune IS NULL OR ts.lastTune < ${subDays(
         new Date(),
-        ALLOWED_INACTIVITY_DAYS
+        ALLOWED_INACTIVITY_DAYS,
       )})  
       AND (nd.lastDrift IS NULL OR nd.lastDrift < ${subDays(
         new Date(),
-        DRIFT_COOL_DOWN_DAYS
+        DRIFT_COOL_DOWN_DAYS,
       )})  
   `;
 

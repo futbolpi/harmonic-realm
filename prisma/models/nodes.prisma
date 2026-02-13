@@ -40,6 +40,7 @@ model Node {
     locationLore   LocationLore? // New: One-to-one with location lore
     tuningSessions TuningSession[]
     drifts         NodeDrift[] // Relation to track drifts for this node
+    userLastDrifts User[]          @relation("UserLastDrift")
 
     // Territory association
     territoryHexId String?

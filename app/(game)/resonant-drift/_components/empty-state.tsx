@@ -1,70 +1,56 @@
 "use client";
 
-import React, { type Dispatch, type SetStateAction } from "react";
-import { useRouter } from "next/navigation";
+import { Navigation } from "lucide-react";
 
-import type { StatusInfo } from "@/lib/schema/drift";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { DriftStatus } from "@/lib/schema/drift";
 
-const EmptyState = ({
-  setShowInfoModal,
-  statusInfo,
-}: {
-  setShowInfoModal: Dispatch<SetStateAction<boolean>>;
-  statusInfo?: StatusInfo;
-}) => {
-  const router = useRouter();
+type Props = {
+  driftStatus: DriftStatus;
+  handleFindMe: () => void;
+  locationLoading: boolean;
+};
 
-  return (
-    <div className="absolute inset-0 flex items-center justify-center z-15 bg-black/40">
-      <Card className="w-full max-w-sm text-center p-4">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="bg-gradient-to-tr from-indigo-600 to-purple-500 rounded-full h-9 w-9 flex items-center justify-center text-white shadow-sm">
-            🌌
-          </div>
-          <div className="text-left">
-            <h2 className="text-lg font-semibold">
-              {statusInfo?.text ?? "No Dormant Nodes Detected"}
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              {statusInfo
-                ? `Status: ${statusInfo.icon} ${statusInfo.text}`
-                : "Try exploring beyond 10km to find drift targets"}
-            </p>
-          </div>
-        </div>
-
-        <ul className="text-sm text-muted-foreground space-y-2 my-3 text-left">
-          <li>• Node not tuned for 7+ days</li>
-          <li>• Not sponsored or lore-staked</li>
-          <li>• Pioneer must be outside 10km of existing nodes</li>
-          <li>• Pioneer must have sufficient sharepoints to drift</li>
-          <li>
-            • Pioneer must not be on cooldown — wait 72 hours after a drift
-          </li>
-          {statusInfo?.variant === "secondary" && (
-            <li className="text-xs text-muted-foreground">
-              • {statusInfo.text}
-            </li>
-          )}
-        </ul>
-
-        <div className="flex gap-2">
+const EmptyState = ({ driftStatus, handleFindMe, locationLoading }: Props) => {
+  if (driftStatus === DriftStatus.NO_LOCATION) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-40">
+        <div className="text-center space-y-4 max-w-md p-6">
+          <div className="text-6xl">📍</div>
+          <h3 className="text-xl font-semibold">Location Required</h3>
+          <p className="text-muted-foreground">
+            Enable location access to explore drift opportunities in your area.
+          </p>
           <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => router.push("/map")}
+            onClick={handleFindMe}
+            size="lg"
+            className="gap-2"
+            disabled={locationLoading}
           >
-            Explore World
-          </Button>
-          <Button className="flex-1" onClick={() => setShowInfoModal(true)}>
-            Learn More
+            <Navigation className="h-4 w-4" />
+            Enable Location
           </Button>
         </div>
-      </Card>
-    </div>
-  );
+      </div>
+    );
+  }
+
+  if (driftStatus === DriftStatus.NO_ELIGIBLE_NODES) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-40">
+        <div className="text-center space-y-4 max-w-md p-6">
+          <div className="text-6xl">🌌</div>
+          <h3 className="text-xl font-semibold">No Dormant Nodes</h3>
+          <p className="text-muted-foreground">
+            No eligible nodes found within 100km. Nodes must be inactive for 7+
+            days and not recently drifted.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default EmptyState;

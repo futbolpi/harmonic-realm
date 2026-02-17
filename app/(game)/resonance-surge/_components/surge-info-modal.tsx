@@ -46,7 +46,7 @@ export function SurgeInfoModal() {
 
         <CredenzaBody className="space-y-6 py-4 max-h-[85vh] overflow-y-auto">
           {/* Hero Description */}
-          <div className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg">
+          <div className="p-4 bg-linear-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg">
             <p className="text-lg font-semibold mb-2">
               The Lattice Remembers Your Actions
             </p>
@@ -201,9 +201,9 @@ export function SurgeInfoModal() {
           <Separator />
 
           {/* FOMO Section */}
-          <div className="p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg">
+          <div className="p-4 bg-linear-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg">
             <div className="flex items-start gap-3">
-              <Users className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+              <Users className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
               <div className="space-y-2">
                 <p className="font-semibold text-green-500">
                   Rural Players: This Solves Your Content Problem
@@ -263,21 +263,21 @@ export function SurgeInfoModal() {
             </p>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                 <span>Check the heatmap daily to find Surges near you</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                 <span>
                   Mine consistently to boost your area&apos;s activity score
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                 <span>Anchor/Calibrate to guarantee future spawns</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                 <span>
                   Be first to stabilize high-rank nodes for bragging rights
                 </span>
@@ -395,7 +395,7 @@ function TimelineStep({
 }) {
   return (
     <div className="flex items-start gap-3 pl-2 border-l-2 border-primary/30 py-2">
-      <div className="flex-shrink-0 w-20">
+      <div className="shrink-0 w-20">
         <Badge variant="outline" className="font-mono text-xs">
           {time}
         </Badge>

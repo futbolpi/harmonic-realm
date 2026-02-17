@@ -134,7 +134,7 @@ export function HeatmapView({ surges }: HeatmapViewProps) {
   return (
     <>
       <Card className="overflow-hidden">
-        <CardContent className="p-0 h-[600px] relative">
+        <CardContent className="p-0 h-150 relative">
           <Map
             ref={mapRef}
             initialViewState={{

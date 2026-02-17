@@ -137,18 +137,18 @@ async function getNodeTypesForSurge() {
 
 /**
  * Select random node type based on weighted probability
- * 60% Rare, 30% Epic, 10% Legendary
+ * 80% Rare, 15% Epic, 5% Legendary
  */
 function selectRandomNodeType(
   nodeTypesCache: Awaited<ReturnType<typeof getNodeTypesForSurge>>,
 ): string {
   const rand = Math.random();
 
-  if (rand < 0.6) {
+  if (rand < 0.8) {
     // 60% Rare
     const types = nodeTypesCache.rareTypes;
     return types[Math.floor(Math.random() * types.length)].id;
-  } else if (rand < 0.9) {
+  } else if (rand < 0.95) {
     // 30% Epic
     const types = nodeTypesCache.epicTypes;
     return types[Math.floor(Math.random() * types.length)].id;

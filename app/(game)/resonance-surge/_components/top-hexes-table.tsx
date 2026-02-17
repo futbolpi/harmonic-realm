@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { NodeTypeRarity } from "@/lib/generated/prisma/enums";
 import type { SurgeNode } from "../services";
 
 interface TopHexesTableProps {
@@ -44,7 +45,7 @@ type TableRow = {
   activityScore: number;
   nodesActive: number;
   nodesStabilized: number;
-  topRarity: string;
+  topRarity: NodeTypeRarity;
 };
 
 type Status = "all" | "active" | "stabilized";
@@ -61,18 +62,42 @@ export function TopHexesTable({ surges }: TopHexesTableProps) {
   // Aggregate data by hex
   const hexData = useMemo(() => {
     const hexMap = new Map<string, TableRow>();
+    // Define an ordering of rarities from common -> rarest.
+    const rarityOrder: NodeTypeRarity[] = [
+      "Common",
+      "Uncommon",
+      "Rare",
+      "Epic",
+      "Legendary",
+    ];
+
+    const getRank = (r?: NodeTypeRarity) => {
+      if (!r) return -1;
+      return rarityOrder.indexOf(r);
+    };
 
     surges.forEach((surge) => {
       const existing = hexMap.get(surge.h3Index);
+      const incomingRarity = surge.node?.type?.rarity;
 
       if (existing) {
         existing.nodesActive += !surge.isStabilized ? 1 : 0;
         existing.nodesStabilized += surge.isStabilized ? 1 : 0;
+        existing.activityScore =
+          (existing.activityScore ?? 0) + (surge.activityScore ?? 0);
+
+        const currentRank = getRank(existing.topRarity);
+        const incomingRank = getRank(incomingRarity);
+
+        // pick the rarer (higher index in rarityOrder). If unknown, prefer existing.
+        if (incomingRank > currentRank) {
+          existing.topRarity = incomingRarity;
+        }
       } else {
         hexMap.set(surge.h3Index, {
           rank: surge.hexRank,
           h3Index: surge.h3Index,
-          activityScore: surge.activityScore,
+          activityScore: surge.activityScore ?? 0,
           nodesActive: !surge.isStabilized ? 1 : 0,
           nodesStabilized: surge.isStabilized ? 1 : 0,
           topRarity: surge.node.type.rarity,
@@ -208,7 +233,7 @@ export function TopHexesTable({ surges }: TopHexesTableProps) {
             value={statusFilter}
             onValueChange={(v: string) => setStatusFilter(v as Status)}
           >
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-45">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

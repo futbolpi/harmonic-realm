@@ -30,7 +30,7 @@ export function VideoSection() {
       className="py-12 md:py-20 lg:py-32 relative overflow-hidden scroll-mt-16"
     >
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-muted/30" />
+      <div className="absolute inset-0 bg-linear-to-b from-muted/30 via-background to-muted/30" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-primary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -46,7 +46,7 @@ export function VideoSection() {
             </Badge>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
               Experience the{" "}
-              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                 Cosmic Journey
               </span>
             </h2>
@@ -60,7 +60,7 @@ export function VideoSection() {
           <Card className="overflow-hidden border-primary/20 bg-card/50 backdrop-blur-sm shadow-2xl">
             <div className="relative aspect-video w-full group">
               {!hasStarted && (
-                <div className="absolute inset-0 z-10 bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90">
+                <div className="absolute inset-0 z-10 bg-linear-to-br from-primary/20 to-secondary/20 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90">
                   <button
                     onClick={() => {
                       setHasStarted(true);

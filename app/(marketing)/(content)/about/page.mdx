@@ -2,215 +2,549 @@ import {
   MapPin,
   Zap,
   Users,
+  Trophy,
+  Crown,
+  Target,
   Compass,
-  TrendingUp,
-  Award,
   BookOpen,
+  Award,
+  Layers,
+  TrendingUp,
+  Shield,
+  Flame,
+  Globe,
+  Star,
+  Clock,
+  Coins,
+  Rocket,
+  Map,
+  Sparkles,
 } from "lucide-react";
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "About HarmonicRealm - The Cosmic Lattice Awaits",
+  title: "About HarmonicRealm — The Flagship Pi Network Adventure",
   description:
-    "Discover HarmonicRealm, a geolocation adventure bound to the infinite digits of Pi. Explore your world, discover Nodes, and shape the Lattice.",
+    "HarmonicRealm is the premier geolocation adventure on Pi Network. Explore the cosmic Lattice, mine RESONANCE tokens, form guilds, and shape the world. Genesis Phase is live — early Pioneers earn the most.",
   openGraph: {
-    title: "About HarmonicRealm - The Cosmic Lattice Awaits",
+    title: "About HarmonicRealm — The Flagship Pi Network Adventure",
     description:
-      "Discover HarmonicRealm, a geolocation adventure bound to the infinite digits of Pi. Explore your world, discover Nodes, and shape the Lattice.",
+      "HarmonicRealm is the premier geolocation adventure on Pi Network. Explore the cosmic Lattice, mine RESONANCE tokens, form guilds, and shape the world.",
     images: [
       {
-        url: "/api/og?title=About HarmonicRealm&description=Where Pioneers resonate with the cosmic Lattice&type=default",
+        url: "/api/og?title=About HarmonicRealm&description=The Flagship Pi Network Adventure&type=default",
         width: 1200,
         height: 630,
-        alt: "About HarmonicRealm - Cosmic Lattice Exploration",
+        alt: "HarmonicRealm — The Cosmic Lattice Awaits",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "About HarmonicRealm - The Cosmic Lattice Awaits",
+    title: "About HarmonicRealm — The Flagship Pi Network Adventure",
     description:
-      "Discover HarmonicRealm, a geolocation adventure bound to the infinite digits of Pi. Explore your world, discover Nodes, and shape the Lattice.",
+      "HarmonicRealm is the premier geolocation adventure on Pi Network. Genesis Phase is live — early Pioneers earn the most.",
     images: [
-      "/api/og?title=About HarmonicRealm&description=Where Pioneers resonate with the cosmic Lattice&type=default",
+      "/api/og?title=About HarmonicRealm&description=The Flagship Pi Network Adventure&type=default",
     ],
   },
 };
 
-<div className="text-center space-y-6 mb-12">
-  <Badge variant="outline" className="text-primary border-primary/50">
-    About HarmonicRealm
+<div className="text-center space-y-6 py-8 md:py-16 relative">
+  <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent rounded-3xl -z-10" />
+
+<div className="flex flex-wrap items-center justify-center gap-2">
+  <Badge className="bg-primary/10 text-primary border-primary/30 text-xs md:text-sm font-medium px-3 py-1">
+    🌌 Pi Network's Flagship Adventure
+  </Badge>
+  <Badge className="bg-neon-green/10 text-neon-green border-neon-green/30 text-xs md:text-sm font-medium px-3 py-1">
+    ⚡ Genesis Phase — Live Now
   </Badge>
 </div>
 
-# The Cosmic Lattice Awaits
+<h1 className="neon-text text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
+  <span>The Cosmic Lattice </span>
+  <br className="hidden sm:block" />{" "}
+  <span className="mt-1">Awaits, Pioneer</span>
+</h1>
 
-We're pioneering a new realm where the **infinite digits of Pi** create a cosmic frequency grid called the Lattice. As a Pioneer (or Harmonizer), you explore your physical world to discover and resonate with geo-anchored **Nodes**—mystical points that offer mining rewards, rare lore fragments, and cosmetic treasures.
+<div className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+  HarmonicRealm is the world's first geolocation adventure built on Pi's
+  infinite mathematical foundation. Explore your city. Resonate with Nodes. Earn
+  real Pi rewards. Shape a universe that evolves with every Pioneer who joins.
+</div>
 
-## Our Mission
+<div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+  <Button asChild size="lg" className="game-button text-base font-semibold">
+    <Link href="/login">🚀 Begin Your Journey</Link>
+  </Button>
+  <Button
+    asChild
+    size="lg"
+    variant="outline"
+    className="border-primary/40 hover:bg-primary/5 text-base"
+  >
+    <Link href="#how-it-works">Explore the Lore ↓</Link>
+  </Button>
+</div>
 
-To bridge the digital and physical realms through harmonic resonance. HarmonicRealm transforms your world into a living mathematical canvas, creating a sustainable and community-driven ecosystem built on the foundation of Pi.
+  <div className="text-xs text-muted-foreground">
+    Free to play · Built on Pi Network · Genesis Phase yields halve at next Awakening
+  </div>
+</div>
 
-<div className="grid md:grid-cols-2 gap-8 my-12">
+<Separator className="my-8 opacity-30" />
+
+<VideoPlayer
+  url="https://youtu.be/p2jdp4nTp2s"
+  title="Complete Introduction to HarmonicRealm"
+  description="Everything you need to know about the Lattice, Nodes, RESONANCE tokens, and how to earn, in one video."
+  duration="8 min tutorial"
+/>
+
+<InfoAlert>
+  **Prefer reading?** Everything in the video is covered below: from lore and
+  mechanics to tokenomics and early Pioneer advantages.
+</InfoAlert>
+
+## What is HarmonicRealm?
+
+Long ago, mathematicians discovered that Pi's infinite, non-repeating digits were not random. They were a **cosmic frequency**, a universal heartbeat threading through every coordinate on Earth. This discovery revealed the **Lattice**: a mystical resonance grid overlaying our physical world, invisible to ordinary perception, pulsing with energy at thousands of geo-anchored **Nodes**.
+
+HarmonicRealm is the game where you, a **Pioneer**, step into that hidden frequency. Equip yourself with your phone, step outside, and discover the Echo Guardians — ancient cosmic entities bound to each Node, who are waiting to be awakened by someone brave enough to resonate.
+
+> _"The Lattice does not yield its secrets to those who stay still. Every step taken in the physical world echoes through the cosmic frequency."_
+
+<div className="grid sm:grid-cols-3 gap-4 my-8" id="how-it-works">
+  <div className="game-card p-5 text-center space-y-3">
+    <div className="text-3xl">🗺️</div>
+    <div className="font-semibold text-foreground">Real World Exploration</div>
+    <div className="text-sm text-muted-foreground">
+      Walk, travel, discover; Nodes exist at real coordinates in your city and
+      across the globe.
+    </div>
+  </div>
+  <div className="game-card p-5 text-center space-y-3">
+    <div className="text-3xl">⚡</div>
+    <div className="font-semibold text-foreground">Earn Real Pi Rewards</div>
+    <div className="text-sm text-muted-foreground">
+      Every Resonance session earns sharePoints, converted to RESONANCE tokens
+      at a fixed rate.
+    </div>
+  </div>
+  <div className="game-card p-5 text-center space-y-3">
+    <div className="text-3xl">🌌</div>
+    <div className="font-semibold text-foreground">A Living Universe</div>
+    <div className="text-sm text-muted-foreground">
+      The world evolves through Harmonic Awakenings triggered by your collective
+      resonance.
+    </div>
+  </div>
+</div>
+
+## The Pioneer's Loop
+
+Every session in HarmonicRealm follows a satisfying rhythm: approach, resonate, tune, repeat. Here's how it works:
+
+<CosmicTable>
+  <CosmicTableHeader>
+    <CosmicTableRow>
+      <CosmicTableCell header>Step</CosmicTableCell>
+      <CosmicTableCell header>Action</CosmicTableCell>
+      <CosmicTableCell header>Reward</CosmicTableCell>
+    </CosmicTableRow>
+  </CosmicTableHeader>
+  <CosmicTableBody>
+    <CosmicTableRow>
+      <CosmicTableCell>1. Discover</CosmicTableCell>
+      <CosmicTableCell>
+        Open the World Map. Locate a Node within range. Nodes pulse with
+        rarity-colored light: blue for Common, purple for Rare, gold for Epic,
+        pink for Legendary.
+      </CosmicTableCell>
+      <CosmicTableCell>Node revealed on map</CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>2. Resonate</CosmicTableCell>
+      <CosmicTableCell>
+        Walk within 100m. Tap **Resonate** to begin a one-time mining lock (2–10
+        min based on rarity). Your first resonance awakens the Node permanently.
+      </CosmicTableCell>
+      <CosmicTableCell>Major sharePoints + lore unlock</CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>3. Tune</CosmicTableCell>
+      <CosmicTableCell>
+        Return to any awakened Node up to **5 times daily**. Complete
+        skill-based mini-games (Wave Sculptor, pattern matching) to harvest
+        supplementary sharePoints.
+      </CosmicTableCell>
+      <CosmicTableCell>Daily sharePoints + streak bonuses</CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>4. Earn</CosmicTableCell>
+      <CosmicTableCell>
+        Your sharePoints are automatically converted to **RESONANCE tokens** at
+        a fixed rate of 0.00095 RESONANCE/sharePoint, a rate that never changes,
+        ever.
+      </CosmicTableCell>
+      <CosmicTableCell>RESONANCE tokens in wallet</CosmicTableCell>
+    </CosmicTableRow>
+  </CosmicTableBody>
+</CosmicTable>
+
+## Everything the Lattice Offers
+
+HarmonicRealm is far more than mine-and-earn. A decade of layered content awaits.
+
+<div className="grid sm:grid-cols-2 gap-5 my-8">
   <FeatureCard
     icon={Compass}
-    title="Explore & Discover"
-    description="Use your physical location to find procedural Phase-Spawned, community-funded Calibration, and player-created Resonant-Anchored Nodes."
+    title="Node Mastery & Progression"
+    description="Earn a separate mastery level (0–16) for each Node type. Fibonacci-based progression gates reward early dedication, reach Level 13 to unlock a permanent 300% sharePoint multiplier on that type."
     color="text-primary"
   />
   <FeatureCard
-    icon={Zap}
-    title="Mine & Earn"
-    description="Resonate with Nodes to earn rewards. Epic and Legendary Nodes unlocked in later Awakenings offer unique mechanics and higher yields."
+    icon={Target}
+    title="Resonance Tuning Suite"
+    description="Daily skill-based mini-games including Wave Sculptor (waveform matching) and memory challenges. 5 tunings per day max, with streak bonuses that compound over consecutive days."
     color="text-neon-green"
   />
   <FeatureCard
     icon={Users}
-    title="Collaborate & Fund"
-    description="Join Lattice Calibration Events—pool Pi with Pioneers worldwide to spawn rare Nodes, with 70% appearing near contributors."
+    title="Guilds & Territory Control"
+    description="Form or join guilds. Control H3 hex territories through async Resonance Contests. Claim vault RESONANCE distributions, complete weekly guild challenges, and equip shared Guild Artifacts."
     color="text-neon-purple"
   />
   <FeatureCard
-    icon={MapPin}
-    title="Shape the World"
-    description="Use Resonant Anchoring to permanently create your own sponsored Node anywhere, with powerful Resonance Fidelity discounts for loyal Pioneers."
+    icon={Crown}
+    title="Echo Resonance Chambers"
+    description="Invest RESONANCE to anchor personal crystalline chambers at strategic real-world locations. Active chambers boost all mining and tuning within a 5km radius. Level up to amplify the effect."
     color="text-neon-orange"
+  />
+  <FeatureCard
+    icon={MapPin}
+    title="Resonant Anchoring"
+    description="Stake Pi to permanently create a sponsored Node anywhere you choose. Earn Landlord's tax passively when other pioneers tune your node. This is your place on the Lattice, forever."
+    color="text-secondary"
+  />
+  <FeatureCard
+    icon={Globe}
+    title="Lattice Calibration Events"
+    description="Pool Pi with Pioneers worldwide to fund rare Node generation events. 70% of newly spawned Nodes appear nearest to contributor locations: collective action, local reward."
+    color="text-chart-1"
+  />
+  <FeatureCard
+    icon={BookOpen}
+    title="Location Lore Discovery"
+    description="Every Node evolves through 5 lore tiers, from real-world geography to AI-woven cosmic mythology. Community Pi staking unlocks deeper chapters. Top contributors become immortalized Lore Patrons."
+    color="text-chart-2"
+  />
+  <FeatureCard
+    icon={Flame}
+    title="Resonance Surge (Daily Spawns)"
+    description="Every day at 00:00 UTC, 50–200 high-yield Surge Nodes spawn in the most active zones: 80% Rare, 15% Epic, 5% Legendary. The first Pioneer to Resonate stabilizes the Node permanently."
+    color="text-chart-4"
+  />
+  <FeatureCard
+    icon={Rocket}
+    title="Resonance Drift"
+    description="Can't reach a Node? Use Resonance Drift, a virtual exploration mechanic that lets you deploy a Drift token to a distant location, mining without physical presence at a reduced yield."
+    color="text-accent"
+  />
+  <FeatureCard
+    icon={Trophy}
+    title="Achievements & Leaderboards"
+    description="20+ achievement types spanning mining, exploration, mastery, social, and special events. Climb global leaderboards for individual stats and guild rankings. Earn exclusive cosmetic recognition."
+    color="text-chart-5"
   />
 </div>
 
-## The Core of HarmonicRealm
+## Harmonic Awakenings: The World Evolves
 
-The world evolves through three powerful, interconnected systems plus a rich storytelling layer.
+The most important mechanic in HarmonicRealm is also the one that makes early entry _critical_.
 
-### The Three Pillars of Exploration
+The Lattice progresses through **Harmonic Awakenings**; cosmic events triggered by the community's collective resonance reaching mathematical thresholds derived from Pi convergent series. Each Awakening:
+
+- **Halves** mining yields and the number of new Nodes spawned
+- **Spawns** entirely new, rarer Node types with unique mechanics
+- **Reveals** major story beats in the cosmic narrative
+- **Rewards** early Pioneers who mined before the halving with asymmetric advantage
+
+<WarningAlert>
+  **We are currently in Genesis Phase (Phase 0)**, the highest-yield phase in
+  HarmonicRealm's history. The next Awakening triggers when the community's
+  collective resonance crosses the first Pi threshold. Yields halve the moment
+  it fires. Every session you delay is a session at permanently reduced returns.
+</WarningAlert>
 
 <CosmicTable>
   <CosmicTableHeader>
     <CosmicTableRow>
-      <CosmicTableCell header>System</CosmicTableCell>
-      <CosmicTableCell header>What It Is</CosmicTableCell>
+      <CosmicTableCell header>Phase</CosmicTableCell>
+      <CosmicTableCell header>Node Yield</CosmicTableCell>
+      <CosmicTableCell header>Surge Nodes/Day</CosmicTableCell>
+      <CosmicTableCell header>Status</CosmicTableCell>
     </CosmicTableRow>
   </CosmicTableHeader>
   <CosmicTableBody>
     <CosmicTableRow>
-      <CosmicTableCell>Harmonic Awakenings</CosmicTableCell>
+      <CosmicTableCell>**0 — Genesis**</CosmicTableCell>
+      <CosmicTableCell>1.0× (Maximum)</CosmicTableCell>
+      <CosmicTableCell>100–200 / day</CosmicTableCell>
       <CosmicTableCell>
-        **Main Progression:** Cosmic events triggered by collective resonance.
-        Each Awakening halves yields, spawns rarer Node tiers, and reveals major
-        lore.
+        <Badge className="bg-neon-green/15 text-neon-green border-neon-green/30 text-xs">
+          ⚡ Live Now
+        </Badge>
       </CosmicTableCell>
     </CosmicTableRow>
     <CosmicTableRow>
-      <CosmicTableCell>Lattice Calibration Events</CosmicTableCell>
+      <CosmicTableCell>1 — First Awakening</CosmicTableCell>
+      <CosmicTableCell>0.5× (Halved)</CosmicTableCell>
+      <CosmicTableCell>75–150 / day</CosmicTableCell>
       <CosmicTableCell>
-        **Community-Funded:** Pioneers collectively fund rare Node spawns
-        between Awakenings. 70% of new Nodes appear in contributor-chosen areas.
+        <Badge variant="outline" className="text-xs opacity-60">
+          Upcoming
+        </Badge>
       </CosmicTableCell>
     </CosmicTableRow>
     <CosmicTableRow>
-      <CosmicTableCell>Resonant Anchoring</CosmicTableCell>
+      <CosmicTableCell>2 — Second Awakening</CosmicTableCell>
+      <CosmicTableCell>0.25×</CosmicTableCell>
+      <CosmicTableCell>~100 / day</CosmicTableCell>
       <CosmicTableCell>
-        **Individual Agency:** Stake Pi to anchor a permanent sponsored Node at
-        any location you choose. Loyal Pioneers earn Resonance Fidelity
-        discounts that grow exponentially more powerful (and costly) the more
-        you use them.
+        <Badge variant="outline" className="text-xs opacity-60">
+          Future
+        </Badge>
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>5+</CosmicTableCell>
+      <CosmicTableCell>~0.03×</CosmicTableCell>
+      <CosmicTableCell>50–100 / day</CosmicTableCell>
+      <CosmicTableCell>
+        <Badge variant="outline" className="text-xs opacity-40">
+          Far Future
+        </Badge>
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>10+ — Eternal Resonance</CosmicTableCell>
+      <CosmicTableCell>~0.001× + 0.5%/yr tail</CosmicTableCell>
+      <CosmicTableCell>50 / day (floor)</CosmicTableCell>
+      <CosmicTableCell>
+        <Badge variant="outline" className="text-xs opacity-40">
+          Decade+
+        </Badge>
       </CosmicTableCell>
     </CosmicTableRow>
   </CosmicTableBody>
 </CosmicTable>
 
-### Location-Based Lore Discovery
+The RESONANCE conversion rate of **0.00095 RESONANCE/sharePoint is fixed forever**, only the underlying Node yields and spawn volumes decrease with each Awakening. This means early Pioneers earn exponentially more RESONANCE per hour of play than anyone who joins in Phase 3 or beyond.
 
-<div className="grid md:grid-cols-2 gap-8 my-12">
+## The RESONANCE Token: Built to Last
+
+RESONANCE is the on-chain utility and rewards token of HarmonicRealm. Its economics are engineered for multi-decade sustainability.
+
+<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
+  <div className="game-card p-5 text-center space-y-2">
+    <div className="text-2xl md:text-3xl font-bold neon-text">314,159,265</div>
+    <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+      Fixed Total Supply
+    </div>
+    <div className="text-xs text-muted-foreground">
+      Pi digits. Mathematically immutable. Never mintable.
+    </div>
+  </div>
+  <div className="game-card p-5 text-center space-y-2">
+    <div className="text-2xl md:text-3xl font-bold text-neon-green">50%</div>
+    <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+      Community Rewards
+    </div>
+    <div className="text-xs text-muted-foreground">
+      157M RESONANCE reserved purely for Pioneer gameplay earnings.
+    </div>
+  </div>
+  <div className="game-card p-5 text-center space-y-2">
+    <div className="text-2xl md:text-3xl font-bold text-neon-purple">50%</div>
+    <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+      Pi Treasury → Buyback & Burn
+    </div>
+    <div className="text-xs text-muted-foreground">
+      Half of all Pi spent in-game buys and permanently burns RESONANCE.
+    </div>
+  </div>
+  <div className="game-card p-5 text-center space-y-2">
+    <div className="text-2xl md:text-3xl font-bold text-neon-orange">10+</div>
+    <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+      Phases of Scarcity
+    </div>
+    <div className="text-xs text-muted-foreground">
+      A decade+ of built-in deflation. Scarcity compounds with every Awakening.
+    </div>
+  </div>
+</div>
+
+<CosmicTable>
+  <CosmicTableHeader>
+    <CosmicTableRow>
+      <CosmicTableCell header>Allocation</CosmicTableCell>
+      <CosmicTableCell header>%</CosmicTableCell>
+      <CosmicTableCell header>Purpose</CosmicTableCell>
+    </CosmicTableRow>
+  </CosmicTableHeader>
+  <CosmicTableBody>
+    <CosmicTableRow>
+      <CosmicTableCell>Community Rewards (Emission)</CosmicTableCell>
+      <CosmicTableCell>50%</CosmicTableCell>
+      <CosmicTableCell>
+        Gameplay earnings, fixed 0.00095 conversion rate forever
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Liquidity Provision (DEX)</CosmicTableCell>
+      <CosmicTableCell>15%</CosmicTableCell>
+      <CosmicTableCell>
+        100% injected at TGE into RESONANCE/π pair on Pi DEX
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Ecosystem & Treasury</CosmicTableCell>
+      <CosmicTableCell>20%</CosmicTableCell>
+      <CosmicTableCell>
+        Grants, buybacks, TWAP floor support, staking yields
+      </CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Team & Advisors</CosmicTableCell>
+      <CosmicTableCell>10%</CosmicTableCell>
+      <CosmicTableCell>12-month cliff → 48-month linear vest</CosmicTableCell>
+    </CosmicTableRow>
+    <CosmicTableRow>
+      <CosmicTableCell>Airdrop & Early Adopters</CosmicTableCell>
+      <CosmicTableCell>5%</CosmicTableCell>
+      <CosmicTableCell>
+        Distributed pre-launch and within 30 days post-launch
+      </CosmicTableCell>
+    </CosmicTableRow>
+  </CosmicTableBody>
+</CosmicTable>
+
+**The deflationary flywheel:** Every time a Pioneer spends Pi on Anchoring, Calibration, or Lore Staking, 50% of that Pi is used to buy RESONANCE on the open market and burn it permanently. The more the game grows, the faster RESONANCE disappears from circulation.
+
+## Why Joining Now Changes Everything
+
+This is not a warning, it's a fact. The mathematics of HarmonicRealm guarantee that the Pioneers who join in **Genesis Phase** will always hold a structural advantage that can never be replicated.
+
+<div className="grid sm:grid-cols-2 gap-5 my-8">
   <FeatureCard
-    icon={BookOpen}
-    title="Collaborative Storytelling"
-    description="Every Node can evolve through five lore tiers—from real-world geography to AI-woven cosmic mythology—unlocked by community Pi staking."
-    color="text-primary"
+    icon={TrendingUp}
+    title="Maximum Yield Window"
+    description="Genesis Phase (Phase 0) runs at 1.0× yield multiplier. When the First Awakening fires, yields halve to 0.5× permanently. Every day in Genesis is worth 2× a day in Phase 1 and 4× a day in Phase 2."
+    color="text-neon-green"
+  />
+  <FeatureCard
+    icon={Star}
+    title="Pioneer Mastery Head Start"
+    description="Node Mastery is cumulative. A Pioneer who reaches Level 8 Mastery in Genesis earns a permanent 142%+ bonus on future sessions. That advantage compounds every day, it's unbridgeable for late entrants."
+    color="text-neon-orange"
   />
   <FeatureCard
     icon={Award}
-    title="Become a Lore Patron"
-    description="Top contributors are immortalized as Lore Patrons in the Node’s eternal description and receive exclusive early access and cosmetics."
-    color="text-neon-orange"
+    title="Surge Node Stabilization Rights"
+    description="The first Pioneer to Resonate a Surge Node stabilizes it permanently, becoming the node's first custodian. Stabilization earns +50 Prestige instantly and permanent Lore attribution. Early Pioneers stake claims on the best spots."
+    color="text-primary"
+  />
+  <FeatureCard
+    icon={Layers}
+    title="RESONANCE Scarcity Accelerates"
+    description="157M RESONANCE is reserved for gameplay, and the projected curve shows 19.7% consumed in Year 1, rising to 79.6% by Year 5. The token becomes progressively scarcer every phase. Genesis Pioneers earn while supply is most abundant."
+    color="text-neon-purple"
   />
 </div>
 
-## How We're Different
-
-<InfoAlert>
-  HarmonicRealm is the first geolocation adventure built on Pi’s infinite
-  mathematics, where scarcity, progression, and world-shaping are entirely
-  driven by community and individual action.
-</InfoAlert>
-
-### Traditional Gaming vs. HarmonicRealm
-
-<CosmicTable>
-  <CosmicTableHeader>
-    <CosmicTableRow>
-      <CosmicTableCell header>Traditional Gaming</CosmicTableCell>
-      <CosmicTableCell header>HarmonicRealm</CosmicTableCell>
-    </CosmicTableRow>
-  </CosmicTableHeader>
-  <CosmicTableBody>
-    <CosmicTableRow>
-      <CosmicTableCell>Fictional worlds</CosmicTableCell>
-      <CosmicTableCell>A mystical overlay on your reality</CosmicTableCell>
-    </CosmicTableRow>
-    <CosmicTableRow>
-      <CosmicTableCell>Static, developer-placed content</CosmicTableCell>
-      <CosmicTableCell>
-        Phase-Spawned, Calibration-Funded, and Resonant-Anchored Nodes created
-        by players and community
-      </CosmicTableCell>
-    </CosmicTableRow>
-    <CosmicTableRow>
-      <CosmicTableCell>Fixed progression paths</CosmicTableCell>
-      <CosmicTableCell>
-        Emergent scarcity via halving, dynamic costs, and strategic discount
-        timing
-      </CosmicTableCell>
-    </CosmicTableRow>
-    <CosmicTableRow>
-      <CosmicTableCell>Solo achievements</CosmicTableCell>
-      <CosmicTableCell>
-        Real rewards for collective funding, personal anchoring, and lore
-        patronage
-      </CosmicTableCell>
-    </CosmicTableRow>
-  </CosmicTableBody>
-</CosmicTable>
-
-## The Harmonic Phases
-
-The universe evolves through major narrative events called Harmonic Awakenings.
-
-### Genesis Phase
-
-- **Trigger**: 100+ Pioneers join
-- **Nodes**: Common Nodes with full yield
-- **Lore**: _The Lattice awakens to first resonance._
-
-### Next Phase Awakening
-
-- **Trigger**: Collective resonance threshold met
-- **New Nodes**: 70% of new nodes spawned in region with high mining activity + yields halved
-- **Lore**: _The frequency deepens; echoes multiply._
-
-## Join the Cosmic Journey
-
 <SuccessAlert>
-  The Lattice is alive and expanding. Pioneers are already anchoring personal
-  landmarks, funding global Calibrations, and unlocking legendary lore across
-  the planet.
+  **The Lattice remembers its first voices.** Airdrop rewards, early adopter
+  allocations, and Lore Patron credits are reserved for Pioneers who join before
+  the First Awakening. Once it fires, the genesis window closes forever.
 </SuccessAlert>
 
-HarmonicRealm is more than a game—it's a living mathematical universe shaped by mathematics, community collaboration, and your footsteps.  
-**Ready to resonate with infinity?** [Join thousands of Pioneers](/login) who are exploring, mining, and shaping the Lattice.
+## A New Standard for Pi Network Games
 
----
+HarmonicRealm is not a clicker. It is not a passive yield farm. It is a **living geolocation universe**, the first of its kind built on Pi's infinite mathematical foundation.
 
-_HarmonicRealm is an independent platform built for the Pi Network community.  
-We are not officially affiliated with Pi Network but are proud supporters of the Pi ecosystem._
+<div className="grid sm:grid-cols-2 gap-5 my-8">
+  <FeatureCard
+    icon={Globe}
+    title="Real-World Integration"
+    description="Unlike purely digital games, HarmonicRealm is anchored to physical reality. Nodes exist at real GPS coordinates. Your movement in the world generates value in the Lattice."
+    color="text-secondary"
+  />
+  <FeatureCard
+    icon={Shield}
+    title="Transparent, Auditable Economics"
+    description="Every Treasury movement, buyback, and token burn is published in real-time via on-chain dashboards and weekly public reports. No black boxes. No hidden mints."
+    color="text-chart-1"
+  />
+  <FeatureCard
+    icon={Users}
+    title="Collective Intelligence"
+    description="The game's content scales with collective action: Calibration Events, Harmonic Awakenings, Guild Territories, and Surge spawn patterns all respond to how Pioneers play together."
+    color="text-chart-2"
+  />
+  <FeatureCard
+    icon={Coins}
+    title="Pi-First, Always"
+    description="Pi is the only currency for world-shaping actions. Every Pi spent strengthens the ecosystem: buying and burning RESONANCE, funding floor support, and maintaining development. Pi and RESONANCE rise together."
+    color="text-chart-3"
+  />
+</div>
+
+<Separator className="my-12 opacity-30" />
+
+<div className="text-center space-y-6 py-8 md:py-12 relative">
+  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent rounded-3xl -z-10" />
+
+<Badge className="bg-primary/10 text-primary border-primary/30 text-sm font-medium px-4 py-1.5">
+  🌌 Genesis Phase is Open
+</Badge>
+
+<h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+  The Lattice Is Calling. <span className="neon-text">Will You Answer?</span>
+</h2>
+
+<div className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
+  Thousands of Pioneers are already resonating, tuning, and claiming their place
+  in the Lattice. Every moment you wait is a Node someone else is stabilizing, a
+  lore chapter someone else is unlocking.
+</div>
+
+<div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+  <Button
+    asChild
+    size="lg"
+    className="game-button text-base font-semibold h-12 px-8"
+  >
+    <Link href="/login">Enter the Lattice →</Link>
+  </Button>
+  <Button
+    asChild
+    size="lg"
+    variant="outline"
+    className="border-primary/40 hover:bg-primary/5 h-12 px-8"
+  >
+    <Link href="/">Explore the Map</Link>
+  </Button>
+</div>
+
+  <div className="text-xs text-muted-foreground pt-2">
+    HarmonicRealm is an independent adventure platform built for the Pi Network community.
+    <br className="hidden sm:block" />
+    We are not officially affiliated with Pi Network but are proud guardians of the Pi ecosystem.
+  </div>
+</div>

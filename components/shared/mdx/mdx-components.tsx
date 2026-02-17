@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { VideoPlayer } from "@/components/shared/mdx/video-player";
 
 // Custom components for MDX
 const components = {
@@ -24,7 +25,7 @@ const components = {
     <h1
       className={cn(
         "scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl neon-text mb-8",
-        className
+        className,
       )}
       {...props}
     />
@@ -33,7 +34,7 @@ const components = {
     <h2
       className={cn(
         "scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0 mt-12 mb-6",
-        className
+        className,
       )}
       {...props}
     />
@@ -42,7 +43,7 @@ const components = {
     <h3
       className={cn(
         "scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4",
-        className
+        className,
       )}
       {...props}
     />
@@ -51,7 +52,7 @@ const components = {
     <h4
       className={cn(
         "scroll-m-20 text-xl font-semibold tracking-tight mt-6 mb-3",
-        className
+        className,
       )}
       {...props}
     />
@@ -61,8 +62,8 @@ const components = {
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
       className={cn(
-        "leading-7 [&:not(:first-child)]:mt-6 text-muted-foreground",
-        className
+        "leading-7 not-first:mt-6 text-muted-foreground",
+        className,
       )}
       {...props}
     />
@@ -97,7 +98,7 @@ const components = {
         href={href || "#"}
         className={cn(
           "font-medium text-primary underline underline-offset-4 hover:text-primary/80 inline-flex items-center gap-1",
-          className
+          className,
         )}
         {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
         {...props}
@@ -113,7 +114,7 @@ const components = {
     <code
       className={cn(
         "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
-        className
+        className,
       )}
       {...props}
     />
@@ -142,8 +143,8 @@ const components = {
   th: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <th
       className={cn(
-        "border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
-        className
+        "border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right",
+        className,
       )}
       {...props}
     />
@@ -151,8 +152,8 @@ const components = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td
       className={cn(
-        "border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
-        className
+        "border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right",
+        className,
       )}
       {...props}
     />
@@ -221,7 +222,7 @@ const components = {
   // Cosmic-themed components for HarmonicRealm lore
   CosmicAlert: ({ children }: { children: React.ReactNode }) => (
     <Alert className="my-6 border-primary/50 bg-primary/10 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-neon-purple/5" />
+      <div className="absolute inset-0 bg-linear-to-r from-primary/5 to-neon-purple/5" />
       <Sparkles className="h-4 w-4 text-primary relative z-10" />
       <AlertDescription className="text-primary-foreground relative z-10">
         {children}
@@ -243,7 +244,7 @@ const components = {
     color?: string;
   }) => (
     <Card className="game-card my-6 relative overflow-hidden group hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <CardHeader className="relative z-10">
         <CardTitle className="flex items-center gap-3">
           <Icon
@@ -263,7 +264,7 @@ const components = {
     className,
     ...props
   }: React.HTMLAttributes<HTMLTableElement>) => (
-    <div className="my-8 overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-game-dark/50 to-game-accent/20">
+    <div className="my-8 overflow-hidden rounded-lg border border-primary/20 bg-linear-to-br from-game-dark/50 to-game-accent/20">
       <table className={cn("w-full border-collapse", className)} {...props} />
     </div>
   ),
@@ -274,8 +275,8 @@ const components = {
   }: React.HTMLAttributes<HTMLTableSectionElement>) => (
     <thead
       className={cn(
-        "bg-gradient-to-r from-primary/20 to-game-accent/30 border-b border-primary/30",
-        className
+        "bg-linear-to-r from-primary/20 to-game-accent/30 border-b border-primary/30",
+        className,
       )}
       {...props}
     />
@@ -295,7 +296,7 @@ const components = {
     <tr
       className={cn(
         "border-b border-primary/10 hover:bg-primary/5 transition-colors duration-200",
-        className
+        className,
       )}
       {...props}
     />
@@ -315,12 +316,15 @@ const components = {
           header
             ? "font-semibold text-primary text-sm uppercase tracking-wider"
             : "text-muted-foreground",
-          className
+          className,
         )}
         {...props}
       />
     );
   },
+
+  // Video Player
+  VideoPlayer,
 } satisfies MDXComponents;
 
 export { components };

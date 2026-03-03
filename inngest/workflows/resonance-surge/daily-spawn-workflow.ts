@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, subHours } from "date-fns";
 import prisma from "@/lib/prisma";
 
 import { inngest } from "@/inngest/client";
@@ -14,6 +14,13 @@ import { spawnSurgeNodes } from "@/lib/api-helpers/server/resonance-surge/spawn-
  * 3. Aggressive Cleanup: Removes expired nodes, snapshots, and old spawn logs
  * 4. Error Recovery: Graceful degradation with retry logic
  *
+ * FIX (aggressive-cleanup): Added explicit pre-deletion of MiningSession and TuningSession
+ * records for deletable nodes. Both models declare `onDelete: Restrict` on their `nodeId`
+ * FK — Postgres will refuse to delete a Node while either table still holds a referencing row.
+ * Added ACTIVE MiningSession guard so nodes mid-session are promoted to the protected set.
+ * All child-record deletions run inside a single $transaction so a partial failure never
+ * leaves the database in an inconsistent state.
+ *
  * Schedule: Daily at 00:00 UTC
  */
 export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
@@ -27,13 +34,12 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
     const today = format(new Date(), "yyyy-MM-dd");
 
     // =====================================================================
-    // STEP 1: AGGRESSIVE CLEANUP (Enhanced)
+    // STEP 1: AGGRESSIVE CLEANUP
     // =====================================================================
     const cleanupResult = await step.run("aggressive-cleanup", async () => {
       logger.info("Starting aggressive cleanup of expired Surge data...");
 
-      // 1a. Find expired unstabilized Surge nodes eligible for deletion
-      // A node is eligible if it has NO stakes in PROCESSING or COMPLETED status
+      // 1a. Find expired unstabilized Surge nodes eligible for deletion.
       const expiredSurges = await prisma.resonanceSurge.findMany({
         where: {
           spawnCycle: { lt: today },
@@ -51,8 +57,14 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
       if (expiredSurges.length > 0) {
         const candidateNodeIds = expiredSurges.map((s) => s.nodeId);
 
-        // Identify nodes that have active (PROCESSING/COMPLETED) lore stakes — must be preserved
-        const protectedNodes = await prisma.locationLoreStake.findMany({
+        // ── Protection Gate ───────────────────────────────────────────────
+        // Nodes must be preserved when they have:
+        //   (a) a lore stake with a live payment (PROCESSING / COMPLETED), OR
+        //   (b) an ACTIVE mining session (player is currently mid-session
+        //       and session not older than an hour)
+        //
+        // (a) Lore stake guard
+        const loreProtected = await prisma.locationLoreStake.findMany({
           where: {
             nodeId: { in: candidateNodeIds },
             paymentStatus: { in: ["PROCESSING", "COMPLETED"] },
@@ -60,40 +72,91 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
           select: { nodeId: true },
         });
 
-        const protectedNodeIds = new Set(protectedNodes.map((s) => s.nodeId));
+        // (b) Active mining session guard — NEW
+        // A node with a recent ACTIVE session must not be deleted mid-play.
+        const sessionProtected = await prisma.miningSession.findMany({
+          where: {
+            nodeId: { in: candidateNodeIds },
+            status: "ACTIVE",
+            createdAt: { gt: subHours(new Date(), 1) },
+          },
+          select: { nodeId: true },
+        });
+
+        const protectedNodeIds = new Set([
+          ...loreProtected.map((s) => s.nodeId),
+          ...sessionProtected.map((s) => s.nodeId),
+        ]);
+
         const deletableNodeIds = candidateNodeIds.filter(
           (id) => !protectedNodeIds.has(id),
         );
 
         logger.info(
-          `Deletable nodes: ${deletableNodeIds.length} (protected: ${protectedNodeIds.size})`,
+          `Deletable nodes: ${deletableNodeIds.length} | Protected (lore: ${loreProtected.length}, active session: ${sessionProtected.length})`,
         );
 
         if (deletableNodeIds.length > 0) {
-          // FIX: Explicitly delete PENDING/FAILED lore stakes BEFORE deleting nodes.
-          // The location_lore_stakes FK (ON DELETE RESTRICT → location_lore.nodeId)
-          // blocks the Node → LocationLore cascade even for non-active stakes.
-          await prisma.locationLoreStake.deleteMany({
-            where: {
-              nodeId: { in: deletableNodeIds },
-              paymentStatus: { notIn: ["PROCESSING", "COMPLETED"] },
-            },
-          });
+          // ── Ordered child-record cleanup inside a single transaction ────
+          //
+          // Postgres enforces every FK with RESTRICT before the parent row
+          // can be removed. The delete order must respect the dependency tree:
+          //
+          //   LocationLoreStake  (FK → location_lore.nodeId  RESTRICT)
+          //   LoreGenerationJob  (FK → nodes.id              RESTRICT)
+          //   MiningSession      (FK → nodes.id              RESTRICT)  ← was missing
+          //   TuningSession      (FK → nodes.id              RESTRICT)  ← was missing
+          //   ── everything below cascades automatically once Node is gone ──
+          //   ResonanceSurge     (FK → nodes.id  CASCADE)
+          //   LocationLore       (FK → nodes.id  CASCADE)
+          //   NodeDrift          (FK → nodes.id  CASCADE)
+          //   User.lastDriftNodeId (FK → nodes.id  SET NULL)
+          //
+          const result = await prisma.$transaction(async (tx) => {
+            // Step A: Remove non-live lore stakes blocking LocationLore cascade
+            await tx.locationLoreStake.deleteMany({
+              where: {
+                nodeId: { in: deletableNodeIds },
+                paymentStatus: { notIn: ["PROCESSING", "COMPLETED"] },
+              },
+            });
 
-          // Also clean up any pending lore generation jobs for these nodes
-          await prisma.loreGenerationJob.deleteMany({
-            where: {
-              nodeId: { in: deletableNodeIds },
-              status: { in: ["PENDING", "FAILED"] },
-            },
-          });
+            // Step B: Remove stale lore generation jobs
+            await tx.loreGenerationJob.deleteMany({
+              where: {
+                nodeId: { in: deletableNodeIds },
+                status: { in: ["PENDING", "FAILED"] },
+              },
+            });
 
-          // Now safe to delete nodes — LocationLore cascades cleanly
-          const result = await prisma.node.deleteMany({
-            where: { id: { in: deletableNodeIds } },
+            // Step C: Remove non-active mining sessions (COMPLETED / CANCELLED).
+            // ACTIVE sessions are excluded — those nodes were moved to the
+            // protected set above and will NOT appear in deletableNodeIds.
+            await tx.miningSession.deleteMany({
+              where: {
+                nodeId: { in: deletableNodeIds },
+              },
+            });
+
+            // Step D: Remove all tuning sessions for these nodes.
+            // TuningSession.nodeId has ON DELETE RESTRICT in the migration, so
+            // it must be cleared before the parent Node row can be removed.
+            await tx.tuningSession.deleteMany({
+              where: { nodeId: { in: deletableNodeIds } },
+            });
+
+            // Step E: Delete the nodes — all remaining child FKs cascade or
+            // set-null automatically (ResonanceSurge, LocationLore, NodeDrift,
+            // User.lastDriftNodeId).
+            return tx.node.deleteMany({
+              where: { id: { in: deletableNodeIds } },
+            });
           });
 
           nodesDeleted = result.count;
+          logger.info(
+            `Successfully deleted ${nodesDeleted} expired Surge nodes`,
+          );
         }
       }
 
@@ -180,7 +243,6 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
     // STEP 4: COSMIC HERALD ANNOUNCEMENT
     // =====================================================================
     await step.run("announce-surge-spawn", async () => {
-      // Customize announcement based on edge cases
       let announcement = `🌊 Daily Resonance Surge! ${spawnResult.nodesSpawned} high-yield nodes spawned`;
 
       if (spawnResult.zeroActivityFallback) {
@@ -205,18 +267,15 @@ export const spawnDailyResonanceSurgesWorkflow = inngest.createFunction(
       success: true,
       summary: {
         date: today,
-        // Cleanup stats
         cleanup: {
           nodesDeleted: cleanupResult.nodesDeleted,
           snapshotsDeleted: cleanupResult.snapshotsDeleted,
           logsDeleted: cleanupResult.logsDeleted,
         },
-        // Activity stats
         activity: {
           totalHexes: snapshotResult.totalHexes,
           totalScore: snapshotResult.totalActivityScore,
         },
-        // Spawn stats
         spawn: {
           nodesSpawned: spawnResult.nodesSpawned,
           hexesUsed: spawnResult.hexesUsed,

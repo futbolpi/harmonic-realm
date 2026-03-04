@@ -13,7 +13,7 @@ import { awardPrestige } from "@/lib/api-helpers/server/guilds/prestige";
  * ACTION: upgrades guild vault level (only leader/officer)
  */
 export async function upgradeVault(
-  params: JoinGuildParams
+  params: JoinGuildParams,
 ): Promise<ApiResponse<{ id: string }>> {
   try {
     const { success, data } = JoinGuildSchema.safeParse(params);
@@ -115,17 +115,17 @@ export async function upgradeVault(
           metadata: { level: nextLevel },
         },
       });
+    });
 
-      await awardPrestige({
-        guildId,
-        amount: 50 * nextLevel, // Scaling prestige reward,
-        metadata: {
-          amount: 50 * nextLevel,
-          newLevel: nextLevel,
-          previousLevel: nextLevel - 1,
-        },
-        source: "VAULT_UPGRADE",
-      });
+    await awardPrestige({
+      guildId,
+      amount: 50 * nextLevel, // Scaling prestige reward,
+      metadata: {
+        amount: 50 * nextLevel,
+        newLevel: nextLevel,
+        previousLevel: nextLevel - 1,
+      },
+      source: "VAULT_UPGRADE",
     });
 
     revalidatePath(`/guilds/${guildId}`, "layout");

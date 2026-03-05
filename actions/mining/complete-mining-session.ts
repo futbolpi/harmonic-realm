@@ -307,8 +307,8 @@ export const completeMiningSession = async (
     });
 
     // 12. Revalidate pages showing balances & levels
-    revalidatePath("/");
-    revalidatePath(`/nodes/${session.nodeId}`);
+    revalidatePath("/nodes", "layout");
+    // revalidatePath(`/nodes/${session.nodeId}`);
 
     return { success: true, data: { finalShares, xpGained, chamberBonus } };
   } catch (error) {

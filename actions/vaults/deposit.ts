@@ -17,7 +17,7 @@ import { updateChallengeProgress } from "@/lib/api-helpers/server/guilds/challen
  * (only active members with sufficient points)
  */
 export async function depositToVault(
-  params: VaultDepsositParams
+  params: VaultDepsositParams,
 ): Promise<ApiResponse<{ id: string }>> {
   try {
     const { success, data } = VaultDepsositSchema.safeParse(params);
@@ -128,7 +128,8 @@ export async function depositToVault(
       console.warn("Failed to update vault contribution challenge", e);
     }
 
-    revalidatePath(`/guilds/${guildId}`, "layout");
+    revalidatePath(`/guilds/${guildId}`);
+    revalidatePath(`/guilds/${guildId}/vault`);
     return { success: true, data: { id: result.id } };
   } catch (error) {
     console.error("Error depositing to guild vault:", error);

@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import prisma from "@/lib/prisma";
 import { verifyTokenAndGetUser } from "@/lib/api-helpers/server/users";
 import type { ApiResponse } from "@/lib/schema/api";
@@ -54,9 +52,6 @@ export async function completeTutorial(params: {
         hasCompletedTutorial: true,
       },
     });
-
-    // Revalidate paths so UI updates immediately
-    revalidatePath("/tutorial");
 
     return {
       success: true,

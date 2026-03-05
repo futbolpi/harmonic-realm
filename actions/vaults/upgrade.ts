@@ -128,7 +128,8 @@ export async function upgradeVault(
       source: "VAULT_UPGRADE",
     });
 
-    revalidatePath(`/guilds/${guildId}`, "layout");
+    revalidatePath(`/guilds/${guildId}`);
+    revalidatePath(`/guilds/${guildId}/vault`);
     return { success: true, data: { id: guildId } };
   } catch (error) {
     console.error("Error upgrading guild vault:", error);

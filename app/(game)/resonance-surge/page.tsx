@@ -17,6 +17,8 @@ export const metadata = {
     "Explore today's Resonance Surge nodes spawned in high-activity zones.",
 };
 
+export const revalidate = 0;
+
 export default async function ResonanceSurgePage() {
   const { surges, spawnLog } = await getSurgeData();
 
@@ -130,7 +132,7 @@ export default async function ResonanceSurgePage() {
 function MapSkeleton() {
   return (
     <Card>
-      <CardContent className="h-[600px] flex items-center justify-center">
+      <CardContent className="h-150 flex items-center justify-center">
         <Skeleton className="w-full h-full" />
       </CardContent>
     </Card>

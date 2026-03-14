@@ -17,7 +17,7 @@ export default function ChamberLoading() {
         </div>
 
         {/* Map gradient background placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted/60" />
+        <div className="absolute inset-0 bg-linear-to-br from-muted via-muted/80 to-muted/60" />
 
         {/* Animated Chamber Markers */}
         <div className="absolute inset-0 pointer-events-none">
